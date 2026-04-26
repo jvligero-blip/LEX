@@ -234,6 +234,17 @@ body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text)
 .ch-pendente     { background:var(--orange-light); color:var(--orange); }
 .ch-vencido      { background:var(--red-light);    color:var(--red); }
 
+/* ── CHIPS — TIPO DE PRAZO ── */
+.pt-recurso        { background:#dde8ff; color:#2d5be3; }          /* azul */
+.pt-contestacao    { background:#e8f5e9; color:#1a7a4a; }          /* verde */
+.pt-manifestacao   { background:#ede8ff; color:#6b3be8; }          /* roxo */
+.pt-juntada        { background:#fff3e0; color:#b86e00; }          /* âmbar */
+.pt-pagamento      { background:#fce4ec; color:#c62828; }          /* rosa-vermelho */
+.pt-apelacao       { background:#fff9c4; color:#8a7000; }          /* amarelo */
+.pt-impugnacao     { background:#fdecd8; color:#d4671a; }          /* laranja */
+.pt-embargos       { background:#e0f4ff; color:#0277bd; }          /* azul-claro */
+.pt-outro          { background:#f0f0f0; color:#555; }             /* cinza */
+
 /* ── PILL ── */
 .pill {
   display:inline-flex; align-items:center; gap:.3rem;
@@ -616,12 +627,24 @@ textarea.finput { min-height:72px; resize:vertical; }
         <button class="btn btn-navy" onclick="openPrazModal()">+ Novo</button>
       </div>
       <div class="toolbar">
-        <input class="f-search" id="sPraz" type="text" placeholder="🔍 Buscar..." oninput="renderPrazs()">
+        <input class="f-search" id="sPraz" type="text" placeholder="🔍 Buscar processo ou descrição..." oninput="renderPrazs()">
+        <select class="f-select" id="fPrazTipo" onchange="renderPrazs()">
+          <option value="">Todos os tipos</option>
+          <option value="Recurso">⚡ Recurso</option>
+          <option value="Apelação">📄 Apelação</option>
+          <option value="Contestação">🛡️ Contestação</option>
+          <option value="Manifestação">📝 Manifestação</option>
+          <option value="Juntada">📎 Juntada</option>
+          <option value="Pagamento">💰 Pagamento</option>
+          <option value="Impugnação">⚠️ Impugnação</option>
+          <option value="Embargos">⚖️ Embargos</option>
+          <option value="Outro">🔹 Outro</option>
+        </select>
         <select class="f-select" id="fPrazUrg" onchange="renderPrazs()">
-          <option value="">Todos</option>
-          <option value="urgente">Urgente (≤3 dias)</option>
-          <option value="proximo">Próximo (≤7 dias)</option>
-          <option value="futuro">Futuro</option>
+          <option value="">Todos os prazos</option>
+          <option value="urgente">🔴 Urgente (≤3 dias)</option>
+          <option value="proximo">🟡 Próximo (≤7 dias)</option>
+          <option value="futuro">🟢 Futuro</option>
         </select>
       </div>
       <div class="table-wrap"><div class="table-scroll">
@@ -761,8 +784,9 @@ textarea.finput { min-height:72px; resize:vertical; }
         <div class="fg"><label class="flabel">Data de Vencimento *</label><input class="finput" type="date" id="z_data"></div>
         <div class="fg"><label class="flabel">Tipo</label>
           <select class="finput" id="z_tipo">
-            <option>Recurso</option><option>Contestação</option><option>Manifestação</option>
-            <option>Juntada</option><option>Pagamento</option><option>Outro</option>
+            <option>Recurso</option><option>Apelação</option><option>Contestação</option>
+            <option>Manifestação</option><option>Juntada</option><option>Pagamento</option>
+            <option>Impugnação</option><option>Embargos</option><option>Outro</option>
           </select>
         </div>
       </div>
@@ -781,7 +805,7 @@ textarea.finput { min-height:72px; resize:vertical; }
 // ──────────────────────────────────────────
 // DATA
 // ──────────────────────────────────────────
-const SK = { a:'lex4_aud', p:'lex4_proc', z:'lex4_praz' };
+const SK = { a:'lex5_aud', p:'lex5_proc', z:'lex5_praz' };
 let auds  = JSON.parse(localStorage.getItem(SK.a) || '[]');
 let procs = JSON.parse(localStorage.getItem(SK.p) || '[]');
 let prazs = JSON.parse(localStorage.getItem(SK.z) || '[]');
@@ -816,9 +840,13 @@ const persist = () => {
   ];
   prazs = [
     { id:uid(), proc:'0012345-12.2023.8.26.0100', desc:'Apresentar rol de testemunhas',        data:off(2),  tipo:'Manifestação', obs:'Máximo 5 testemunhas. Protocolar via PJe.' },
-    { id:uid(), proc:'0098765-55.2022.5.02.0001', desc:'Juntada de documentos',                data:off(5),  tipo:'Juntada',     obs:'Documentos já digitalizados.' },
-    { id:uid(), proc:'0011111-11.2024.8.26.0200', desc:'Recurso de Apelação',                  data:off(14), tipo:'Recurso',     obs:'Verificar cálculo de custas antes do protocolo.' },
-    { id:uid(), proc:'0022222-22.2021.4.03.6100', desc:'Pagamento de custas processuais',      data:off(1),  tipo:'Pagamento',   obs:'GRU gerada. Valor: R$ 847,50.' },
+    { id:uid(), proc:'0098765-55.2022.5.02.0001', desc:'Juntada de documentos trabalhistas',   data:off(5),  tipo:'Juntada',      obs:'Documentos já digitalizados.' },
+    { id:uid(), proc:'0011111-11.2024.8.26.0200', desc:'Recurso de Apelação cível',            data:off(14), tipo:'Apelação',     obs:'Verificar cálculo de custas antes do protocolo.' },
+    { id:uid(), proc:'0022222-22.2021.4.03.6100', desc:'Pagamento de custas processuais',      data:off(1),  tipo:'Pagamento',    obs:'GRU gerada. Valor: R$ 847,50.' },
+    { id:uid(), proc:'0012345-12.2023.8.26.0100', desc:'Contestação da reconvenção',           data:off(7),  tipo:'Contestação',  obs:'Contestar todos os pedidos reconvencionais.' },
+    { id:uid(), proc:'0098765-55.2022.5.02.0001', desc:'Recurso Ordinário Trabalhista',        data:off(10), tipo:'Recurso',      obs:'Prazo de 8 dias após publicação do acórdão.' },
+    { id:uid(), proc:'0011111-11.2024.8.26.0200', desc:'Impugnação ao valor da causa',         data:off(3),  tipo:'Impugnação',   obs:'Valor atribuído pela parte contrária está inflado.' },
+    { id:uid(), proc:'0022222-22.2021.4.03.6100', desc:'Embargos de Declaração',               data:off(20), tipo:'Embargos',     obs:'Pontos omissos na sentença de 1ª instância.' },
   ];
   persist();
 })();
@@ -1077,18 +1105,40 @@ function renderProcs() {
 }
 
 // ──────────────────────────────────────────
+// PRAZO TIPO — color map
+// ──────────────────────────────────────────
+const prazoTipoMap = {
+  'Recurso':      { cls:'pt-recurso',      icon:'⚡' },
+  'Apelação':     { cls:'pt-apelacao',     icon:'📄' },
+  'Contestação':  { cls:'pt-contestacao',  icon:'🛡️' },
+  'Manifestação': { cls:'pt-manifestacao', icon:'📝' },
+  'Juntada':      { cls:'pt-juntada',      icon:'📎' },
+  'Pagamento':    { cls:'pt-pagamento',    icon:'💰' },
+  'Impugnação':   { cls:'pt-impugnacao',   icon:'⚠️' },
+  'Embargos':     { cls:'pt-embargos',     icon:'⚖️' },
+  'Outro':        { cls:'pt-outro',        icon:'🔹' },
+};
+
+function chipTipo(tipo) {
+  const t = prazoTipoMap[tipo] || { cls:'pt-outro', icon:'🔹' };
+  return '<span class="chip ' + t.cls + '">' + t.icon + ' ' + tipo + '</span>';
+}
+
+// ──────────────────────────────────────────
 // PRAZOS TABLE
 // ──────────────────────────────────────────
 function renderPrazs() {
-  const q   = (document.getElementById('sPraz')?.value || '').toLowerCase();
-  const urg = document.getElementById('fPrazUrg')?.value || '';
+  const q    = (document.getElementById('sPraz')?.value || '').toLowerCase();
+  const tipo = document.getElementById('fPrazTipo')?.value || '';
+  const urg  = document.getElementById('fPrazUrg')?.value || '';
   let list = [...prazs].sort((a,b) => a.data.localeCompare(b.data));
-  if (q) list = list.filter(p => p.proc.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+  if (q)    list = list.filter(p => p.proc.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+  if (tipo) list = list.filter(p => p.tipo === tipo);
   if (urg === 'urgente') list = list.filter(p => { const d=daysLeft(p.data); return d!==null&&d>=0&&d<=3; });
   else if (urg === 'proximo') list = list.filter(p => { const d=daysLeft(p.data); return d!==null&&d>=0&&d<=7; });
   else if (urg === 'futuro')  list = list.filter(p => { const d=daysLeft(p.data); return d!==null&&d>7; });
   const tb = document.getElementById('tbPraz');
-  if (!list.length) { tb.innerHTML = '<tr><td colspan="7">' + emptyEl('⏰','Nenhum prazo') + '</td></tr>'; return; }
+  if (!list.length) { tb.innerHTML = '<tr><td colspan="7">' + emptyEl('⏰','Nenhum prazo encontrado') + '</td></tr>'; return; }
   tb.innerHTML = list.map(p => {
     const d = daysLeft(p.data); const venc = d !== null && d < 0;
     return '<tr onclick="openDetPraz(\'' + p.id + '\')" style="' + (venc?'opacity:.55':'') + '">' +
@@ -1096,7 +1146,7 @@ function renderPrazs() {
       '<td>' + pill(d) + '</td>' +
       '<td><span class="mono">' + p.proc + '</span></td>' +
       '<td class="td-name">' + p.desc + '</td>' +
-      '<td><span class="chip ch-aguardando">' + p.tipo + '</span></td>' +
+      '<td>' + chipTipo(p.tipo) + '</td>' +
       '<td><span class="chip ' + (venc?'ch-vencido':'ch-pendente') + '">' + (venc?'Vencido':'Pendente') + '</span></td>' +
       '<td onclick="event.stopPropagation()"><div class="act-cell">' +
         '<button class="btn-ico" onclick="delPraz(\'' + p.id + '\')" title="Excluir">🗑️</button>' +
@@ -1138,7 +1188,7 @@ function openDetProc(id) {
         d<=2 ? 'tb-urgent' : '',
         d===0 ? 'HOJE' : d+'d', fmt(z.data),
         z.desc, z.tipo,
-        pill(d),
+        pill(d) + ' ' + chipTipo(z.tipo),
         'openDetPraz(\'' + z.id + '\')'
       );
     }).join('');
@@ -1194,7 +1244,7 @@ function openDetPraz(id) {
   document.getElementById('dPrazHero').innerHTML =
     '<div class="dh-num">' + z.proc + '</div>' +
     '<div class="dh-name">' + z.desc + '</div>' +
-    '<div class="dh-chips"><span class="chip ch-aguardando">' + z.tipo + '</span> ' + pill(d) +
+    '<div class="dh-chips">' + chipTipo(z.tipo) + ' ' + pill(d) +
     ' <span class="chip ' + (venc?'ch-vencido':'ch-pendente') + '">' + (venc?'Vencido':'Pendente') + '</span></div>';
 
   const restLabel = d===null ? '—' : d<0 ? Math.abs(d)+' dias atrás' : d===0 ? 'Hoje' : d===1 ? 'Amanhã' : d+' dias';
