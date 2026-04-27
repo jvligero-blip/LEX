@@ -6,697 +6,612 @@
 <title>Lex · Gestão Jurídica</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#f4f2ee; --white:#fff; --navy:#1a2340; --navy2:#253060;
-  --gold:#c08b30; --gold-light:#f5e6c8;
-  --blue:#2d5be3; --blue-light:#dde8ff;
-  --green:#1a9c6e; --green-light:#d4f4e8;
-  --red:#d63b3b; --red-light:#fde8e8;
-  --orange:#d4671a; --orange-light:#fdecd8;
-  --purple:#6b3be8; --purple-light:#ede8ff;
-  --text:#1a2340; --text2:#4a5568; --muted:#8a94a8; --border:#e0dcd4;
+:root{
+  --bg:#f4f2ee;--white:#fff;--navy:#1a2340;--navy2:#253060;
+  --gold:#c08b30;--gold-light:#f5e6c8;
+  --blue:#2d5be3;--blue-light:#dde8ff;
+  --green:#1a9c6e;--green-light:#d4f4e8;
+  --red:#d63b3b;--red-light:#fde8e8;
+  --orange:#d4671a;--orange-light:#fdecd8;
+  --purple:#6b3be8;--purple-light:#ede8ff;
+  --text:#1a2340;--text2:#4a5568;--muted:#8a94a8;--border:#e0dcd4;
   --shadow:0 2px 12px rgba(26,35,64,.08);
   --shadow-lg:0 8px 32px rgba(26,35,64,.14);
   --radius:14px;
 }
-* { box-sizing:border-box; margin:0; padding:0; }
-body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-/* ── LAYOUT ── */
-.layout { display:flex; min-height:100vh; }
-
-/* ── SIDEBAR OVERLAY (mobile backdrop) ── */
-#sidebarOverlay {
-  display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,.5); z-index:99;
+/* ════ LOGIN ════ */
+#loginScreen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;background:var(--navy);
+  animation:fadeUp .4s ease;
 }
-#sidebarOverlay.visible { display:block; }
-
-/* ── SIDEBAR ── */
-.sidebar {
-  width:230px; flex-shrink:0;
-  background:var(--navy);
-  display:flex; flex-direction:column;
-  min-height:100vh;
-  position:relative; z-index:100;
-  transition:transform .28s ease;
+.login-box{
+  background:var(--white);border-radius:20px;
+  padding:2.5rem 2rem;width:100%;max-width:400px;
+  box-shadow:0 24px 60px rgba(0,0,0,.3);
+  margin:1rem;
 }
+.login-logo{
+  text-align:center;margin-bottom:2rem;
+}
+.login-logo-mark{
+  font-family:'Fraunces',serif;font-size:3rem;font-weight:900;
+  color:var(--navy);letter-spacing:.04em;line-height:1;
+}
+.login-logo-mark span{color:#c9a84c;}
+.login-logo p{color:var(--muted);font-size:.82rem;margin-top:.3rem;letter-spacing:.1em;text-transform:uppercase;}
+.login-box h2{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--navy);margin-bottom:1.25rem;}
+.login-err{
+  background:var(--red-light);border:1px solid var(--red);
+  color:var(--red);border-radius:8px;padding:.65rem 1rem;
+  font-size:.84rem;margin-bottom:1rem;display:none;
+}
+.login-err.on{display:block;}
 
-/* ── SIDEBAR LOGO ── */
-.sidebar-logo {
-  padding:1.5rem 1.5rem 1.25rem;
+/* ════ LAYOUT ════ */
+#appScreen{ display:none; }
+#appScreen.on{ display:flex; min-height:100vh; }
+#loginScreen.hidden{ display:none !important; }
+#sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99;}
+#sidebarOverlay.visible{display:block;}
+
+/* ════ SIDEBAR ════ */
+.sidebar{
+  width:230px;flex-shrink:0;background:var(--navy);
+  display:flex;flex-direction:column;min-height:100vh;
+  position:relative;z-index:100;transition:transform .28s ease;
+}
+.sidebar-logo{
+  padding:1.4rem 1.5rem 1.2rem;
   border-bottom:1px solid rgba(255,255,255,.08);
   margin-bottom:.5rem;
-  display:flex; align-items:center; justify-content:space-between;
+  display:flex;align-items:center;justify-content:space-between;
 }
-.logo-text {}
-.logo-mark {
-  font-family:'Fraunces',serif; font-size:1.8rem; font-weight:900;
-  color:#fff; letter-spacing:.04em; line-height:1;
-}
-.logo-mark span { color:#c9a84c; }
-.logo-tag {
-  font-size:.6rem; color:rgba(255,255,255,.35);
-  letter-spacing:.16em; text-transform:uppercase;
-  margin-top:3px; font-family:'DM Mono',monospace;
-}
-.sidebar-close-btn {
-  display:none; background:none; border:none;
-  color:rgba(255,255,255,.5); font-size:1.5rem;
-  cursor:pointer; line-height:1; padding:4px;
-}
+.logo-mark{font-family:'Fraunces',serif;font-size:1.75rem;font-weight:900;color:#fff;letter-spacing:.04em;}
+.logo-mark span{color:#c9a84c;}
+.logo-tag{font-size:.6rem;color:rgba(255,255,255,.35);letter-spacing:.15em;text-transform:uppercase;margin-top:3px;font-family:'DM Mono',monospace;}
+.sidebar-close-btn{display:none;background:none;border:none;color:rgba(255,255,255,.5);font-size:1.5rem;cursor:pointer;padding:4px;}
 
-.nav-label {
-  font-size:.58rem; letter-spacing:.18em; text-transform:uppercase;
-  color:rgba(255,255,255,.28); padding:.9rem 1.5rem .35rem;
-  font-family:'DM Mono',monospace;
+/* USER PILL */
+.sidebar-user{
+  margin:0 1rem .5rem;background:rgba(255,255,255,.07);
+  border-radius:10px;padding:.65rem .9rem;
+  display:flex;align-items:center;gap:.6rem;
 }
-.nav-item {
-  display:flex; align-items:center; gap:.75rem;
-  padding:.72rem 1.5rem; cursor:pointer;
-  color:rgba(255,255,255,.58); font-size:.9rem; font-weight:500;
-  transition:all .18s; border-left:3px solid transparent; margin:1px 0;
+.user-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--gold);display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:.85rem;color:var(--navy);flex-shrink:0;
 }
-.nav-item:hover { color:#fff; background:rgba(255,255,255,.06); }
-.nav-item.active { color:#fff; background:rgba(201,168,76,.14); border-left-color:#c9a84c; }
-.nav-icon { width:20px; text-align:center; font-size:1rem; flex-shrink:0; }
-.nav-badge {
-  margin-left:auto; background:var(--red); color:#fff;
-  font-size:.62rem; font-weight:700; padding:1px 6px;
-  border-radius:10px; min-width:18px; text-align:center;
-}
-.sidebar-foot {
-  margin-top:auto; padding:1rem 1.5rem 0;
-  border-top:1px solid rgba(255,255,255,.08);
-}
-.sidebar-date {
-  font-family:'DM Mono',monospace; font-size:.7rem;
-  color:rgba(255,255,255,.35); line-height:1.9;
-}
+.user-name{font-size:.8rem;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-role{font-size:.65rem;color:rgba(255,255,255,.4);margin-top:1px;}
 
-/* ── MAIN ── */
-.main { flex:1; display:flex; flex-direction:column; min-width:0; }
+.nav-label{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.28);padding:.85rem 1.5rem .35rem;font-family:'DM Mono',monospace;}
+.nav-item{display:flex;align-items:center;gap:.75rem;padding:.7rem 1.5rem;cursor:pointer;color:rgba(255,255,255,.58);font-size:.9rem;font-weight:500;transition:all .18s;border-left:3px solid transparent;margin:1px 0;}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.06);}
+.nav-item.active{color:#fff;background:rgba(201,168,76,.14);border-left-color:#c9a84c;}
+.nav-icon{width:20px;text-align:center;font-size:1rem;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:10px;min-width:18px;text-align:center;}
+.nav-item.admin-only{display:none;}
+.nav-item.admin-only.show{display:flex;}
 
-/* ── TOPBAR ── */
-.topbar {
-  background:var(--white); border-bottom:1px solid var(--border);
-  padding:0 1.5rem; height:56px;
-  display:flex; align-items:center; gap:.75rem;
-  position:sticky; top:0; z-index:40;
-}
-.hamburger {
-  display:none; background:none; border:none;
-  font-size:1.35rem; color:var(--navy); cursor:pointer; padding:4px;
-}
-.topbar-title {
-  font-family:'Fraunces',serif; font-size:1.1rem;
-  font-weight:700; color:var(--navy);
-}
-.topbar-spacer { flex:1; }
-.topbar-search {
-  background:var(--bg); border:1.5px solid var(--border);
-  border-radius:8px; padding:.42rem .9rem;
-  font-family:'DM Sans',sans-serif; font-size:.85rem; color:var(--text);
-  width:200px; transition:border-color .2s, width .3s;
-}
-.topbar-search:focus { outline:none; border-color:var(--blue); width:240px; }
-.topbar-search::placeholder { color:var(--muted); }
+.sidebar-foot{margin-top:auto;padding:.75rem 1rem;border-top:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:.5rem;}
+.sidebar-date{font-family:'DM Mono',monospace;font-size:.68rem;color:rgba(255,255,255,.3);line-height:1.9;}
+.btn-logout{background:rgba(255,255,255,.08);border:none;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:.45rem .9rem;border-radius:7px;cursor:pointer;transition:all .18s;text-align:left;}
+.btn-logout:hover{background:rgba(224,85,85,.2);color:var(--red);}
 
-/* ── VIEWS (pages + detail pages) ── */
-.view { display:none; padding:1.5rem; animation:fadeUp .28s ease; }
-.view.active { display:block; }
-@keyframes fadeUp {
-  from { opacity:0; transform:translateY(8px); }
-  to   { opacity:1; transform:translateY(0); }
-}
+/* ════ MAIN ════ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 1.5rem;height:56px;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:40;}
+.hamburger{display:none;background:none;border:none;font-size:1.35rem;color:var(--navy);cursor:pointer;padding:4px;}
+.topbar-title{font-family:'Fraunces',serif;font-size:1.1rem;font-weight:700;color:var(--navy);}
+.topbar-spacer{flex:1;}
+.topbar-search{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:.42rem .9rem;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--text);width:200px;transition:border-color .2s,width .3s;}
+.topbar-search:focus{outline:none;border-color:var(--blue);width:240px;}
+.topbar-search::placeholder{color:var(--muted);}
 
-/* ── PAGE HEADER ── */
-.page-header {
-  display:flex; align-items:flex-start; justify-content:space-between;
-  margin-bottom:1.5rem; flex-wrap:wrap; gap:.75rem;
-}
-.page-header h1 {
-  font-family:'Fraunces',serif; font-size:1.6rem;
-  font-weight:700; color:var(--navy);
-}
-.page-header p { color:var(--muted); font-size:.84rem; margin-top:.25rem; }
+/* ════ VIEWS ════ */
+.view{display:none;padding:1.5rem;animation:fadeUp .28s ease;}
+.view.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
 
-/* ── STATS ── */
-.stats-row {
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:.85rem; margin-bottom:1.5rem;
-}
-.stat-card {
-  background:var(--white); border-radius:var(--radius);
-  padding:1.2rem 1.3rem; box-shadow:var(--shadow);
-  display:flex; align-items:flex-start; gap:.9rem;
-  cursor:pointer; transition:transform .2s, box-shadow .2s;
-}
-.stat-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
-.stat-ico {
-  width:44px; height:44px; border-radius:11px;
-  display:flex; align-items:center; justify-content:center;
-  font-size:1.2rem; flex-shrink:0;
-}
-.ic-gold { background:var(--gold-light); }
-.ic-blue { background:var(--blue-light); }
-.ic-red  { background:var(--red-light); }
-.ic-green{ background:var(--green-light); }
-.stat-num {
-  font-family:'Fraunces',serif; font-size:2rem;
-  font-weight:900; color:var(--navy); line-height:1;
-}
-.stat-lbl { font-size:.76rem; color:var(--muted); margin-top:.2rem; font-weight:500; }
-.stat-sub { font-size:.7rem; color:var(--muted); margin-top:.35rem; }
+/* ════ PAGE HEADER ════ */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem;}
+.page-header h1{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--navy);}
+.page-header p{color:var(--muted);font-size:.84rem;margin-top:.25rem;}
 
-/* ── TWO COL ── */
-.two-col { display:grid; grid-template-columns:1fr 1fr; gap:1.1rem; }
+/* ════ STATS ════ */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1.5rem;}
+.stat-card{background:var(--white);border-radius:var(--radius);padding:1.2rem 1.3rem;box-shadow:var(--shadow);display:flex;align-items:flex-start;gap:.9rem;cursor:pointer;transition:transform .2s,box-shadow .2s;}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+.stat-ico{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.ic-gold{background:var(--gold-light);}.ic-blue{background:var(--blue-light);}.ic-red{background:var(--red-light);}.ic-green{background:var(--green-light);}
+.stat-num{font-family:'Fraunces',serif;font-size:2rem;font-weight:900;color:var(--navy);line-height:1;}
+.stat-lbl{font-size:.76rem;color:var(--muted);margin-top:.2rem;font-weight:500;}
+.stat-sub{font-size:.7rem;color:var(--muted);margin-top:.35rem;}
 
-/* ── CARD ── */
-.card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
-.card-head {
-  padding:1rem 1.3rem; display:flex; align-items:center;
-  gap:.7rem; border-bottom:1px solid var(--border);
-}
-.card-head-ico {
-  width:28px; height:28px; border-radius:7px;
-  display:flex; align-items:center; justify-content:center; font-size:.85rem;
-}
-.card-head h3 {
-  font-family:'Fraunces',serif; font-size:.95rem;
-  font-weight:700; color:var(--navy); flex:1;
-}
+/* ════ TWO COL ════ */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;}
 
-/* ── AGENDA ROW ── */
-.agenda-row {
-  display:flex; align-items:center; gap:.85rem;
-  padding:.85rem 1.3rem; border-bottom:1px solid var(--border);
-  cursor:pointer; transition:background .15s;
-}
-.agenda-row:last-child { border-bottom:none; }
-.agenda-row:hover { background:var(--bg); }
-.time-box {
-  background:var(--navy); color:#fff; border-radius:7px;
-  padding:.3rem .55rem; text-align:center; min-width:52px; flex-shrink:0;
-}
-.time-box.tb-today  { background:var(--blue); }
-.time-box.tb-urgent { background:var(--red); }
-.time-box .tb-h {
-  font-family:'DM Mono',monospace; font-size:.82rem;
-  font-weight:500; display:block; line-height:1.2;
-}
-.time-box .tb-d { font-size:.58rem; opacity:.6; display:block; }
-.ag-body { flex:1; min-width:0; }
-.ag-name {
-  font-weight:600; font-size:.86rem; color:var(--navy);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.ag-sub {
-  font-size:.73rem; color:var(--muted); margin-top:2px;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
+/* ════ CARD ════ */
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.card-head{padding:1rem 1.3rem;display:flex;align-items:center;gap:.7rem;border-bottom:1px solid var(--border);}
+.card-head-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;}
+.card-head h3{font-family:'Fraunces',serif;font-size:.95rem;font-weight:700;color:var(--navy);flex:1;}
 
-/* ── CHIPS ── */
-.chip {
-  display:inline-flex; align-items:center;
-  font-size:.67rem; font-weight:700; padding:.2rem .5rem;
-  border-radius:6px; text-transform:uppercase; letter-spacing:.05em; white-space:nowrap;
-}
-.ch-civel        { background:var(--blue-light);   color:var(--blue); }
-.ch-criminal     { background:var(--red-light);    color:var(--red); }
-.ch-trabalhista  { background:var(--gold-light);   color:var(--gold); }
-.ch-familia      { background:var(--green-light);  color:var(--green); }
-.ch-administrativo { background:var(--purple-light); color:var(--purple); }
-.ch-ativo        { background:var(--green-light);  color:var(--green); }
-.ch-encerrado    { background:#eee;                color:var(--muted); }
-.ch-suspenso     { background:var(--orange-light); color:var(--orange); }
-.ch-aguardando   { background:var(--blue-light);   color:var(--blue); }
-.ch-pendente     { background:var(--orange-light); color:var(--orange); }
-.ch-vencido      { background:var(--red-light);    color:var(--red); }
+/* ════ AGENDA ROW ════ */
+.agenda-row{display:flex;align-items:center;gap:.85rem;padding:.85rem 1.3rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.agenda-row:last-child{border-bottom:none;}
+.agenda-row:hover{background:var(--bg);}
+.time-box{background:var(--navy);color:#fff;border-radius:7px;padding:.3rem .55rem;text-align:center;min-width:52px;flex-shrink:0;}
+.time-box.tb-today{background:var(--blue);}
+.time-box.tb-urgent{background:var(--red);}
+.time-box .tb-h{font-family:'DM Mono',monospace;font-size:.82rem;font-weight:500;display:block;line-height:1.2;}
+.time-box .tb-d{font-size:.58rem;opacity:.6;display:block;}
+.ag-body{flex:1;min-width:0;}
+.ag-name{font-weight:600;font-size:.86rem;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ag-sub{font-size:.73rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-/* ── CHIPS — TIPO DE PRAZO ── */
-.pt-recurso        { background:#dde8ff; color:#2d5be3; }          /* azul */
-.pt-contestacao    { background:#e8f5e9; color:#1a7a4a; }          /* verde */
-.pt-manifestacao   { background:#ede8ff; color:#6b3be8; }          /* roxo */
-.pt-juntada        { background:#fff3e0; color:#b86e00; }          /* âmbar */
-.pt-pagamento      { background:#fce4ec; color:#c62828; }          /* rosa-vermelho */
-.pt-apelacao       { background:#fff9c4; color:#8a7000; }          /* amarelo */
-.pt-impugnacao     { background:#fdecd8; color:#d4671a; }          /* laranja */
-.pt-embargos       { background:#e0f4ff; color:#0277bd; }          /* azul-claro */
-.pt-outro          { background:#f0f0f0; color:#555; }             /* cinza */
+/* ════ CHIPS ════ */
+.chip{display:inline-flex;align-items:center;font-size:.67rem;font-weight:700;padding:.2rem .5rem;border-radius:6px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
+.ch-civel{background:var(--blue-light);color:var(--blue);}
+.ch-criminal{background:var(--red-light);color:var(--red);}
+.ch-trabalhista{background:var(--gold-light);color:var(--gold);}
+.ch-familia{background:var(--green-light);color:var(--green);}
+.ch-administrativo{background:var(--purple-light);color:var(--purple);}
+.ch-ativo{background:var(--green-light);color:var(--green);}
+.ch-encerrado{background:#eee;color:var(--muted);}
+.ch-suspenso{background:var(--orange-light);color:var(--orange);}
+.ch-aguardando{background:var(--blue-light);color:var(--blue);}
+.ch-pendente{background:var(--orange-light);color:var(--orange);}
+.ch-vencido{background:var(--red-light);color:var(--red);}
+.ch-concluido{background:var(--green-light);color:var(--green);}
+.ch-atrasado{background:var(--red-light);color:var(--red);}
+/* prazo tipo */
+.pt-recurso{background:#dde8ff;color:#2d5be3;}
+.pt-apelacao{background:#fff9c4;color:#8a7000;}
+.pt-contestacao{background:#e8f5e9;color:#1a7a4a;}
+.pt-manifestacao{background:#ede8ff;color:#6b3be8;}
+.pt-juntada{background:#fff3e0;color:#b86e00;}
+.pt-pagamento{background:#fce4ec;color:#c62828;}
+.pt-impugnacao{background:#fdecd8;color:#d4671a;}
+.pt-embargos{background:#e0f4ff;color:#0277bd;}
+.pt-outro{background:#f0f0f0;color:#555;}
 
-/* ── PILL ── */
-.pill {
-  display:inline-flex; align-items:center; gap:.3rem;
-  font-weight:700; font-size:.78rem; padding:.22rem .6rem; border-radius:20px;
-}
-.pill-urg { background:var(--red-light);    color:var(--red); }
-.pill-prox{ background:var(--orange-light); color:var(--orange); }
-.pill-ok  { background:var(--green-light);  color:var(--green); }
-.pill-venc{ background:#eee;                color:var(--muted); }
+/* ════ PILL ════ */
+.pill{display:inline-flex;align-items:center;gap:.3rem;font-weight:700;font-size:.78rem;padding:.22rem .6rem;border-radius:20px;}
+.pill-urg{background:var(--red-light);color:var(--red);}
+.pill-prox{background:var(--orange-light);color:var(--orange);}
+.pill-ok{background:var(--green-light);color:var(--green);}
+.pill-venc{background:#eee;color:var(--muted);}
 
-/* ── TOOLBAR ── */
-.toolbar { display:flex; align-items:center; gap:.65rem; margin-bottom:1.1rem; flex-wrap:wrap; }
-.f-search {
-  background:var(--white); border:1.5px solid var(--border);
-  border-radius:8px; padding:.48rem .9rem;
-  font-family:'DM Sans',sans-serif; font-size:.86rem; color:var(--text);
-  flex:1; min-width:140px; transition:border-color .2s;
-}
-.f-search:focus { outline:none; border-color:var(--blue); }
-.f-search::placeholder { color:var(--muted); }
-.f-select {
-  background:var(--white); border:1.5px solid var(--border);
-  border-radius:8px; padding:.48rem .8rem;
-  font-family:'DM Sans',sans-serif; font-size:.86rem; color:var(--text); cursor:pointer;
-}
-.f-select:focus { outline:none; border-color:var(--blue); }
+/* ════ TOOLBAR ════ */
+.toolbar{display:flex;align-items:center;gap:.65rem;margin-bottom:1.1rem;flex-wrap:wrap;}
+.f-search{background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:.48rem .9rem;font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--text);flex:1;min-width:140px;transition:border-color .2s;}
+.f-search:focus{outline:none;border-color:var(--blue);}
+.f-search::placeholder{color:var(--muted);}
+.f-select{background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:.48rem .8rem;font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--text);cursor:pointer;}
+.f-select:focus{outline:none;border-color:var(--blue);}
 
-/* ── BUTTONS ── */
-.btn {
-  display:inline-flex; align-items:center; gap:.4rem;
-  padding:.5rem 1.1rem; border-radius:8px;
-  font-family:'DM Sans',sans-serif; font-size:.86rem; font-weight:600;
-  cursor:pointer; border:none; transition:all .18s;
-}
-.btn-navy { background:var(--navy); color:#fff; }
-.btn-navy:hover { background:var(--navy2); transform:translateY(-1px); box-shadow:0 4px 14px rgba(26,35,64,.25); }
-.btn-ghost { background:none; border:1.5px solid var(--border); color:var(--text2); }
-.btn-ghost:hover { border-color:var(--navy); color:var(--navy); }
-.btn-sm { padding:.28rem .7rem; font-size:.76rem; }
-.btn-ico {
-  width:30px; height:30px; padding:0; justify-content:center;
-  border-radius:7px; background:none; border:1.5px solid var(--border);
-  color:var(--muted); cursor:pointer; font-size:.85rem;
-  transition:all .15s; display:inline-flex; align-items:center;
-}
-.btn-ico:hover         { border-color:var(--red);  color:var(--red);  background:var(--red-light); }
-.btn-ico.edit:hover    { border-color:var(--blue); color:var(--blue); background:var(--blue-light); }
+/* ════ BUTTONS ════ */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1.1rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;border:none;transition:all .18s;}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-navy:hover{background:var(--navy2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(26,35,64,.25);}
+.btn-ghost{background:none;border:1.5px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--navy);color:var(--navy);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{background:#157a57;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-red:hover{background:#b52e2e;}
+.btn-sm{padding:.28rem .7rem;font-size:.76rem;}
+.btn-ico{width:30px;height:30px;padding:0;justify-content:center;border-radius:7px;background:none;border:1.5px solid var(--border);color:var(--muted);cursor:pointer;font-size:.85rem;transition:all .15s;display:inline-flex;align-items:center;}
+.btn-ico:hover{border-color:var(--red);color:var(--red);background:var(--red-light);}
+.btn-ico.edit:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light);}
+.btn-ico.ok:hover{border-color:var(--green);color:var(--green);background:var(--green-light);}
 
-/* ── TABLE ── */
-.table-wrap { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
-.table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-table { width:100%; border-collapse:collapse; min-width:580px; }
-thead th {
-  background:var(--bg); text-align:left;
-  font-size:.68rem; font-weight:700; color:var(--muted);
-  text-transform:uppercase; letter-spacing:.1em;
-  padding:.75rem 1.1rem; border-bottom:1px solid var(--border);
-  font-family:'DM Mono',monospace; white-space:nowrap;
-}
-tbody td {
-  padding:.8rem 1.1rem; border-bottom:1px solid var(--border);
-  font-size:.86rem; vertical-align:middle; color:var(--text2);
-}
-tbody tr:last-child td { border-bottom:none; }
-tbody tr { cursor:pointer; transition:background .12s; }
-tbody tr:hover td { background:#fafaf8; }
-.mono { font-family:'DM Mono',monospace; font-size:.76rem; color:var(--muted); }
-.td-name { font-weight:600; color:var(--navy); }
-.act-cell { display:flex; gap:.35rem; }
+/* ════ TABLE ════ */
+.table-wrap{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:580px;}
+thead th{background:var(--bg);text-align:left;font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding:.75rem 1.1rem;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;white-space:nowrap;}
+tbody td{padding:.8rem 1.1rem;border-bottom:1px solid var(--border);font-size:.86rem;vertical-align:middle;color:var(--text2);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr{cursor:pointer;transition:background .12s;}
+tbody tr:hover td{background:#fafaf8;}
+.mono{font-family:'DM Mono',monospace;font-size:.76rem;color:var(--muted);}
+.td-name{font-weight:600;color:var(--navy);}
+.act-cell{display:flex;gap:.35rem;}
 
-/* ── ALERT BAR ── */
-.alert-bar {
-  background:linear-gradient(90deg,#fff5e0,#fff9ec);
-  border:1.5px solid #f0c96a; border-radius:10px;
-  padding:.75rem 1.1rem; display:none; align-items:center;
-  gap:.7rem; margin-bottom:1.4rem; font-size:.84rem; color:#8a6200; font-weight:500;
-}
-.alert-bar.on { display:flex; }
+/* ════ ALERT BAR ════ */
+.alert-bar{background:linear-gradient(90deg,#fff5e0,#fff9ec);border:1.5px solid #f0c96a;border-radius:10px;padding:.75rem 1.1rem;display:none;align-items:center;gap:.7rem;margin-bottom:1.4rem;font-size:.84rem;color:#8a6200;font-weight:500;}
+.alert-bar.on{display:flex;}
 
-/* ── EMPTY ── */
-.empty { text-align:center; padding:2.5rem 1rem; color:var(--muted); }
-.empty-emo { font-size:2.2rem; margin-bottom:.6rem; opacity:.45; }
-.empty-txt { font-size:.88rem; }
+/* ════ EMPTY ════ */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);}
+.empty-emo{font-size:2.2rem;margin-bottom:.6rem;opacity:.45;}
+.empty-txt{font-size:.88rem;}
 
-/* ── MODAL ── */
-.overlay {
-  display:none; position:fixed; inset:0;
-  background:rgba(26,35,64,.45); backdrop-filter:blur(3px);
-  z-index:200; align-items:center; justify-content:center; padding:1rem;
-}
-.overlay.open { display:flex; }
-.modal {
-  background:var(--white); border-radius:18px;
-  width:100%; max-width:550px; max-height:92vh; overflow-y:auto;
-  box-shadow:0 24px 60px rgba(26,35,64,.22);
-  animation:mUp .24s ease;
-}
-@keyframes mUp { from { transform:translateY(18px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-.modal-hd {
-  padding:1.3rem 1.5rem 1.1rem; display:flex; align-items:center;
-  gap:.9rem; border-bottom:1px solid var(--border);
-}
-.modal-hd-ico {
-  width:38px; height:38px; border-radius:10px;
-  display:flex; align-items:center; justify-content:center; font-size:1rem;
-}
-.modal-hd h2 { font-family:'Fraunces',serif; font-size:1.1rem; color:var(--navy); flex:1; }
-.modal-x {
-  background:none; border:none; font-size:1.4rem; color:var(--muted);
-  cursor:pointer; width:30px; height:30px; border-radius:7px;
-  display:flex; align-items:center; justify-content:center; transition:background .15s;
-}
-.modal-x:hover { background:var(--bg); color:var(--text); }
-.modal-body { padding:1.3rem 1.5rem; }
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
-.fg { margin-bottom:1rem; }
-.flabel {
-  display:block; font-size:.7rem; font-weight:700; color:var(--muted);
-  text-transform:uppercase; letter-spacing:.09em; margin-bottom:.35rem;
-}
-.finput {
-  width:100%; background:var(--bg); border:1.5px solid var(--border);
-  border-radius:8px; padding:.58rem .85rem;
-  font-family:'DM Sans',sans-serif; font-size:.875rem; color:var(--text);
-  transition:border-color .2s, background .2s;
-}
-.finput:focus { outline:none; border-color:var(--blue); background:#fff; }
-textarea.finput { min-height:72px; resize:vertical; }
-.modal-ft {
-  padding:1rem 1.5rem; border-top:1px solid var(--border);
-  display:flex; gap:.65rem; justify-content:flex-end;
-}
+/* ════ MODAL ════ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(26,35,64,.45);backdrop-filter:blur(3px);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:18px;width:100%;max-width:550px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(26,35,64,.22);animation:mUp .24s ease;}
+.modal-lg{max-width:720px;}
+@keyframes mUp{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-hd{padding:1.3rem 1.5rem 1.1rem;display:flex;align-items:center;gap:.9rem;border-bottom:1px solid var(--border);}
+.modal-hd-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.modal-hd h2{font-family:'Fraunces',serif;font-size:1.1rem;color:var(--navy);flex:1;}
+.modal-x{background:none;border:none;font-size:1.4rem;color:var(--muted);cursor:pointer;width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.modal-x:hover{background:var(--bg);color:var(--text);}
+.modal-body{padding:1.3rem 1.5rem;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
+.fg{margin-bottom:1rem;}
+.flabel{display:block;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.35rem;}
+.finput{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:.58rem .85rem;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--text);transition:border-color .2s,background .2s;}
+.finput:focus{outline:none;border-color:var(--blue);background:#fff;}
+textarea.finput{min-height:80px;resize:vertical;}
+.modal-ft{padding:1rem 1.5rem;border-top:1px solid var(--border);display:flex;gap:.65rem;justify-content:flex-end;}
 
-/* ── DETAIL PAGE ── */
-.detail-back {
-  display:inline-flex; align-items:center; gap:.45rem;
-  background:none; border:none; color:var(--muted);
-  font-family:'DM Sans',sans-serif; font-size:.86rem;
-  cursor:pointer; margin-bottom:1.2rem; padding:.3rem 0; transition:color .15s;
-}
-.detail-back:hover { color:var(--navy); }
-.detail-hero {
-  background:var(--navy); border-radius:var(--radius);
-  padding:1.6rem; color:#fff; margin-bottom:1.25rem;
-  position:relative; overflow:hidden;
-}
-.detail-hero::after {
-  content:'⚖'; position:absolute; right:1.2rem; top:50%;
-  transform:translateY(-50%); font-size:5rem; opacity:.06;
-}
-.dh-num {
-  font-family:'DM Mono',monospace; font-size:.75rem;
-  color:rgba(255,255,255,.5); margin-bottom:.4rem; letter-spacing:.08em;
-}
-.dh-name {
-  font-family:'Fraunces',serif; font-size:1.4rem;
-  font-weight:700; margin-bottom:.7rem; line-height:1.2;
-}
-.dh-chips { display:flex; gap:.5rem; flex-wrap:wrap; }
-.detail-grid {
-  display:grid; grid-template-columns:repeat(3,1fr);
-  gap:.85rem; margin-bottom:1.25rem;
-}
-.detail-field {
-  background:var(--white); border-radius:10px;
-  padding:1rem 1.1rem; box-shadow:var(--shadow);
-}
-.detail-field label {
-  font-size:.68rem; font-weight:700; color:var(--muted);
-  text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:.3rem;
-}
-.detail-field p { font-size:.9rem; color:var(--navy); font-weight:500; }
-.detail-sec {
-  font-family:'Fraunces',serif; font-size:1rem;
-  font-weight:700; color:var(--navy); margin-bottom:.8rem;
-}
-.detail-list {
-  background:var(--white); border-radius:var(--radius);
-  box-shadow:var(--shadow); overflow:hidden; margin-bottom:1.25rem;
-}
-.detail-list-item {
-  display:flex; align-items:center; gap:.85rem;
-  padding:.85rem 1.2rem; border-bottom:1px solid var(--border);
-  cursor:pointer; transition:background .15s;
-}
-.detail-list-item:last-child { border-bottom:none; }
-.detail-list-item:hover { background:var(--bg); }
-.detail-obs {
-  background:var(--white); border-radius:10px; padding:1.1rem;
-  box-shadow:var(--shadow); font-size:.88rem; color:var(--text2);
-  line-height:1.6; margin-bottom:1.25rem;
-}
-.detail-actions { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:.5rem; }
+/* ════ DETAIL PAGE ════ */
+.detail-back{display:inline-flex;align-items:center;gap:.45rem;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.86rem;cursor:pointer;margin-bottom:1.2rem;padding:.3rem 0;transition:color .15s;}
+.detail-back:hover{color:var(--navy);}
+.detail-hero{background:var(--navy);border-radius:var(--radius);padding:1.6rem;color:#fff;margin-bottom:1.25rem;position:relative;overflow:hidden;}
+.detail-hero::after{content:'⚖';position:absolute;right:1.2rem;top:50%;transform:translateY(-50%);font-size:5rem;opacity:.06;}
+.dh-num{font-family:'DM Mono',monospace;font-size:.75rem;color:rgba(255,255,255,.5);margin-bottom:.4rem;letter-spacing:.08em;}
+.dh-name{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;margin-bottom:.7rem;line-height:1.2;}
+.dh-chips{display:flex;gap:.5rem;flex-wrap:wrap;}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;margin-bottom:1.25rem;}
+.detail-field{background:var(--white);border-radius:10px;padding:1rem 1.1rem;box-shadow:var(--shadow);}
+.detail-field label{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:.3rem;}
+.detail-field p{font-size:.9rem;color:var(--navy);font-weight:500;}
+.detail-sec{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:.8rem;}
+.detail-list{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:1.25rem;}
+.detail-list-item{display:flex;align-items:center;gap:.85rem;padding:.85rem 1.2rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.detail-list-item:last-child{border-bottom:none;}
+.detail-list-item:hover{background:var(--bg);}
+.detail-obs{background:var(--white);border-radius:10px;padding:1.1rem;box-shadow:var(--shadow);font-size:.88rem;color:var(--text2);line-height:1.6;margin-bottom:1.25rem;}
+.detail-actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem;}
 
-/* ── TOAST ── */
-.toast {
-  position:fixed; bottom:1.25rem; right:1.25rem;
-  background:var(--navy); color:#fff;
-  padding:.7rem 1.15rem; border-radius:10px;
-  font-size:.84rem; font-weight:500; box-shadow:var(--shadow-lg);
-  z-index:300; display:none; align-items:center; gap:.5rem;
-}
-.toast.on { display:flex; animation:tLeft .24s ease; }
-@keyframes tLeft { from { transform:translateX(50px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+/* ════ ADMIN PANEL ════ */
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.user-card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:.75rem;}
+.user-card-top{display:flex;align-items:center;gap:.85rem;}
+.user-avatar-lg{width:46px;height:46px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:#fff;flex-shrink:0;}
+.user-card-name{font-weight:700;font-size:.95rem;color:var(--navy);}
+.user-card-meta{font-size:.78rem;color:var(--muted);margin-top:2px;}
+.user-card-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;}
+.user-stat{background:var(--bg);border-radius:8px;padding:.5rem .65rem;text-align:center;}
+.user-stat-num{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:900;color:var(--navy);}
+.user-stat-lbl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.user-card-actions{display:flex;gap:.5rem;}
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar { width:5px; height:5px; }
-::-webkit-scrollbar-track { background:transparent; }
-::-webkit-scrollbar-thumb { background:var(--border); border-radius:10px; }
+/* transfer modal */
+.transfer-item{display:flex;align-items:center;gap:.75rem;padding:.7rem 0;border-bottom:1px solid var(--border);}
+.transfer-item:last-child{border-bottom:none;}
+.transfer-check{width:18px;height:18px;accent-color:var(--blue);cursor:pointer;flex-shrink:0;}
+.transfer-info{flex:1;font-size:.86rem;color:var(--text);}
+.transfer-info span{display:block;font-size:.72rem;color:var(--muted);margin-top:1px;}
 
-/* ── MOBILE ── */
-@media (max-width: 768px) {
-  .layout { flex-direction:column; }
-  .sidebar {
-    position:fixed; left:0; top:0; bottom:0;
-    transform:translateX(-100%); z-index:100;
-  }
-  .sidebar.open { transform:translateX(0); }
-  .sidebar-close-btn { display:block; }
-  .main { margin-left:0; }
-  .hamburger { display:block; }
-  .topbar-search { display:none; }
-  .stats-row { grid-template-columns:1fr 1fr; }
-  .two-col { grid-template-columns:1fr; }
-  .detail-grid { grid-template-columns:1fr 1fr; }
-  .form-row { grid-template-columns:1fr; }
-  .view { padding:1rem; }
-  .page-header h1 { font-size:1.35rem; }
+/* ════ PUBLICAÇÕES ════ */
+.pub-list{display:flex;flex-direction:column;gap:.85rem;}
+.pub-card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border-left:4px solid var(--blue);}
+.pub-card.pub-urgent{border-left-color:var(--red);}
+.pub-header{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.65rem;}
+.pub-title{font-weight:700;font-size:.95rem;color:var(--navy);}
+.pub-meta{font-size:.75rem;color:var(--muted);margin-top:3px;}
+.pub-body{font-size:.86rem;color:var(--text2);line-height:1.65;white-space:pre-wrap;}
+.pub-footer{display:flex;align-items:center;gap:.5rem;margin-top:.85rem;flex-wrap:wrap;}
+
+/* ════ ADVOGADO PROFILE ════ */
+.adv-card{background:var(--navy);border-radius:var(--radius);padding:1.75rem;color:#fff;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;}
+.adv-avatar{width:64px;height:64px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.5rem;font-weight:900;color:var(--navy);flex-shrink:0;}
+.adv-info{}
+.adv-name{font-family:'Fraunces',serif;font-size:1.4rem;font-weight:700;}
+.adv-oab{font-family:'DM Mono',monospace;font-size:.82rem;color:rgba(255,255,255,.6);margin-top:.3rem;}
+.adv-empty{color:rgba(255,255,255,.45);font-size:.9rem;}
+
+/* ════ TOAST ════ */
+.toast{position:fixed;bottom:1.25rem;right:1.25rem;background:var(--navy);color:#fff;padding:.7rem 1.15rem;border-radius:10px;font-size:.84rem;font-weight:500;box-shadow:var(--shadow-lg);z-index:300;display:none;align-items:center;gap:.5rem;}
+.toast.on{display:flex;animation:tLeft .24s ease;}
+@keyframes tLeft{from{transform:translateX(50px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+
+/* ════ SCROLLBAR ════ */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}
+
+/* ════ MOBILE ════ */
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);z-index:100;}
+  .sidebar.open{transform:translateX(0);}
+  .sidebar-close-btn{display:block;}
+  .main{margin-left:0;}
+  .hamburger{display:block;}
+  .topbar-search{display:none;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .two-col{grid-template-columns:1fr;}
+  .detail-grid{grid-template-columns:1fr 1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .view{padding:1rem;}
+  .page-header h1{font-size:1.35rem;}
+  .admin-grid{grid-template-columns:1fr;}
 }
-@media (max-width: 420px) {
-  .detail-grid { grid-template-columns:1fr; }
-  .stat-num { font-size:1.6rem; }
+@media(max-width:420px){
+  .detail-grid{grid-template-columns:1fr;}
+  .stat-num{font-size:1.6rem;}
 }
 </style>
 </head>
 <body>
 
+<!-- ═══════════════════════════════════════
+     LOGIN
+════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-mark">L<span>E</span>X</div>
+      <p>Gestão Jurídica</p>
+    </div>
+    <h2>Entrar no sistema</h2>
+    <div class="login-err" id="loginErr">Usuário ou senha incorretos.</div>
+    <div class="fg">
+      <label class="flabel">Usuário</label>
+      <input class="finput" type="text" id="loginUser" placeholder="seu.usuario" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="fg">
+      <label class="flabel">Senha</label>
+      <input class="finput" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-navy" style="width:100%;justify-content:center;padding:.7rem" onclick="doLogin()">Entrar →</button>
+    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:1rem">Admin padrão: <b>admin</b> / <b>admin123</b></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     APP
+════════════════════════════════════════ -->
+<div id="appScreen">
 <div id="sidebarOverlay" onclick="closeSidebar()"></div>
+<div style="display:flex;min-height:100vh;">
 
-<div class="layout">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div>
+      <div class="logo-mark">L<span>E</span>X</div>
+      <div class="logo-tag">Gestão Jurídica</div>
+    </div>
+    <button class="sidebar-close-btn" onclick="closeSidebar()">×</button>
+  </div>
 
-  <!-- ═══ SIDEBAR ═══ -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-      <div class="logo-text">
-        <div class="logo-mark">L<span>E</span>X</div>
-        <div class="logo-tag">Gestão Jurídica</div>
-      </div>
-      <button class="sidebar-close-btn" onclick="closeSidebar()">×</button>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sideAvatar">A</div>
+    <div>
+      <div class="user-name" id="sideName">Admin</div>
+      <div class="user-role" id="sideRole">Administrador</div>
     </div>
+  </div>
 
-    <div class="nav-label">Menu</div>
-    <div class="nav-item active" id="nav-dashboard" onclick="navTo('dashboard')">
-      <span class="nav-icon">🏠</span> Painel
-    </div>
-    <div class="nav-item" id="nav-audiencias" onclick="navTo('audiencias')">
-      <span class="nav-icon">⚖️</span> Audiências
-    </div>
-    <div class="nav-item" id="nav-processos" onclick="navTo('processos')">
-      <span class="nav-icon">📂</span> Processos
-    </div>
-    <div class="nav-item" id="nav-prazos" onclick="navTo('prazos')">
-      <span class="nav-icon">⏰</span> Prazos
-      <span class="nav-badge" id="navBadge" style="display:none">0</span>
-    </div>
+  <div class="nav-label">Menu</div>
+  <div class="nav-item active" id="nav-dashboard" onclick="navTo('dashboard')"><span class="nav-icon">🏠</span>Painel</div>
+  <div class="nav-item" id="nav-audiencias" onclick="navTo('audiencias')"><span class="nav-icon">⚖️</span>Audiências</div>
+  <div class="nav-item" id="nav-processos" onclick="navTo('processos')"><span class="nav-icon">📂</span>Processos</div>
+  <div class="nav-item" id="nav-prazos" onclick="navTo('prazos')">
+    <span class="nav-icon">⏰</span>Prazos
+    <span class="nav-badge" id="navBadge" style="display:none">0</span>
+  </div>
+  <div class="nav-item" id="nav-publicacoes" onclick="navTo('publicacoes')"><span class="nav-icon">📰</span>Publicações</div>
+  <div class="nav-item" id="nav-advogado" onclick="navTo('advogado')"><span class="nav-icon">👤</span>Advogado</div>
 
-    <div class="sidebar-foot">
-      <div class="sidebar-date" id="sideDate"></div>
+  <div class="nav-label admin-only show" id="navAdminLabel">Admin</div>
+  <div class="nav-item admin-only show" id="nav-admin" onclick="navTo('admin')"><span class="nav-icon">⚙️</span>Usuários</div>
+
+  <div class="sidebar-foot">
+    <div class="sidebar-date" id="sideDate"></div>
+    <button class="btn-logout" onclick="doLogout()">🚪 Sair do sistema</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="openSidebar()">☰</button>
+    <div class="topbar-title" id="topTitle">Painel</div>
+    <div class="topbar-spacer"></div>
+    <input class="topbar-search" type="text" placeholder="🔍 Buscar...">
+  </div>
+
+  <!-- ══ PAINEL ══ -->
+  <div class="view active" id="v-dashboard">
+    <div class="page-header">
+      <div><h1 id="greeting">Bom dia!</h1><p id="greetDate"></p></div>
+      <button class="btn btn-navy" onclick="navTo('audiencias');setTimeout(()=>openAudModal(),80)">+ Nova Audiência</button>
     </div>
-  </aside>
-
-  <!-- ═══ MAIN ═══ -->
-  <div class="main">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <button class="hamburger" onclick="openSidebar()">☰</button>
-      <div class="topbar-title" id="topTitle">Painel</div>
-      <div class="topbar-spacer"></div>
-      <input class="topbar-search" type="text" placeholder="🔍 Buscar...">
-    </div>
-
-    <!-- ══ PAINEL ══ -->
-    <div class="view active" id="v-dashboard">
-      <div class="page-header">
-        <div>
-          <h1 id="greeting">Bom dia!</h1>
-          <p id="greetDate"></p>
+    <div class="alert-bar" id="alertBar">⚠️&nbsp;<span id="alertMsg"></span></div>
+    <div class="stats-row" id="statsRow"></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-ico" style="background:var(--blue-light)">⚖️</div>
+          <h3>Audiências de Hoje</h3>
+          <button class="btn btn-ghost btn-sm" onclick="navTo('audiencias')">Ver →</button>
         </div>
-        <button class="btn btn-navy" onclick="navTo('audiencias'); setTimeout(()=>openAudModal(),80)">+ Nova Audiência</button>
+        <div id="dashAuds"></div>
       </div>
-
-      <div class="alert-bar" id="alertBar">
-        ⚠️&nbsp;<span id="alertMsg"></span>
-      </div>
-
-      <div class="stats-row" id="statsRow"></div>
-
-      <div class="two-col">
-        <div class="card">
-          <div class="card-head">
-            <div class="card-head-ico" style="background:var(--blue-light)">⚖️</div>
-            <h3>Audiências de Hoje</h3>
-            <button class="btn btn-ghost btn-sm" onclick="navTo('audiencias')">Ver →</button>
-          </div>
-          <div id="dashAuds"></div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-ico" style="background:var(--red-light)">⏰</div>
+          <h3>Prazos Próximos</h3>
+          <button class="btn btn-ghost btn-sm" onclick="navTo('prazos')">Ver →</button>
         </div>
-        <div class="card">
-          <div class="card-head">
-            <div class="card-head-ico" style="background:var(--red-light)">⏰</div>
-            <h3>Prazos Próximos</h3>
-            <button class="btn btn-ghost btn-sm" onclick="navTo('prazos')">Ver →</button>
-          </div>
-          <div id="dashPrazos"></div>
-        </div>
+        <div id="dashPrazos"></div>
       </div>
     </div>
+  </div>
 
-    <!-- ══ AUDIÊNCIAS ══ -->
-    <div class="view" id="v-audiencias">
-      <div class="page-header">
-        <div><h1>Audiências</h1><p>Agende e gerencie suas audiências</p></div>
-        <button class="btn btn-navy" onclick="openAudModal()">+ Nova</button>
-      </div>
-      <div class="toolbar">
-        <input class="f-search" id="sAud" type="text" placeholder="🔍 Buscar..." oninput="renderAuds()">
-        <select class="f-select" id="fAudArea" onchange="renderAuds()">
-          <option value="">Todas as áreas</option>
-          <option value="civel">Cível</option>
-          <option value="criminal">Criminal</option>
-          <option value="trabalhista">Trabalhista</option>
-          <option value="familia">Família</option>
-          <option value="administrativo">Administrativo</option>
-        </select>
-      </div>
-      <div class="table-wrap"><div class="table-scroll">
-        <table>
-          <thead><tr><th>Data & Hora</th><th>Processo</th><th>Parte</th><th>Vara</th><th>Área</th><th>Tipo</th><th></th></tr></thead>
-          <tbody id="tbAud"></tbody>
-        </table>
-      </div></div>
+  <!-- ══ AUDIÊNCIAS ══ -->
+  <div class="view" id="v-audiencias">
+    <div class="page-header">
+      <div><h1>Audiências</h1><p>Agende e gerencie suas audiências</p></div>
+      <button class="btn btn-navy" onclick="openAudModal()">+ Nova</button>
     </div>
-
-    <!-- ══ PROCESSOS ══ -->
-    <div class="view" id="v-processos">
-      <div class="page-header">
-        <div><h1>Processos</h1><p>Sua carteira de processos</p></div>
-        <button class="btn btn-navy" onclick="openProcModal()">+ Novo</button>
-      </div>
-      <div class="toolbar">
-        <input class="f-search" id="sProc" type="text" placeholder="🔍 Buscar..." oninput="renderProcs()">
-        <select class="f-select" id="fProcStatus" onchange="renderProcs()">
-          <option value="">Todos os status</option>
-          <option value="ativo">Ativo</option>
-          <option value="aguardando">Aguardando</option>
-          <option value="suspenso">Suspenso</option>
-          <option value="encerrado">Encerrado</option>
-        </select>
-        <select class="f-select" id="fProcArea" onchange="renderProcs()">
-          <option value="">Todas as áreas</option>
-          <option value="civel">Cível</option>
-          <option value="criminal">Criminal</option>
-          <option value="trabalhista">Trabalhista</option>
-          <option value="familia">Família</option>
-          <option value="administrativo">Administrativo</option>
-        </select>
-      </div>
-      <div class="table-wrap"><div class="table-scroll">
-        <table>
-          <thead><tr><th>Nº Processo</th><th>Parte</th><th>Área</th><th>Vara</th><th>Distribuição</th><th>Status</th><th>Próx. Aud.</th><th></th></tr></thead>
-          <tbody id="tbProc"></tbody>
-        </table>
-      </div></div>
+    <div class="toolbar">
+      <input class="f-search" id="sAud" type="text" placeholder="🔍 Buscar..." oninput="renderAuds()">
+      <select class="f-select" id="fAudArea" onchange="renderAuds()">
+        <option value="">Todas as áreas</option>
+        <option value="civel">Cível</option><option value="criminal">Criminal</option>
+        <option value="trabalhista">Trabalhista</option><option value="familia">Família</option>
+        <option value="administrativo">Administrativo</option>
+      </select>
     </div>
+    <div class="table-wrap"><div class="table-scroll">
+      <table><thead><tr><th>Data & Hora</th><th>Processo</th><th>Parte</th><th>Vara</th><th>Área</th><th>Tipo</th><th></th></tr></thead>
+      <tbody id="tbAud"></tbody></table>
+    </div></div>
+  </div>
 
-    <!-- ══ PRAZOS ══ -->
-    <div class="view" id="v-prazos">
-      <div class="page-header">
-        <div><h1>Prazos</h1><p>Controle seus prazos processuais</p></div>
-        <button class="btn btn-navy" onclick="openPrazModal()">+ Novo</button>
-      </div>
-      <div class="toolbar">
-        <input class="f-search" id="sPraz" type="text" placeholder="🔍 Buscar processo ou descrição..." oninput="renderPrazs()">
-        <select class="f-select" id="fPrazTipo" onchange="renderPrazs()">
-          <option value="">Todos os tipos</option>
-          <option value="Recurso">⚡ Recurso</option>
-          <option value="Apelação">📄 Apelação</option>
-          <option value="Contestação">🛡️ Contestação</option>
-          <option value="Manifestação">📝 Manifestação</option>
-          <option value="Juntada">📎 Juntada</option>
-          <option value="Pagamento">💰 Pagamento</option>
-          <option value="Impugnação">⚠️ Impugnação</option>
-          <option value="Embargos">⚖️ Embargos</option>
-          <option value="Outro">🔹 Outro</option>
-        </select>
-        <select class="f-select" id="fPrazUrg" onchange="renderPrazs()">
-          <option value="">Todos os prazos</option>
-          <option value="urgente">🔴 Urgente (≤3 dias)</option>
-          <option value="proximo">🟡 Próximo (≤7 dias)</option>
-          <option value="futuro">🟢 Futuro</option>
-        </select>
-      </div>
-      <div class="table-wrap"><div class="table-scroll">
-        <table>
-          <thead><tr><th>Vencimento</th><th>Restam</th><th>Processo</th><th>Descrição</th><th>Tipo</th><th>Status</th><th></th></tr></thead>
-          <tbody id="tbPraz"></tbody>
-        </table>
-      </div></div>
+  <!-- ══ PROCESSOS ══ -->
+  <div class="view" id="v-processos">
+    <div class="page-header">
+      <div><h1>Processos</h1><p>Sua carteira de processos</p></div>
+      <button class="btn btn-navy" onclick="openProcModal()">+ Novo</button>
     </div>
-
-    <!-- ══ DETALHE PROCESSO ══ -->
-    <div class="view" id="v-det-proc">
-      <button class="detail-back" onclick="backTo('processos')">← Voltar a Processos</button>
-      <div class="detail-hero" id="dProcHero"></div>
-      <div class="detail-grid" id="dProcGrid"></div>
-      <div class="detail-sec">Audiências neste processo</div>
-      <div class="detail-list" id="dProcAuds"></div>
-      <div class="detail-sec">Prazos neste processo</div>
-      <div class="detail-list" id="dProcPrazs"></div>
-      <div id="dProcObs"></div>
-      <div class="detail-actions" id="dProcActions"></div>
+    <div class="toolbar">
+      <input class="f-search" id="sProc" type="text" placeholder="🔍 Buscar..." oninput="renderProcs()">
+      <select class="f-select" id="fProcStatus" onchange="renderProcs()">
+        <option value="">Todos os status</option><option value="ativo">Ativo</option>
+        <option value="aguardando">Aguardando</option><option value="suspenso">Suspenso</option><option value="encerrado">Encerrado</option>
+      </select>
+      <select class="f-select" id="fProcArea" onchange="renderProcs()">
+        <option value="">Todas as áreas</option><option value="civel">Cível</option><option value="criminal">Criminal</option>
+        <option value="trabalhista">Trabalhista</option><option value="familia">Família</option><option value="administrativo">Administrativo</option>
+      </select>
     </div>
+    <div class="table-wrap"><div class="table-scroll">
+      <table><thead><tr><th>Nº Processo</th><th>Parte</th><th>Área</th><th>Vara</th><th>Distribuição</th><th>Status</th><th>Próx. Aud.</th><th></th></tr></thead>
+      <tbody id="tbProc"></tbody></table>
+    </div></div>
+  </div>
 
-    <!-- ══ DETALHE AUDIÊNCIA ══ -->
-    <div class="view" id="v-det-aud">
-      <button class="detail-back" onclick="backTo('audiencias')">← Voltar a Audiências</button>
-      <div class="detail-hero" id="dAudHero"></div>
-      <div class="detail-grid" id="dAudGrid"></div>
-      <div id="dAudObs"></div>
-      <div class="detail-actions" id="dAudActions"></div>
+  <!-- ══ PRAZOS ══ -->
+  <div class="view" id="v-prazos">
+    <div class="page-header">
+      <div><h1>Prazos</h1><p>Controle seus prazos processuais</p></div>
+      <button class="btn btn-navy" onclick="openPrazModal()">+ Novo</button>
     </div>
-
-    <!-- ══ DETALHE PRAZO ══ -->
-    <div class="view" id="v-det-praz">
-      <button class="detail-back" onclick="backTo('prazos')">← Voltar a Prazos</button>
-      <div class="detail-hero" id="dPrazHero"></div>
-      <div class="detail-grid" id="dPrazGrid"></div>
-      <div id="dPrazObs"></div>
-      <div class="detail-actions" id="dPrazActions"></div>
+    <div class="toolbar">
+      <input class="f-search" id="sPraz" type="text" placeholder="🔍 Buscar processo ou descrição..." oninput="renderPrazs()">
+      <select class="f-select" id="fPrazTipo" onchange="renderPrazs()">
+        <option value="">Todos os tipos</option>
+        <option value="Recurso">⚡ Recurso</option><option value="Apelação">📄 Apelação</option>
+        <option value="Contestação">🛡️ Contestação</option><option value="Manifestação">📝 Manifestação</option>
+        <option value="Juntada">📎 Juntada</option><option value="Pagamento">💰 Pagamento</option>
+        <option value="Impugnação">⚠️ Impugnação</option><option value="Embargos">⚖️ Embargos</option>
+        <option value="Outro">🔹 Outro</option>
+      </select>
+      <select class="f-select" id="fPrazStatus" onchange="renderPrazs()">
+        <option value="">Todos os status</option>
+        <option value="pendente">🟡 Pendente</option>
+        <option value="concluido">✅ Concluído</option>
+        <option value="atrasado">🔴 Atrasado</option>
+      </select>
+      <select class="f-select" id="fPrazUrg" onchange="renderPrazs()">
+        <option value="">Todos os prazos</option>
+        <option value="urgente">🔴 Urgente (≤3 dias)</option>
+        <option value="proximo">🟡 Próximo (≤7 dias)</option>
+        <option value="futuro">🟢 Futuro</option>
+      </select>
     </div>
+    <div class="table-wrap"><div class="table-scroll">
+      <table><thead><tr><th>Vencimento</th><th>Restam</th><th>Processo</th><th>Descrição</th><th>Tipo</th><th>Status</th><th></th></tr></thead>
+      <tbody id="tbPraz"></tbody></table>
+    </div></div>
+  </div>
 
-  </div><!-- /main -->
-</div><!-- /layout -->
+  <!-- ══ PUBLICAÇÕES ══ -->
+  <div class="view" id="v-publicacoes">
+    <div class="page-header">
+      <div><h1>Publicações</h1><p>Diário de Justiça e publicações dos tribunais</p></div>
+      <button class="btn btn-navy" onclick="openPubModal()">+ Nova Publicação</button>
+    </div>
+    <div class="toolbar">
+      <input class="f-search" id="sPub" type="text" placeholder="🔍 Buscar publicação..." oninput="renderPubs()">
+      <select class="f-select" id="fPubTrib" onchange="renderPubs()">
+        <option value="">Todos os tribunais</option>
+        <option value="TJSP">TJSP</option><option value="TJMG">TJMG</option>
+        <option value="TJRJ">TJRJ</option><option value="TJRS">TJRS</option>
+        <option value="TRT">TRT</option><option value="STJ">STJ</option>
+        <option value="STF">STF</option><option value="TRF">TRF</option>
+        <option value="Outro">Outro</option>
+      </select>
+      <input class="f-search" id="fPubData" type="date" style="flex:none;width:auto" onchange="renderPubs()">
+    </div>
+    <div id="pubList"></div>
+  </div>
 
-<!-- ═══ MODAL AUDIÊNCIA ═══ -->
+  <!-- ══ ADVOGADO ══ -->
+  <div class="view" id="v-advogado">
+    <div class="page-header">
+      <div><h1>Perfil do Advogado</h1><p>Dados do responsável pelo escritório</p></div>
+      <button class="btn btn-navy" onclick="openAdvModal()">✏️ Editar Perfil</button>
+    </div>
+    <div id="advCard"></div>
+    <div class="two-col" style="margin-top:1.25rem" id="advStats"></div>
+  </div>
+
+  <!-- ══ ADMIN — USUÁRIOS ══ -->
+  <div class="view" id="v-admin">
+    <div class="page-header">
+      <div><h1>Gerenciar Usuários</h1><p>Administre os funcionários do sistema</p></div>
+      <button class="btn btn-navy" onclick="openUserModal()">+ Novo Usuário</button>
+    </div>
+    <div class="admin-grid" id="adminGrid"></div>
+  </div>
+
+  <!-- ══ DETAIL PROCESSO ══ -->
+  <div class="view" id="v-det-proc">
+    <button class="detail-back" onclick="backTo('processos')">← Voltar a Processos</button>
+    <div class="detail-hero" id="dProcHero"></div>
+    <div class="detail-grid" id="dProcGrid"></div>
+    <div class="detail-sec">Audiências neste processo</div>
+    <div class="detail-list" id="dProcAuds"></div>
+    <div class="detail-sec">Prazos neste processo</div>
+    <div class="detail-list" id="dProcPrazs"></div>
+    <div id="dProcObs"></div>
+    <div class="detail-actions" id="dProcActions"></div>
+  </div>
+
+  <!-- ══ DETAIL AUDIÊNCIA ══ -->
+  <div class="view" id="v-det-aud">
+    <button class="detail-back" onclick="backTo('audiencias')">← Voltar a Audiências</button>
+    <div class="detail-hero" id="dAudHero"></div>
+    <div class="detail-grid" id="dAudGrid"></div>
+    <div id="dAudObs"></div>
+    <div class="detail-actions" id="dAudActions"></div>
+  </div>
+
+  <!-- ══ DETAIL PRAZO ══ -->
+  <div class="view" id="v-det-praz">
+    <button class="detail-back" onclick="backTo('prazos')">← Voltar a Prazos</button>
+    <div class="detail-hero" id="dPrazHero"></div>
+    <div class="detail-grid" id="dPrazGrid"></div>
+    <div id="dPrazObs"></div>
+    <div class="detail-actions" id="dPrazActions"></div>
+  </div>
+
+</div><!-- /main -->
+</div>
+</div><!-- /appScreen -->
+
+<!-- ═══ MODAIS ═══ -->
+
+<!-- Modal Audiência -->
 <div class="overlay" id="ovAud">
   <div class="modal">
-    <div class="modal-hd">
-      <div class="modal-hd-ico" style="background:var(--blue-light)">⚖️</div>
-      <h2 id="audModalTitle">Nova Audiência</h2>
-      <button class="modal-x" onclick="closeModal('ovAud')">×</button>
-    </div>
+    <div class="modal-hd"><div class="modal-hd-ico" style="background:var(--blue-light)">⚖️</div><h2 id="audModalTitle">Nova Audiência</h2><button class="modal-x" onclick="closeModal('ovAud')">×</button></div>
     <div class="modal-body">
       <div class="form-row">
         <div class="fg"><label class="flabel">Data *</label><input class="finput" type="date" id="a_data"></div>
@@ -707,153 +622,299 @@ textarea.finput { min-height:72px; resize:vertical; }
       <div class="form-row">
         <div class="fg"><label class="flabel">Vara / Tribunal</label><input class="finput" type="text" id="a_vara" placeholder="Ex: 3ª Vara Cível"></div>
         <div class="fg"><label class="flabel">Área</label>
-          <select class="finput" id="a_area">
-            <option value="civel">Cível</option><option value="criminal">Criminal</option>
-            <option value="trabalhista">Trabalhista</option><option value="familia">Família</option>
-            <option value="administrativo">Administrativo</option>
-          </select>
+          <select class="finput" id="a_area"><option value="civel">Cível</option><option value="criminal">Criminal</option><option value="trabalhista">Trabalhista</option><option value="familia">Família</option><option value="administrativo">Administrativo</option></select>
         </div>
       </div>
       <div class="fg"><label class="flabel">Tipo</label>
-        <select class="finput" id="a_tipo">
-          <option>Instrução e Julgamento</option><option>Conciliação</option>
-          <option>Una</option><option>Designação</option>
-          <option>Sustentação Oral</option><option>Preliminar</option><option>Outro</option>
-        </select>
+        <select class="finput" id="a_tipo"><option>Instrução e Julgamento</option><option>Conciliação</option><option>Una</option><option>Designação</option><option>Sustentação Oral</option><option>Preliminar</option><option>Outro</option></select>
+      </div>
+      <div class="fg"><label class="flabel">Responsável</label>
+        <select class="finput" id="a_owner"></select>
       </div>
       <div class="fg"><label class="flabel">Observações</label><textarea class="finput" id="a_obs" placeholder="Documentos, lembretes..."></textarea></div>
     </div>
-    <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeModal('ovAud')">Cancelar</button>
-      <button class="btn btn-navy" onclick="saveAud()">Salvar Audiência</button>
-    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovAud')">Cancelar</button><button class="btn btn-navy" onclick="saveAud()">Salvar</button></div>
   </div>
 </div>
 
-<!-- ═══ MODAL PROCESSO ═══ -->
+<!-- Modal Processo -->
 <div class="overlay" id="ovProc">
   <div class="modal">
-    <div class="modal-hd">
-      <div class="modal-hd-ico" style="background:var(--green-light)">📂</div>
-      <h2 id="procModalTitle">Novo Processo</h2>
-      <button class="modal-x" onclick="closeModal('ovProc')">×</button>
-    </div>
+    <div class="modal-hd"><div class="modal-hd-ico" style="background:var(--green-light)">📂</div><h2 id="procModalTitle">Novo Processo</h2><button class="modal-x" onclick="closeModal('ovProc')">×</button></div>
     <div class="modal-body">
       <div class="fg"><label class="flabel">Nº do Processo *</label><input class="finput" type="text" id="p_num" placeholder="0000000-00.0000.0.00.0000"></div>
       <div class="fg"><label class="flabel">Parte / Requerente *</label><input class="finput" type="text" id="p_parte" placeholder="Nome completo"></div>
       <div class="form-row">
         <div class="fg"><label class="flabel">Área</label>
-          <select class="finput" id="p_area">
-            <option value="civel">Cível</option><option value="criminal">Criminal</option>
-            <option value="trabalhista">Trabalhista</option><option value="familia">Família</option>
-            <option value="administrativo">Administrativo</option>
-          </select>
+          <select class="finput" id="p_area"><option value="civel">Cível</option><option value="criminal">Criminal</option><option value="trabalhista">Trabalhista</option><option value="familia">Família</option><option value="administrativo">Administrativo</option></select>
         </div>
         <div class="fg"><label class="flabel">Status</label>
-          <select class="finput" id="p_status">
-            <option value="ativo">Ativo</option><option value="aguardando">Aguardando</option>
-            <option value="suspenso">Suspenso</option><option value="encerrado">Encerrado</option>
-          </select>
+          <select class="finput" id="p_status"><option value="ativo">Ativo</option><option value="aguardando">Aguardando</option><option value="suspenso">Suspenso</option><option value="encerrado">Encerrado</option></select>
         </div>
       </div>
       <div class="form-row">
         <div class="fg"><label class="flabel">Juízo / Vara</label><input class="finput" type="text" id="p_juizo" placeholder="Ex: TJSP — 1ª Vara"></div>
         <div class="fg"><label class="flabel">Data de Distribuição</label><input class="finput" type="date" id="p_data"></div>
       </div>
-      <div class="fg"><label class="flabel">Observações</label><textarea class="finput" id="p_obs" placeholder="Fase processual, adv. contrário..."></textarea></div>
+      <div class="fg"><label class="flabel">Responsável</label><select class="finput" id="p_owner"></select></div>
+      <div class="fg"><label class="flabel">Observações</label><textarea class="finput" id="p_obs"></textarea></div>
     </div>
-    <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeModal('ovProc')">Cancelar</button>
-      <button class="btn btn-navy" onclick="saveProc()">Salvar Processo</button>
-    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovProc')">Cancelar</button><button class="btn btn-navy" onclick="saveProc()">Salvar</button></div>
   </div>
 </div>
 
-<!-- ═══ MODAL PRAZO ═══ -->
+<!-- Modal Prazo -->
 <div class="overlay" id="ovPraz">
   <div class="modal">
-    <div class="modal-hd">
-      <div class="modal-hd-ico" style="background:var(--red-light)">⏰</div>
-      <h2>Novo Prazo</h2>
-      <button class="modal-x" onclick="closeModal('ovPraz')">×</button>
-    </div>
+    <div class="modal-hd"><div class="modal-hd-ico" style="background:var(--red-light)">⏰</div><h2>Novo Prazo</h2><button class="modal-x" onclick="closeModal('ovPraz')">×</button></div>
     <div class="modal-body">
       <div class="fg"><label class="flabel">Nº do Processo *</label><input class="finput" type="text" id="z_proc" placeholder="0000000-00.0000.0.00.0000"></div>
       <div class="fg"><label class="flabel">Descrição *</label><input class="finput" type="text" id="z_desc" placeholder="Ex: Apresentar contestação"></div>
       <div class="form-row">
         <div class="fg"><label class="flabel">Data de Vencimento *</label><input class="finput" type="date" id="z_data"></div>
         <div class="fg"><label class="flabel">Tipo</label>
-          <select class="finput" id="z_tipo">
+          <select class="finput" id="z_tipo"><option>Recurso</option><option>Apelação</option><option>Contestação</option><option>Manifestação</option><option>Juntada</option><option>Pagamento</option><option>Impugnação</option><option>Embargos</option><option>Outro</option></select>
+        </div>
+      </div>
+      <div class="fg"><label class="flabel">Responsável</label><select class="finput" id="z_owner"></select></div>
+      <div class="fg"><label class="flabel">Observações</label><textarea class="finput" id="z_obs"></textarea></div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovPraz')">Cancelar</button><button class="btn btn-navy" onclick="savePraz()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Editar Prazo -->
+<div class="overlay" id="ovEditPraz">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-hd-ico" style="background:var(--orange-light)">✏️</div>
+      <h2>Editar Prazo</h2>
+      <button class="modal-x" onclick="closeModal('ovEditPraz')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label class="flabel">Descrição</label>
+        <input class="finput" type="text" id="ep_desc" placeholder="Descrição do prazo">
+      </div>
+      <div class="form-row">
+        <div class="fg">
+          <label class="flabel">Nova Data de Vencimento *</label>
+          <input class="finput" type="date" id="ep_data">
+        </div>
+        <div class="fg">
+          <label class="flabel">Tipo</label>
+          <select class="finput" id="ep_tipo">
             <option>Recurso</option><option>Apelação</option><option>Contestação</option>
             <option>Manifestação</option><option>Juntada</option><option>Pagamento</option>
             <option>Impugnação</option><option>Embargos</option><option>Outro</option>
           </select>
         </div>
       </div>
-      <div class="fg"><label class="flabel">Observações</label><textarea class="finput" id="z_obs" placeholder="Detalhes adicionais..."></textarea></div>
+      <div class="fg">
+        <label class="flabel">Responsável</label>
+        <select class="finput" id="ep_owner"></select>
+      </div>
+      <div class="fg">
+        <label class="flabel">Observações</label>
+        <textarea class="finput" id="ep_obs" placeholder="Observações adicionais..."></textarea>
+      </div>
+      <div style="background:var(--blue-light);border-radius:8px;padding:.65rem .9rem;font-size:.8rem;color:var(--blue);margin-top:.25rem;">
+        💡 Ao salvar, o status será recalculado automaticamente com base na nova data.
+      </div>
     </div>
     <div class="modal-ft">
-      <button class="btn btn-ghost" onclick="closeModal('ovPraz')">Cancelar</button>
-      <button class="btn btn-navy" onclick="savePraz()">Salvar Prazo</button>
+      <button class="btn btn-ghost" onclick="closeModal('ovEditPraz')">Cancelar</button>
+      <button class="btn btn-navy" onclick="saveEditPraz()">Salvar Alterações</button>
     </div>
+  </div>
+</div>
+<div class="overlay" id="ovPub">
+  <div class="modal modal-lg">
+    <div class="modal-hd"><div class="modal-hd-ico" style="background:var(--blue-light)">📰</div><h2 id="pubModalTitle">Nova Publicação</h2><button class="modal-x" onclick="closeModal('ovPub')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="fg"><label class="flabel">Data da Publicação *</label><input class="finput" type="date" id="pub_data"></div>
+        <div class="fg"><label class="flabel">Tribunal *</label>
+          <select class="finput" id="pub_trib"><option>TJSP</option><option>TJMG</option><option>TJRJ</option><option>TJRS</option><option>TRT</option><option>STJ</option><option>STF</option><option>TRF</option><option>Outro</option></select>
+        </div>
+      </div>
+      <div class="fg"><label class="flabel">Título / Processo *</label><input class="finput" type="text" id="pub_titulo" placeholder="Ex: Intimação — Processo nº 0012345..."></div>
+      <div class="fg"><label class="flabel">Advogado / OAB</label><input class="finput" type="text" id="pub_adv" placeholder="Nome e OAB preenchidos automaticamente"></div>
+      <div class="fg"><label class="flabel">Conteúdo da Publicação *</label><textarea class="finput" id="pub_corpo" style="min-height:160px" placeholder="Cole aqui o texto completo da publicação do diário..."></textarea></div>
+      <div class="fg"><label class="flabel">Urgente?</label>
+        <select class="finput" id="pub_urg"><option value="0">Não — publicação comum</option><option value="1">Sim — requer atenção imediata</option></select>
+      </div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovPub')">Cancelar</button><button class="btn btn-navy" onclick="savePub()">Salvar Publicação</button></div>
+  </div>
+</div>
+
+<!-- Modal Advogado -->
+<div class="overlay" id="ovAdv">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-hd-ico" style="background:var(--gold-light)">👤</div><h2>Perfil do Advogado</h2><button class="modal-x" onclick="closeModal('ovAdv')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="fg"><label class="flabel">Nome Completo *</label><input class="finput" type="text" id="adv_nome" placeholder="Dr(a). Nome Sobrenome"></div>
+        <div class="fg"><label class="flabel">OAB *</label><input class="finput" type="text" id="adv_oab" placeholder="Ex: 123456"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label class="flabel">Estado (Seccional)</label>
+          <select class="finput" id="adv_uf">
+            <option value="SP">SP — São Paulo</option><option value="MG">MG — Minas Gerais</option>
+            <option value="RJ">RJ — Rio de Janeiro</option><option value="RS">RS — Rio Grande do Sul</option>
+            <option value="PR">PR — Paraná</option><option value="SC">SC — Santa Catarina</option>
+            <option value="BA">BA — Bahia</option><option value="GO">GO — Goiás</option>
+            <option value="DF">DF — Distrito Federal</option><option value="PE">PE — Pernambuco</option>
+            <option value="CE">CE — Ceará</option><option value="PA">PA — Pará</option>
+            <option value="MT">MT — Mato Grosso</option><option value="MS">MS — Mato Grosso do Sul</option>
+            <option value="ES">ES — Espírito Santo</option><option value="RN">RN — Rio Grande do Norte</option>
+            <option value="AM">AM — Amazonas</option><option value="AL">AL — Alagoas</option>
+            <option value="SE">SE — Sergipe</option><option value="PB">PB — Paraíba</option>
+            <option value="PI">PI — Piauí</option><option value="MA">MA — Maranhão</option>
+            <option value="RO">RO — Rondônia</option><option value="TO">TO — Tocantins</option>
+            <option value="AC">AC — Acre</option><option value="AP">AP — Amapá</option>
+            <option value="RR">RR — Roraima</option>
+          </select>
+        </div>
+        <div class="fg"><label class="flabel">Área Principal</label>
+          <select class="finput" id="adv_area"><option value="civel">Cível</option><option value="criminal">Criminal</option><option value="trabalhista">Trabalhista</option><option value="familia">Família</option><option value="administrativo">Administrativo</option></select>
+        </div>
+      </div>
+      <div class="fg"><label class="flabel">Email</label><input class="finput" type="email" id="adv_email" placeholder="email@escritorio.com.br"></div>
+      <div class="fg"><label class="flabel">Telefone</label><input class="finput" type="text" id="adv_tel" placeholder="(11) 99999-9999"></div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovAdv')">Cancelar</button><button class="btn btn-navy" onclick="saveAdv()">Salvar Perfil</button></div>
+  </div>
+</div>
+
+<!-- Modal Usuário -->
+<div class="overlay" id="ovUser">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-hd-ico" style="background:var(--purple-light)">👥</div><h2 id="userModalTitle">Novo Usuário</h2><button class="modal-x" onclick="closeModal('ovUser')">×</button></div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="fg"><label class="flabel">Nome Completo *</label><input class="finput" type="text" id="u_nome" placeholder="Nome do funcionário"></div>
+        <div class="fg"><label class="flabel">Usuário (login) *</label><input class="finput" type="text" id="u_user" placeholder="nome.sobrenome"></div>
+      </div>
+      <div class="form-row">
+        <div class="fg"><label class="flabel">Senha *</label><input class="finput" type="password" id="u_pass" placeholder="Mínimo 6 caracteres"></div>
+        <div class="fg"><label class="flabel">Perfil</label>
+          <select class="finput" id="u_role"><option value="funcionario">Funcionário</option><option value="admin">Administrador</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovUser')">Cancelar</button><button class="btn btn-navy" onclick="saveUser()">Salvar</button></div>
+  </div>
+</div>
+
+<!-- Modal Transferir -->
+<div class="overlay" id="ovTransfer">
+  <div class="modal">
+    <div class="modal-hd"><div class="modal-hd-ico" style="background:var(--orange-light)">🔀</div><h2 id="transferTitle">Transferir itens</h2><button class="modal-x" onclick="closeModal('ovTransfer')">×</button></div>
+    <div class="modal-body">
+      <div class="fg"><label class="flabel">Transferir para</label>
+        <select class="finput" id="transferTarget"></select>
+      </div>
+      <div class="fg"><label class="flabel">Selecione o que transferir</label>
+        <div id="transferList" style="max-height:260px;overflow-y:auto;margin-top:.5rem;"></div>
+      </div>
+    </div>
+    <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovTransfer')">Cancelar</button><button class="btn btn-navy" onclick="doTransfer()">Transferir</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast">✅ <span id="toastMsg"></span></div>
 
 <script>
-// ──────────────────────────────────────────
-// DATA
-// ──────────────────────────────────────────
-const SK = { a:'lex5_aud', p:'lex5_proc', z:'lex5_praz' };
-let auds  = JSON.parse(localStorage.getItem(SK.a) || '[]');
-let procs = JSON.parse(localStorage.getItem(SK.p) || '[]');
-let prazs = JSON.parse(localStorage.getItem(SK.z) || '[]');
-let editAudId  = null;
-let editProcId = null;
+// ══════════════════════════════════════════════════════
+// STORAGE KEYS
+// ══════════════════════════════════════════════════════
+const SK = { a:'lex6_aud', p:'lex6_proc', z:'lex6_praz', u:'lex6_users', pub:'lex6_pub', adv:'lex6_adv' };
 
-const uid  = () => Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+let auds  = JSON.parse(localStorage.getItem(SK.a)   || '[]');
+let procs = JSON.parse(localStorage.getItem(SK.p)   || '[]');
+let prazs = JSON.parse(localStorage.getItem(SK.z)   || '[]');
+let users = JSON.parse(localStorage.getItem(SK.u)   || '[]');
+let pubs  = JSON.parse(localStorage.getItem(SK.pub) || '[]');
+let adv   = JSON.parse(localStorage.getItem(SK.adv) || 'null');
+
+let currentUser = null;
+let editAudId = null, editProcId = null, editUserId = null, editPubId = null;
+let transferFromUid = null;
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,5);
 const persist = () => {
-  localStorage.setItem(SK.a, JSON.stringify(auds));
-  localStorage.setItem(SK.p, JSON.stringify(procs));
-  localStorage.setItem(SK.z, JSON.stringify(prazs));
+  localStorage.setItem(SK.a,   JSON.stringify(auds));
+  localStorage.setItem(SK.p,   JSON.stringify(procs));
+  localStorage.setItem(SK.z,   JSON.stringify(prazs));
+  localStorage.setItem(SK.u,   JSON.stringify(users));
+  localStorage.setItem(SK.pub, JSON.stringify(pubs));
+  localStorage.setItem(SK.adv, JSON.stringify(adv));
 };
 
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 // SEED
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 (function seed() {
+  // Users seed
+  if (!users.length) {
+    users = [
+      { id:'admin', nome:'Administrador', user:'admin', pass:'admin123', role:'admin' },
+      { id:uid(), nome:'Maria Fernanda', user:'maria.fernanda', pass:'func123', role:'funcionario' },
+      { id:uid(), nome:'Carlos Eduardo', user:'carlos.eduardo', pass:'func123', role:'funcionario' },
+    ];
+  }
+
   if (auds.length || procs.length) return;
+
   const off = n => { const d = new Date(); d.setDate(d.getDate()+n); return d.toISOString().split('T')[0]; };
+
   procs = [
-    { id:uid(), num:'0012345-12.2023.8.26.0100', parte:'João Silva Santos',   area:'civel',         juizo:'1ª Vara Cível — TJSP',      data:off(-180), status:'ativo',     obs:'Ação de indenização por danos morais. Fase de instrução.' },
-    { id:uid(), num:'0098765-55.2022.5.02.0001', parte:'Maria Oliveira Ltda', area:'trabalhista',   juizo:'3ª Vara do Trabalho — SP',  data:off(-365), status:'ativo',     obs:'Reclamação trabalhista. Pedido de horas extras e FGTS.' },
-    { id:uid(), num:'0011111-11.2024.8.26.0200', parte:'Carlos Pereira',      area:'familia',       juizo:'2ª Vara de Família — TJSP', data:off(-60),  status:'aguardando',obs:'Divórcio consensual. Aguardando homologação.' },
-    { id:uid(), num:'0022222-22.2021.4.03.6100', parte:'Empresa X S/A',       area:'administrativo',juizo:'TRF3 — São Paulo',          data:off(-500), status:'encerrado', obs:'Mandado de segurança. Trânsito em julgado.' },
+    { id:uid(), num:'0012345-12.2023.8.26.0100', parte:'João Silva Santos',   area:'civel',         juizo:'1ª Vara Cível — TJSP',      data:off(-180), status:'ativo',     obs:'Ação de indenização por danos morais. Fase de instrução.', owner:'admin' },
+    { id:uid(), num:'0098765-55.2022.5.02.0001', parte:'Maria Oliveira Ltda', area:'trabalhista',   juizo:'3ª Vara do Trabalho — SP',  data:off(-365), status:'ativo',     obs:'Reclamação trabalhista. Pedido de horas extras e FGTS.', owner:'admin' },
+    { id:uid(), num:'0011111-11.2024.8.26.0200', parte:'Carlos Pereira',      area:'familia',       juizo:'2ª Vara de Família — TJSP', data:off(-60),  status:'aguardando',obs:'Divórcio consensual. Aguardando homologação.', owner:'admin' },
+    { id:uid(), num:'0022222-22.2021.4.03.6100', parte:'Empresa X S/A',       area:'administrativo',juizo:'TRF3 — São Paulo',          data:off(-500), status:'encerrado', obs:'Mandado de segurança. Trânsito em julgado.', owner:'admin' },
   ];
   auds = [
-    { id:uid(), data:off(0),  hora:'09:00', proc:'0012345-12.2023.8.26.0100', parte:'João Silva Santos',   vara:'1ª Vara Cível — TJSP',      area:'civel',         tipo:'Instrução e Julgamento', obs:'Levar documentos originais e rol de testemunhas.' },
-    { id:uid(), data:off(0),  hora:'14:30', proc:'0098765-55.2022.5.02.0001', parte:'Maria Oliveira Ltda', vara:'3ª Vara do Trabalho — SP',  area:'trabalhista',   tipo:'Conciliação',            obs:'Proposta de acordo: R$ 12.000,00.' },
-    { id:uid(), data:off(3),  hora:'10:00', proc:'0011111-11.2024.8.26.0200', parte:'Carlos Pereira',      vara:'2ª Vara de Família — TJSP', area:'familia',       tipo:'Una',                    obs:'Perícia marcada para o mesmo dia às 08:30.' },
-    { id:uid(), data:off(8),  hora:'11:00', proc:'0012345-12.2023.8.26.0100', parte:'João Silva Santos',   vara:'1ª Vara Cível — TJSP',      area:'civel',         tipo:'Designação',             obs:'' },
-    { id:uid(), data:off(-3), hora:'09:30', proc:'0022222-22.2021.4.03.6100', parte:'Empresa X S/A',       vara:'TRF3',                      area:'administrativo',tipo:'Sustentação Oral',        obs:'Realizada. Aguardando acórdão.' },
+    { id:uid(), data:off(0),  hora:'09:00', proc:'0012345-12.2023.8.26.0100', parte:'João Silva Santos',   vara:'1ª Vara Cível — TJSP',      area:'civel',         tipo:'Instrução e Julgamento', obs:'Levar documentos originais e rol de testemunhas.', owner:'admin' },
+    { id:uid(), data:off(0),  hora:'14:30', proc:'0098765-55.2022.5.02.0001', parte:'Maria Oliveira Ltda', vara:'3ª Vara do Trabalho — SP',  area:'trabalhista',   tipo:'Conciliação',            obs:'Proposta de acordo: R$ 12.000,00.', owner:'admin' },
+    { id:uid(), data:off(3),  hora:'10:00', proc:'0011111-11.2024.8.26.0200', parte:'Carlos Pereira',      vara:'2ª Vara de Família — TJSP', area:'familia',       tipo:'Una',                    obs:'Perícia marcada para o mesmo dia às 08:30.', owner:'admin' },
+    { id:uid(), data:off(8),  hora:'11:00', proc:'0012345-12.2023.8.26.0100', parte:'João Silva Santos',   vara:'1ª Vara Cível — TJSP',      area:'civel',         tipo:'Designação',             obs:'', owner:'admin' },
+    { id:uid(), data:off(-3), hora:'09:30', proc:'0022222-22.2021.4.03.6100', parte:'Empresa X S/A',       vara:'TRF3',                      area:'administrativo',tipo:'Sustentação Oral',        obs:'Realizada. Aguardando acórdão.', owner:'admin' },
   ];
   prazs = [
-    { id:uid(), proc:'0012345-12.2023.8.26.0100', desc:'Apresentar rol de testemunhas',        data:off(2),  tipo:'Manifestação', obs:'Máximo 5 testemunhas. Protocolar via PJe.' },
-    { id:uid(), proc:'0098765-55.2022.5.02.0001', desc:'Juntada de documentos trabalhistas',   data:off(5),  tipo:'Juntada',      obs:'Documentos já digitalizados.' },
-    { id:uid(), proc:'0011111-11.2024.8.26.0200', desc:'Recurso de Apelação cível',            data:off(14), tipo:'Apelação',     obs:'Verificar cálculo de custas antes do protocolo.' },
-    { id:uid(), proc:'0022222-22.2021.4.03.6100', desc:'Pagamento de custas processuais',      data:off(1),  tipo:'Pagamento',    obs:'GRU gerada. Valor: R$ 847,50.' },
-    { id:uid(), proc:'0012345-12.2023.8.26.0100', desc:'Contestação da reconvenção',           data:off(7),  tipo:'Contestação',  obs:'Contestar todos os pedidos reconvencionais.' },
-    { id:uid(), proc:'0098765-55.2022.5.02.0001', desc:'Recurso Ordinário Trabalhista',        data:off(10), tipo:'Recurso',      obs:'Prazo de 8 dias após publicação do acórdão.' },
-    { id:uid(), proc:'0011111-11.2024.8.26.0200', desc:'Impugnação ao valor da causa',         data:off(3),  tipo:'Impugnação',   obs:'Valor atribuído pela parte contrária está inflado.' },
-    { id:uid(), proc:'0022222-22.2021.4.03.6100', desc:'Embargos de Declaração',               data:off(20), tipo:'Embargos',     obs:'Pontos omissos na sentença de 1ª instância.' },
+    { id:uid(), proc:'0012345-12.2023.8.26.0100', desc:'Apresentar rol de testemunhas',      data:off(2),  tipo:'Manifestação', obs:'Máximo 5 testemunhas. Protocolar via PJe.', status:'pendente', owner:'admin' },
+    { id:uid(), proc:'0098765-55.2022.5.02.0001', desc:'Juntada de documentos trabalhistas', data:off(5),  tipo:'Juntada',      obs:'Documentos já digitalizados.', status:'pendente', owner:'admin' },
+    { id:uid(), proc:'0011111-11.2024.8.26.0200', desc:'Recurso de Apelação cível',          data:off(14), tipo:'Apelação',     obs:'Verificar cálculo de custas antes do protocolo.', status:'pendente', owner:'admin' },
+    { id:uid(), proc:'0022222-22.2021.4.03.6100', desc:'Pagamento de custas processuais',    data:off(1),  tipo:'Pagamento',    obs:'GRU gerada. Valor: R$ 847,50.', status:'pendente', owner:'admin' },
+    { id:uid(), proc:'0012345-12.2023.8.26.0100', desc:'Contestação da reconvenção',         data:off(7),  tipo:'Contestação',  obs:'Contestar todos os pedidos reconvencionais.', status:'pendente', owner:'admin' },
+    { id:uid(), proc:'0098765-55.2022.5.02.0001', desc:'Recurso Ordinário Trabalhista',      data:off(10), tipo:'Recurso',      obs:'Prazo de 8 dias após publicação do acórdão.', status:'pendente', owner:'admin' },
+    { id:uid(), proc:'0011111-11.2024.8.26.0200', desc:'Impugnação ao valor da causa',       data:off(3),  tipo:'Impugnação',   obs:'Valor atribuído pela parte contrária está inflado.', status:'pendente', owner:'admin' },
+    { id:uid(), proc:'0022222-22.2021.4.03.6100', desc:'Embargos de Declaração',             data:off(20), tipo:'Embargos',     obs:'Pontos omissos na sentença de 1ª instância.', status:'pendente', owner:'admin' },
   ];
   persist();
 })();
 
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+// AUTO-UPDATE PRAZOS STATUS (pendente vencido → atrasado)
+// ══════════════════════════════════════════════════════
+function autoUpdatePrazStatus() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  let changed = false;
+  prazs.forEach(p => {
+    if (p.status === 'pendente' && p.data < todayStr) {
+      p.status = 'atrasado';
+      changed = true;
+    }
+  });
+  if (changed) persist();
+}
+autoUpdatePrazStatus();
+
+// ══════════════════════════════════════════════════════
 // UTILS
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 const todayStr = new Date().toISOString().split('T')[0];
 
 function daysLeft(str) {
@@ -862,251 +923,27 @@ function daysLeft(str) {
   const t = new Date(); t.setHours(12,0,0,0);
   return Math.round((d - t) / 86400000);
 }
-
 function fmt(str) {
   if (!str) return '—';
   const [y,m,d] = str.split('-');
-  return d + '/' + m + '/' + y;
+  return d+'/'+m+'/'+y;
 }
-
 const areaNames = { civel:'Cível', criminal:'Criminal', trabalhista:'Trabalhista', familia:'Família', administrativo:'Administrativo' };
-
-function chipArea(a) {
-  return '<span class="chip ch-' + a + '">' + (areaNames[a] || a) + '</span>';
-}
-
-function chipStatus(s) {
+const chipArea  = a => '<span class="chip ch-'+a+'">'+(areaNames[a]||a)+'</span>';
+const chipStatus = s => {
   const L = { ativo:'Ativo', encerrado:'Encerrado', suspenso:'Suspenso', aguardando:'Aguardando' };
-  return '<span class="chip ch-' + s + '">' + (L[s] || s) + '</span>';
-}
-
-function pill(d) {
-  if (d === null) return '';
-  if (d < 0)  return '<span class="pill pill-venc">Vencido</span>';
-  if (d === 0) return '<span class="pill pill-urg">🔴 HOJE</span>';
-  if (d === 1) return '<span class="pill pill-urg">🔴 Amanhã</span>';
-  if (d <= 3)  return '<span class="pill pill-urg">⚠️ ' + d + ' dias</span>';
-  if (d <= 7)  return '<span class="pill pill-prox">🟡 ' + d + ' dias</span>';
-  return '<span class="pill pill-ok">🟢 ' + d + ' dias</span>';
-}
-
-function toast(msg) {
-  const el = document.getElementById('toast');
-  document.getElementById('toastMsg').textContent = msg;
-  el.classList.add('on');
-  setTimeout(() => el.classList.remove('on'), 2700);
-}
-
-// ──────────────────────────────────────────
-// SIDEBAR
-// ──────────────────────────────────────────
-function openSidebar() {
-  document.getElementById('sidebar').classList.add('open');
-  document.getElementById('sidebarOverlay').classList.add('visible');
-  document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('visible');
-  document.body.style.overflow = '';
-}
-
-// ──────────────────────────────────────────
-// NAVIGATION
-// ──────────────────────────────────────────
-const mainPages  = ['dashboard','audiencias','processos','prazos'];
-const detailPages = ['det-proc','det-aud','det-praz'];
-const pageTitles  = {
-  'dashboard':'Painel','audiencias':'Audiências','processos':'Processos','prazos':'Prazos',
-  'det-proc':'Processo','det-aud':'Audiência','det-praz':'Prazo'
+  return '<span class="chip ch-'+s+'">'+(L[s]||s)+'</span>';
 };
-
-let currentMain = 'dashboard'; // tracks last main page for back button
-
-function showView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  const el = document.getElementById('v-' + id);
-  if (el) el.classList.add('active');
-  document.getElementById('topTitle').textContent = pageTitles[id] || '';
-  window.scrollTo(0, 0);
+function pill(d) {
+  if (d===null) return '';
+  if (d<0)  return '<span class="pill pill-venc">Vencido</span>';
+  if (d===0) return '<span class="pill pill-urg">🔴 HOJE</span>';
+  if (d===1) return '<span class="pill pill-urg">🔴 Amanhã</span>';
+  if (d<=3)  return '<span class="pill pill-urg">⚠️ '+d+' dias</span>';
+  if (d<=7)  return '<span class="pill pill-prox">🟡 '+d+' dias</span>';
+  return '<span class="pill pill-ok">🟢 '+d+' dias</span>';
 }
 
-function setNav(id) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  const el = document.getElementById('nav-' + id);
-  if (el) el.classList.add('active');
-}
-
-function navTo(id) {
-  closeSidebar();
-  if (mainPages.includes(id)) {
-    currentMain = id;
-    setNav(id);
-    showView(id);
-    renderAll();
-  }
-}
-
-function backTo(id) {
-  setNav(id);
-  showView(id);
-  renderAll();
-}
-
-// ──────────────────────────────────────────
-// RENDER ALL
-// ──────────────────────────────────────────
-function renderAll() {
-  renderDash();
-  renderAuds();
-  renderProcs();
-  renderPrazs();
-  updateBadge();
-}
-
-function updateBadge() {
-  const n = prazs.filter(p => { const d = daysLeft(p.data); return d !== null && d >= 0 && d <= 3; }).length;
-  const b = document.getElementById('navBadge');
-  b.style.display = n > 0 ? 'inline' : 'none';
-  b.textContent = n;
-}
-
-// ──────────────────────────────────────────
-// DASHBOARD
-// ──────────────────────────────────────────
-function renderDash() {
-  const now = new Date();
-  const h = now.getHours();
-  document.getElementById('greeting').textContent = h < 12 ? 'Bom dia!' : h < 18 ? 'Boa tarde!' : 'Boa noite!';
-  document.getElementById('greetDate').textContent = now.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-  document.getElementById('sideDate').textContent =
-    now.toLocaleDateString('pt-BR', { weekday:'long' }) + '\n' +
-    now.toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
-
-  const audHoje   = auds.filter(a => a.data === todayStr);
-  const audSemana = auds.filter(a => { const d = daysLeft(a.data); return d !== null && d >= 0 && d <= 7; });
-  const procAtiv  = procs.filter(p => p.status === 'ativo');
-  const prazUrg   = prazs.filter(p => { const d = daysLeft(p.data); return d !== null && d >= 0 && d <= 3; });
-
-  // alert
-  const bar = document.getElementById('alertBar');
-  if (prazUrg.length) {
-    bar.classList.add('on');
-    document.getElementById('alertMsg').textContent = prazUrg.length + ' prazo(s) vencendo nos próximos 3 dias! Veja a aba Prazos.';
-  } else {
-    bar.classList.remove('on');
-  }
-
-  // stats
-  document.getElementById('statsRow').innerHTML =
-    mkStat('gold','📅', audHoje.length, 'Audiências Hoje', audSemana.length + ' nos próximos 7 dias', 'audiencias') +
-    mkStat('green','📂', procAtiv.length, 'Processos Ativos', procs.length + ' no total', 'processos') +
-    mkStat('red','⚠️', prazUrg.length, 'Prazos Urgentes', 'até 3 dias', 'prazos') +
-    mkStat('blue','⚖️', auds.length, 'Total Audiências', 'cadastradas', 'audiencias');
-
-  // audiências de hoje
-  const al = document.getElementById('dashAuds');
-  const sorted = [...audHoje].sort((a,b) => a.hora.localeCompare(b.hora));
-  if (!sorted.length) {
-    al.innerHTML = emptyEl('📅', 'Nenhuma audiência hoje');
-  } else {
-    al.innerHTML = sorted.map(a =>
-      '<div class="agenda-row" onclick="openDetAud(\'' + a.id + '\')">' +
-        '<div class="time-box tb-today"><span class="tb-h">' + a.hora + '</span><span class="tb-d">hoje</span></div>' +
-        '<div class="ag-body"><div class="ag-name">' + a.parte + '</div><div class="ag-sub">' + (a.vara||'—') + ' · ' + a.tipo + '</div></div>' +
-        chipArea(a.area) +
-      '</div>'
-    ).join('');
-  }
-
-  // prazos
-  const pl = document.getElementById('dashPrazos');
-  const prox = [...prazs].filter(p => daysLeft(p.data) >= 0).sort((a,b) => a.data.localeCompare(b.data)).slice(0,5);
-  if (!prox.length) {
-    pl.innerHTML = emptyEl('✅', 'Sem prazos pendentes');
-  } else {
-    pl.innerHTML = prox.map(p => {
-      const d = daysLeft(p.data);
-      const urg = d <= 2;
-      return '<div class="agenda-row" onclick="openDetPraz(\'' + p.id + '\')">' +
-        '<div class="time-box ' + (urg ? 'tb-urgent' : '') + '"><span class="tb-h">' + (d===0?'HOJE':d+'d') + '</span><span class="tb-d">' + fmt(p.data) + '</span></div>' +
-        '<div class="ag-body"><div class="ag-name">' + p.desc + '</div><div class="ag-sub">' + p.proc + ' · ' + p.tipo + '</div></div>' +
-      '</div>';
-    }).join('');
-  }
-}
-
-function mkStat(ic, emo, num, lbl, sub, page) {
-  return '<div class="stat-card" onclick="navTo(\'' + page + '\')">' +
-    '<div class="stat-ico ic-' + ic + '">' + emo + '</div>' +
-    '<div><div class="stat-num">' + num + '</div><div class="stat-lbl">' + lbl + '</div><div class="stat-sub">' + sub + '</div></div>' +
-  '</div>';
-}
-
-function emptyEl(emo, txt) {
-  return '<div class="empty"><div class="empty-emo">' + emo + '</div><div class="empty-txt">' + txt + '</div></div>';
-}
-
-// ──────────────────────────────────────────
-// AUDIÊNCIAS TABLE
-// ──────────────────────────────────────────
-function renderAuds() {
-  const q    = (document.getElementById('sAud')?.value || '').toLowerCase();
-  const area = document.getElementById('fAudArea')?.value || '';
-  let list = [...auds].sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
-  if (q)    list = list.filter(a => a.proc.toLowerCase().includes(q) || a.parte.toLowerCase().includes(q) || (a.vara||'').toLowerCase().includes(q));
-  if (area) list = list.filter(a => a.area === area);
-  const tb = document.getElementById('tbAud');
-  if (!list.length) { tb.innerHTML = '<tr><td colspan="7">' + emptyEl('📅','Nenhuma audiência') + '</td></tr>'; return; }
-  tb.innerHTML = list.map(a => {
-    const d = daysLeft(a.data); const hoje = d === 0;
-    return '<tr onclick="openDetAud(\'' + a.id + '\')">' +
-      '<td><span style="font-weight:' + (hoje?700:500) + ';color:' + (hoje?'var(--blue)':'var(--navy)') + '">' + fmt(a.data) + '</span><br><span class="mono">' + a.hora + '</span>' + (hoje?' <span class="chip ch-ativo" style="font-size:.58rem">HOJE</span>':'') + '</td>' +
-      '<td><span class="mono">' + a.proc + '</span></td>' +
-      '<td class="td-name">' + a.parte + '</td>' +
-      '<td style="font-size:.8rem">' + (a.vara||'—') + '</td>' +
-      '<td>' + chipArea(a.area) + '</td>' +
-      '<td style="font-size:.8rem">' + a.tipo + '</td>' +
-      '<td onclick="event.stopPropagation()"><div class="act-cell">' +
-        '<button class="btn-ico edit" onclick="openAudModal(\'' + a.id + '\')" title="Editar">✏️</button>' +
-        '<button class="btn-ico" onclick="delAud(\'' + a.id + '\')" title="Excluir">🗑️</button>' +
-      '</div></td></tr>';
-  }).join('');
-}
-
-// ──────────────────────────────────────────
-// PROCESSOS TABLE
-// ──────────────────────────────────────────
-function renderProcs() {
-  const q      = (document.getElementById('sProc')?.value || '').toLowerCase();
-  const status = document.getElementById('fProcStatus')?.value || '';
-  const area   = document.getElementById('fProcArea')?.value || '';
-  let list = [...procs].sort((a,b) => b.data.localeCompare(a.data));
-  if (q)      list = list.filter(p => p.num.toLowerCase().includes(q) || p.parte.toLowerCase().includes(q));
-  if (status) list = list.filter(p => p.status === status);
-  if (area)   list = list.filter(p => p.area === area);
-  const tb = document.getElementById('tbProc');
-  if (!list.length) { tb.innerHTML = '<tr><td colspan="8">' + emptyEl('📂','Nenhum processo') + '</td></tr>'; return; }
-  tb.innerHTML = list.map(p => {
-    const px = auds.filter(a => a.proc === p.num && daysLeft(a.data) >= 0).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora))[0];
-    return '<tr onclick="openDetProc(\'' + p.id + '\')">' +
-      '<td><span class="mono">' + p.num + '</span></td>' +
-      '<td class="td-name">' + p.parte + '</td>' +
-      '<td>' + chipArea(p.area) + '</td>' +
-      '<td style="font-size:.8rem">' + (p.juizo||'—') + '</td>' +
-      '<td style="color:var(--muted)">' + fmt(p.data) + '</td>' +
-      '<td>' + chipStatus(p.status) + '</td>' +
-      '<td style="font-size:.8rem">' + (px ? fmt(px.data)+' '+px.hora : '—') + '</td>' +
-      '<td onclick="event.stopPropagation()"><div class="act-cell">' +
-        '<button class="btn-ico edit" onclick="openProcModal(\'' + p.id + '\')" title="Editar">✏️</button>' +
-        '<button class="btn-ico" onclick="delProc(\'' + p.id + '\')" title="Excluir">🗑️</button>' +
-      '</div></td></tr>';
-  }).join('');
-}
-
-// ──────────────────────────────────────────
-// PRAZO TIPO — color map
-// ──────────────────────────────────────────
 const prazoTipoMap = {
   'Recurso':      { cls:'pt-recurso',      icon:'⚡' },
   'Apelação':     { cls:'pt-apelacao',     icon:'📄' },
@@ -1118,314 +955,744 @@ const prazoTipoMap = {
   'Embargos':     { cls:'pt-embargos',     icon:'⚖️' },
   'Outro':        { cls:'pt-outro',        icon:'🔹' },
 };
-
 function chipTipo(tipo) {
   const t = prazoTipoMap[tipo] || { cls:'pt-outro', icon:'🔹' };
-  return '<span class="chip ' + t.cls + '">' + t.icon + ' ' + tipo + '</span>';
+  return '<span class="chip '+t.cls+'">'+t.icon+' '+tipo+'</span>';
+}
+function chipPrazStatus(s) {
+  if (s==='concluido') return '<span class="chip ch-concluido">✅ Concluído</span>';
+  if (s==='atrasado')  return '<span class="chip ch-atrasado">🔴 Atrasado</span>';
+  return '<span class="chip ch-pendente">⏳ Pendente</span>';
+}
+function getUserName(ownerId) {
+  const u = users.find(x => x.id === ownerId);
+  return u ? u.nome : '—';
+}
+function emptyEl(emo, txt) {
+  return '<div class="empty"><div class="empty-emo">'+emo+'</div><div class="empty-txt">'+txt+'</div></div>';
+}
+function toast(msg, icon='✅') {
+  const el = document.getElementById('toast');
+  el.innerHTML = icon+' <span>'+msg+'</span>';
+  el.classList.add('on');
+  setTimeout(() => el.classList.remove('on'), 2700);
 }
 
-// ──────────────────────────────────────────
-// PRAZOS TABLE
-// ──────────────────────────────────────────
-function renderPrazs() {
-  const q    = (document.getElementById('sPraz')?.value || '').toLowerCase();
-  const tipo = document.getElementById('fPrazTipo')?.value || '';
-  const urg  = document.getElementById('fPrazUrg')?.value || '';
-  let list = [...prazs].sort((a,b) => a.data.localeCompare(b.data));
-  if (q)    list = list.filter(p => p.proc.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
-  if (tipo) list = list.filter(p => p.tipo === tipo);
-  if (urg === 'urgente') list = list.filter(p => { const d=daysLeft(p.data); return d!==null&&d>=0&&d<=3; });
-  else if (urg === 'proximo') list = list.filter(p => { const d=daysLeft(p.data); return d!==null&&d>=0&&d<=7; });
-  else if (urg === 'futuro')  list = list.filter(p => { const d=daysLeft(p.data); return d!==null&&d>7; });
-  const tb = document.getElementById('tbPraz');
-  if (!list.length) { tb.innerHTML = '<tr><td colspan="7">' + emptyEl('⏰','Nenhum prazo encontrado') + '</td></tr>'; return; }
-  tb.innerHTML = list.map(p => {
-    const d = daysLeft(p.data); const venc = d !== null && d < 0;
-    return '<tr onclick="openDetPraz(\'' + p.id + '\')" style="' + (venc?'opacity:.55':'') + '">' +
-      '<td><span style="font-weight:600">' + fmt(p.data) + '</span></td>' +
-      '<td>' + pill(d) + '</td>' +
-      '<td><span class="mono">' + p.proc + '</span></td>' +
-      '<td class="td-name">' + p.desc + '</td>' +
-      '<td>' + chipTipo(p.tipo) + '</td>' +
-      '<td><span class="chip ' + (venc?'ch-vencido':'ch-pendente') + '">' + (venc?'Vencido':'Pendente') + '</span></td>' +
-      '<td onclick="event.stopPropagation()"><div class="act-cell">' +
-        '<button class="btn-ico" onclick="delPraz(\'' + p.id + '\')" title="Excluir">🗑️</button>' +
-      '</div></td></tr>';
+// ══════════════════════════════════════════════════════
+// LOGIN / LOGOUT
+// ══════════════════════════════════════════════════════
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const found = users.find(x => x.user === u && x.pass === p);
+  if (!found) {
+    document.getElementById('loginErr').classList.add('on');
+    return;
+  }
+  document.getElementById('loginErr').classList.remove('on');
+  currentUser = found;
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appScreen').classList.add('on');
+  setupSidebar();
+  renderAll();
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('appScreen').classList.remove('on');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+}
+
+function setupSidebar() {
+  const u = currentUser;
+  document.getElementById('sideAvatar').textContent = u.nome[0].toUpperCase();
+  document.getElementById('sideName').textContent = u.nome;
+  document.getElementById('sideRole').textContent = u.role === 'admin' ? 'Administrador' : 'Funcionário';
+
+  const isAdmin = u.role === 'admin';
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.classList.toggle('show', isAdmin);
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════════════════════════
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('visible');
+  document.body.style.overflow = '';
+}
+
+// ══════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════
+const mainPages = ['dashboard','audiencias','processos','prazos','publicacoes','advogado','admin'];
+const pageTitles = { dashboard:'Painel', audiencias:'Audiências', processos:'Processos', prazos:'Prazos', publicacoes:'Publicações', advogado:'Advogado', admin:'Usuários', 'det-proc':'Processo', 'det-aud':'Audiência', 'det-praz':'Prazo' };
+
+function navTo(id) {
+  closeSidebar();
+  if (id === 'admin' && currentUser?.role !== 'admin') return;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('v-'+id);
+  if (el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const nav = document.getElementById('nav-'+id);
+  if (nav) nav.classList.add('active');
+  document.getElementById('topTitle').textContent = pageTitles[id] || '';
+  if (mainPages.includes(id)) renderAll();
+  window.scrollTo(0,0);
+}
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('v-'+id);
+  if (el) el.classList.add('active');
+  document.getElementById('topTitle').textContent = pageTitles[id] || '';
+  window.scrollTo(0,0);
+}
+
+function backTo(id) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const nav = document.getElementById('nav-'+id);
+  if (nav) nav.classList.add('active');
+  showView(id);
+}
+
+// ══════════════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════════════
+function renderAll() {
+  renderDash();
+  renderAuds();
+  renderProcs();
+  renderPrazs();
+  renderPubs();
+  renderAdv();
+  renderAdmin();
+  updateBadge();
+  populateOwnerSelects();
+}
+
+function updateBadge() {
+  const myPrazs = prazs.filter(p => !currentUser || currentUser.role==='admin' || p.owner===currentUser.id);
+  const n = myPrazs.filter(p => p.status==='pendente' && daysLeft(p.data)!==null && daysLeft(p.data)>=0 && daysLeft(p.data)<=3).length
+          + myPrazs.filter(p => p.status==='atrasado').length;
+  const b = document.getElementById('navBadge');
+  b.style.display = n>0 ? 'inline' : 'none';
+  b.textContent = n;
+}
+
+function filterByOwner(list) {
+  if (!currentUser || currentUser.role === 'admin') return list;
+  return list.filter(x => x.owner === currentUser.id);
+}
+
+function populateOwnerSelects() {
+  const opts = users.map(u => '<option value="'+u.id+'">'+(u.role==='admin'?'👑 ':'')+u.nome+'</option>').join('');
+  ['a_owner','p_owner','z_owner'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.innerHTML = opts; if (currentUser) el.value = currentUser.id; }
+  });
+}
+
+// ══════════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════════
+function renderDash() {
+  const now = new Date(); const h = now.getHours();
+  document.getElementById('greeting').textContent = h<12?'Bom dia!':h<18?'Boa tarde!':'Boa noite!';
+  document.getElementById('greetDate').textContent = now.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('sideDate').textContent = now.toLocaleDateString('pt-BR',{weekday:'long'})+'\n'+now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+
+  const myAuds  = filterByOwner(auds);
+  const myProcs = filterByOwner(procs);
+  const myPrazs = filterByOwner(prazs);
+
+  const audHoje   = myAuds.filter(a => a.data===todayStr);
+  const audSemana = myAuds.filter(a => { const d=daysLeft(a.data); return d!==null&&d>=0&&d<=7; });
+  const procAtiv  = myProcs.filter(p => p.status==='ativo');
+  const prazUrg   = myPrazs.filter(p => p.status==='pendente' && daysLeft(p.data)!==null && daysLeft(p.data)>=0 && daysLeft(p.data)<=3);
+  const prazAtr   = myPrazs.filter(p => p.status==='atrasado');
+
+  const bar = document.getElementById('alertBar');
+  const msgs = [];
+  if (prazUrg.length) msgs.push(prazUrg.length+' prazo(s) vencendo em até 3 dias!');
+  if (prazAtr.length) msgs.push(prazAtr.length+' prazo(s) atrasado(s)!');
+  if (msgs.length) { bar.classList.add('on'); document.getElementById('alertMsg').textContent = msgs.join(' · '); }
+  else bar.classList.remove('on');
+
+  document.getElementById('statsRow').innerHTML =
+    mkStat('gold','📅',audHoje.length,'Audiências Hoje',audSemana.length+' nos próximos 7 dias','audiencias')+
+    mkStat('green','📂',procAtiv.length,'Processos Ativos',myProcs.length+' no total','processos')+
+    mkStat('red','⚠️',prazUrg.length+prazAtr.length,'Prazos Críticos',prazAtr.length+' atrasado(s)','prazos')+
+    mkStat('blue','📰',pubs.length,'Publicações',pubs.filter(p=>p.urg==='1').length+' urgente(s)','publicacoes');
+  document.querySelectorAll('.dash-stat').forEach(el=>el.addEventListener('click',()=>navTo(el.dataset.page)));
+
+  const al = document.getElementById('dashAuds');
+  const sorted = [...audHoje].sort((a,b)=>a.hora.localeCompare(b.hora));
+  al.innerHTML = !sorted.length ? emptyEl('📅','Nenhuma audiência hoje') :
+    sorted.map(a=>`<div class="agenda-row dash-aud" data-id="${a.id}">
+      <div class="time-box tb-today"><span class="tb-h">${a.hora}</span><span class="tb-d">hoje</span></div>
+      <div class="ag-body"><div class="ag-name">${a.parte}</div><div class="ag-sub">${a.vara||'—'} · ${a.tipo}</div></div>
+      ${chipArea(a.area)}</div>`).join('');
+  al.querySelectorAll('.dash-aud').forEach(el=>el.addEventListener('click',()=>openDetAud(el.dataset.id)));
+
+  const prox = [...myPrazs].filter(p=>p.status!=='concluido'&&daysLeft(p.data)>=0).sort((a,b)=>a.data.localeCompare(b.data)).slice(0,5);
+  const pl = document.getElementById('dashPrazos');
+  pl.innerHTML = !prox.length ? emptyEl('✅','Sem prazos pendentes') :
+    prox.map(p=>{const d=daysLeft(p.data);const urg=d<=2;
+      return `<div class="agenda-row dash-praz" data-id="${p.id}">
+        <div class="time-box ${urg?'tb-urgent':''}"><span class="tb-h">${d===0?'HOJE':d+'d'}</span><span class="tb-d">${fmt(p.data)}</span></div>
+        <div class="ag-body"><div class="ag-name">${p.desc}</div><div class="ag-sub">${p.proc} · ${p.tipo}</div></div>
+        ${chipTipo(p.tipo)}</div>`;}).join('');
+  pl.querySelectorAll('.dash-praz').forEach(el=>el.addEventListener('click',()=>openDetPraz(el.dataset.id)));
+}
+
+function mkStat(ic,emo,num,lbl,sub,page) {
+  return `<div class="stat-card dash-stat" data-page="${page}">
+    <div class="stat-ico ic-${ic}">${emo}</div>
+    <div><div class="stat-num">${num}</div><div class="stat-lbl">${lbl}</div><div class="stat-sub">${sub}</div></div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════
+// AUDIÊNCIAS
+// ══════════════════════════════════════════════════════
+function renderAuds() {
+  const q    = (document.getElementById('sAud')?.value||'').toLowerCase();
+  const area = document.getElementById('fAudArea')?.value||'';
+  let list = filterByOwner([...auds]).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora));
+  if (q)    list = list.filter(a=>a.proc.toLowerCase().includes(q)||a.parte.toLowerCase().includes(q)||(a.vara||'').toLowerCase().includes(q));
+  if (area) list = list.filter(a=>a.area===area);
+  const tb = document.getElementById('tbAud');
+  if (!list.length){tb.innerHTML='<tr><td colspan="7">'+emptyEl('📅','Nenhuma audiência')+'</td></tr>';return;}
+  tb.innerHTML = list.map(a=>{
+    const d=daysLeft(a.data); const hoje=d===0;
+    return `<tr data-id="${a.id}" class="aud-row">
+      <td><span style="font-weight:${hoje?700:500};color:${hoje?'var(--blue)':'var(--navy)'}">${fmt(a.data)}</span><br><span class="mono">${a.hora}</span>${hoje?' <span class="chip ch-ativo" style="font-size:.58rem">HOJE</span>':''}</td>
+      <td><span class="mono">${a.proc}</span></td>
+      <td class="td-name">${a.parte}</td>
+      <td style="font-size:.8rem">${a.vara||'—'}</td>
+      <td>${chipArea(a.area)}</td>
+      <td style="font-size:.8rem">${a.tipo}</td>
+      <td><div class="act-cell">
+        <button class="btn-ico edit aud-edit" data-id="${a.id}" title="Editar">✏️</button>
+        <button class="btn-ico aud-del" data-id="${a.id}" title="Excluir">🗑️</button>
+      </div></td></tr>`;
   }).join('');
+  tb.querySelectorAll('.aud-row').forEach(r=>r.addEventListener('click',e=>{if(!e.target.closest('button'))openDetAud(r.dataset.id);}));
+  tb.querySelectorAll('.aud-edit').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openAudModal(b.dataset.id);}));
+  tb.querySelectorAll('.aud-del').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();delAud(b.dataset.id);}));
 }
 
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
+// PROCESSOS
+// ══════════════════════════════════════════════════════
+function renderProcs() {
+  const q      = (document.getElementById('sProc')?.value||'').toLowerCase();
+  const status = document.getElementById('fProcStatus')?.value||'';
+  const area   = document.getElementById('fProcArea')?.value||'';
+  let list = filterByOwner([...procs]).sort((a,b)=>b.data.localeCompare(a.data));
+  if (q)      list = list.filter(p=>p.num.toLowerCase().includes(q)||p.parte.toLowerCase().includes(q));
+  if (status) list = list.filter(p=>p.status===status);
+  if (area)   list = list.filter(p=>p.area===area);
+  const tb = document.getElementById('tbProc');
+  if (!list.length){tb.innerHTML='<tr><td colspan="8">'+emptyEl('📂','Nenhum processo')+'</td></tr>';return;}
+  tb.innerHTML = list.map(p=>{
+    const px = auds.filter(a=>a.proc===p.num&&daysLeft(a.data)>=0).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora))[0];
+    return `<tr data-id="${p.id}" class="proc-row">
+      <td><span class="mono">${p.num}</span></td>
+      <td class="td-name">${p.parte}</td>
+      <td>${chipArea(p.area)}</td>
+      <td style="font-size:.8rem">${p.juizo||'—'}</td>
+      <td style="color:var(--muted)">${fmt(p.data)}</td>
+      <td>${chipStatus(p.status)}</td>
+      <td style="font-size:.8rem">${px?fmt(px.data)+' '+px.hora:'—'}</td>
+      <td><div class="act-cell">
+        <button class="btn-ico edit proc-edit" data-id="${p.id}" title="Editar">✏️</button>
+        <button class="btn-ico proc-del" data-id="${p.id}" title="Excluir">🗑️</button>
+      </div></td></tr>`;
+  }).join('');
+  tb.querySelectorAll('.proc-row').forEach(r=>r.addEventListener('click',e=>{if(!e.target.closest('button'))openDetProc(r.dataset.id);}));
+  tb.querySelectorAll('.proc-edit').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openProcModal(b.dataset.id);}));
+  tb.querySelectorAll('.proc-del').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();delProc(b.dataset.id);}));
+}
+
+// ══════════════════════════════════════════════════════
+// PRAZOS
+// ══════════════════════════════════════════════════════
+function renderPrazs() {
+  const q      = (document.getElementById('sPraz')?.value||'').toLowerCase();
+  const tipo   = document.getElementById('fPrazTipo')?.value||'';
+  const fstatus= document.getElementById('fPrazStatus')?.value||'';
+  const urg    = document.getElementById('fPrazUrg')?.value||'';
+  let list = filterByOwner([...prazs]).sort((a,b)=>a.data.localeCompare(b.data));
+  if (q)       list = list.filter(p=>p.proc.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q));
+  if (tipo)    list = list.filter(p=>p.tipo===tipo);
+  if (fstatus) list = list.filter(p=>p.status===fstatus);
+  if (urg==='urgente') list = list.filter(p=>{const d=daysLeft(p.data);return d!==null&&d>=0&&d<=3;});
+  else if (urg==='proximo') list = list.filter(p=>{const d=daysLeft(p.data);return d!==null&&d>=0&&d<=7;});
+  else if (urg==='futuro')  list = list.filter(p=>{const d=daysLeft(p.data);return d!==null&&d>7;});
+  const tb = document.getElementById('tbPraz');
+  if (!list.length){tb.innerHTML='<tr><td colspan="7">'+emptyEl('⏰','Nenhum prazo')+'</td></tr>';return;}
+  tb.innerHTML = list.map(p=>{
+    const d = daysLeft(p.data);
+    const dim = p.status==='concluido' ? 'opacity:.6;' : '';
+    const dPill = p.status==='concluido' ? '<span class="pill pill-ok">✅ Feito</span>' : p.status==='atrasado' ? '<span class="pill pill-venc">🔴 Atrasado</span>' : pill(d);
+    return `<tr data-id="${p.id}" class="praz-row" style="${dim}">
+      <td><span style="font-weight:600">${fmt(p.data)}</span></td>
+      <td>${dPill}</td>
+      <td><span class="mono">${p.proc}</span></td>
+      <td class="td-name">${p.desc}</td>
+      <td>${chipTipo(p.tipo)}</td>
+      <td>${chipPrazStatus(p.status)}</td>
+      <td><div class="act-cell">
+        ${p.status!=='concluido'?`<button class="btn-ico ok praz-ok" data-id="${p.id}" title="Concluir">✅</button>`:''}
+        <button class="btn-ico edit praz-edit" data-id="${p.id}" title="Editar">✏️</button>
+        <button class="btn-ico praz-del" data-id="${p.id}" title="Excluir">🗑️</button>
+      </div></td></tr>`;
+  }).join('');
+  tb.querySelectorAll('.praz-row').forEach(r=>r.addEventListener('click',e=>{if(!e.target.closest('button'))openDetPraz(r.dataset.id);}));
+  tb.querySelectorAll('.praz-ok').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();concluirPraz(b.dataset.id);}));
+  tb.querySelectorAll('.praz-edit').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openEditPrazModal(b.dataset.id);}));
+  tb.querySelectorAll('.praz-del').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();delPraz(b.dataset.id);}));
+}
+
+function concluirPraz(id) {
+  const p = prazs.find(x=>x.id===id); if(!p) return;
+  p.status = 'concluido';
+  persist(); renderAll(); toast('Prazo marcado como concluído!');
+}
+
+// ══════════════════════════════════════════════════════
+// PUBLICAÇÕES
+// ══════════════════════════════════════════════════════
+function renderPubs() {
+  const q     = (document.getElementById('sPub')?.value||'').toLowerCase();
+  const trib  = document.getElementById('fPubTrib')?.value||'';
+  const fdata = document.getElementById('fPubData')?.value||'';
+  let list = [...pubs].sort((a,b)=>b.data.localeCompare(a.data));
+  if (q)     list = list.filter(p=>p.titulo.toLowerCase().includes(q)||p.corpo.toLowerCase().includes(q));
+  if (trib)  list = list.filter(p=>p.trib===trib);
+  if (fdata) list = list.filter(p=>p.data===fdata);
+
+  const el = document.getElementById('pubList');
+  if (!list.length){el.innerHTML=emptyEl('📰','Nenhuma publicação encontrada');return;}
+  el.innerHTML = '<div class="pub-list">'+list.map(p=>`
+    <div class="pub-card ${p.urg==='1'?'pub-urgent':''}">
+      <div class="pub-header">
+        <div>
+          <div class="pub-title">${p.titulo}</div>
+          <div class="pub-meta">📅 ${fmt(p.data)} &nbsp;·&nbsp; ⚖️ ${p.trib} &nbsp;·&nbsp; 👤 ${p.adv||'—'}</div>
+        </div>
+        ${p.urg==='1'?'<span class="chip ch-atrasado">🚨 Urgente</span>':''}
+      </div>
+      <div class="pub-body">${p.corpo}</div>
+      <div class="pub-footer">
+        <button class="btn btn-ghost btn-sm" onclick="editPub('${p.id}')">✏️ Editar</button>
+        <button class="btn btn-ghost btn-sm" onclick="delPub('${p.id}')">🗑️ Excluir</button>
+      </div>
+    </div>`).join('')+'</div>';
+}
+
+function openPubModal(id=null) {
+  editPubId=id;
+  document.getElementById('pubModalTitle').textContent=id?'Editar Publicação':'Nova Publicação';
+  ['pub_titulo','pub_corpo','pub_adv'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+  document.getElementById('pub_data').value=todayStr;
+  document.getElementById('pub_trib').value='TJSP';
+  document.getElementById('pub_urg').value='0';
+  // pré-preencher com dados do advogado
+  if (adv) document.getElementById('pub_adv').value=(adv.nome?adv.nome+' — OAB '+adv.uf+' '+adv.oab:'');
+  if (id) {
+    const p=pubs.find(x=>x.id===id);
+    if(p){document.getElementById('pub_data').value=p.data;document.getElementById('pub_trib').value=p.trib;document.getElementById('pub_titulo').value=p.titulo;document.getElementById('pub_adv').value=p.adv||'';document.getElementById('pub_corpo').value=p.corpo;document.getElementById('pub_urg').value=p.urg||'0';}
+  }
+  document.getElementById('ovPub').classList.add('open');
+}
+function editPub(id){openPubModal(id);}
+function savePub() {
+  const d={data:document.getElementById('pub_data').value,trib:document.getElementById('pub_trib').value,titulo:document.getElementById('pub_titulo').value.trim(),adv:document.getElementById('pub_adv').value.trim(),corpo:document.getElementById('pub_corpo').value.trim(),urg:document.getElementById('pub_urg').value};
+  if(!d.titulo||!d.corpo){alert('Preencha Título e Conteúdo.');return;}
+  if(editPubId){const i=pubs.findIndex(p=>p.id===editPubId);pubs[i]={...pubs[i],...d};toast('Publicação atualizada!');}
+  else{pubs.push({id:uid(),...d});toast('Publicação salva!');}
+  persist();closeModal('ovPub');renderPubs();
+}
+function delPub(id){if(!confirm('Remover esta publicação?'))return;pubs=pubs.filter(p=>p.id!==id);persist();renderPubs();toast('Publicação removida.','🗑️');}
+
+// ══════════════════════════════════════════════════════
+// ADVOGADO
+// ══════════════════════════════════════════════════════
+function renderAdv() {
+  const el = document.getElementById('advCard');
+  if (!adv||!adv.nome) {
+    el.innerHTML='<div class="adv-card"><div class="adv-avatar">?</div><div class="adv-info"><div class="adv-name">Perfil não configurado</div><div class="adv-empty">Clique em "Editar Perfil" para cadastrar o advogado responsável.</div></div></div>';
+    document.getElementById('advStats').innerHTML='';
+    return;
+  }
+  el.innerHTML=`<div class="adv-card">
+    <div class="adv-avatar">${adv.nome[0]}</div>
+    <div class="adv-info">
+      <div class="adv-name">${adv.nome}</div>
+      <div class="adv-oab">OAB/${adv.uf} ${adv.oab} &nbsp;·&nbsp; ${areaNames[adv.area]||adv.area}</div>
+      ${adv.email?'<div class="adv-oab" style="margin-top:.25rem">✉️ '+adv.email+'</div>':''}
+      ${adv.tel?'<div class="adv-oab">📞 '+adv.tel+'</div>':''}
+    </div>
+  </div>`;
+  document.getElementById('advStats').innerHTML=
+    '<div class="card"><div class="card-head"><div class="card-head-ico" style="background:var(--blue-light)">📊</div><h3>Resumo dos Processos</h3></div>'+
+    '<div style="padding:1rem 1.3rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;">'+
+    ['ativo','aguardando','encerrado'].map(s=>'<div style="text-align:center;"><div style="font-family:Fraunces,serif;font-size:1.8rem;font-weight:900;color:var(--navy)">'+procs.filter(p=>p.status===s).length+'</div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">'+(s[0].toUpperCase()+s.slice(1))+'</div></div>').join('')+
+    '</div></div>'+
+    '<div class="card"><div class="card-head"><div class="card-head-ico" style="background:var(--red-light)">⏰</div><h3>Resumo dos Prazos</h3></div>'+
+    '<div style="padding:1rem 1.3rem;display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;">'+
+    ['pendente','concluido','atrasado'].map(s=>'<div style="text-align:center;"><div style="font-family:Fraunces,serif;font-size:1.8rem;font-weight:900;color:var(--navy)">'+prazs.filter(p=>p.status===s).length+'</div><div style="font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">'+(s[0].toUpperCase()+s.slice(1))+'</div></div>').join('')+
+    '</div></div>';
+}
+
+function openAdvModal() {
+  if(adv){document.getElementById('adv_nome').value=adv.nome||'';document.getElementById('adv_oab').value=adv.oab||'';document.getElementById('adv_uf').value=adv.uf||'SP';document.getElementById('adv_area').value=adv.area||'civel';document.getElementById('adv_email').value=adv.email||'';document.getElementById('adv_tel').value=adv.tel||'';}
+  document.getElementById('ovAdv').classList.add('open');
+}
+function saveAdv() {
+  const d={nome:document.getElementById('adv_nome').value.trim(),oab:document.getElementById('adv_oab').value.trim(),uf:document.getElementById('adv_uf').value,area:document.getElementById('adv_area').value,email:document.getElementById('adv_email').value.trim(),tel:document.getElementById('adv_tel').value.trim()};
+  if(!d.nome||!d.oab){alert('Preencha Nome e OAB.');return;}
+  adv=d;persist();closeModal('ovAdv');renderAdv();toast('Perfil salvo!');
+}
+
+// ══════════════════════════════════════════════════════
+// ADMIN — USUÁRIOS
+// ══════════════════════════════════════════════════════
+function renderAdmin() {
+  if(!currentUser||currentUser.role!=='admin') return;
+  const grid=document.getElementById('adminGrid');
+  grid.innerHTML=users.map(u=>{
+    const uAuds=auds.filter(a=>a.owner===u.id).length;
+    const uProcs=procs.filter(p=>p.owner===u.id).length;
+    const uPrazs=prazs.filter(p=>p.owner===u.id).length;
+    const isAdmin=u.role==='admin';
+    return `<div class="user-card" data-uid="${u.id}">
+      <div class="user-card-top">
+        <div class="user-avatar-lg" style="background:${isAdmin?'var(--gold)':'var(--navy)'}">${u.nome[0]}</div>
+        <div>
+          <div class="user-card-name">${u.nome} ${isAdmin?'👑':''}</div>
+          <div class="user-card-meta">@${u.user} · ${isAdmin?'Administrador':'Funcionário'}</div>
+        </div>
+      </div>
+      <div class="user-card-stats">
+        <div class="user-stat"><div class="user-stat-num">${uAuds}</div><div class="user-stat-lbl">Audiências</div></div>
+        <div class="user-stat"><div class="user-stat-num">${uProcs}</div><div class="user-stat-lbl">Processos</div></div>
+        <div class="user-stat"><div class="user-stat-num">${uPrazs}</div><div class="user-stat-lbl">Prazos</div></div>
+      </div>
+      <div class="user-card-actions">
+        ${u.id!=='admin'?`<button class="btn btn-ghost btn-sm uc-transfer" data-uid="${u.id}">🔀 Transferir</button>`:''}
+        ${u.id!=='admin'?`<button class="btn btn-ghost btn-sm uc-edit" data-uid="${u.id}">✏️ Editar</button>`:''}
+        ${u.id!=='admin'?`<button class="btn btn-ghost btn-sm uc-del" data-uid="${u.id}" style="color:var(--red);border-color:var(--red)">🗑️</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.uc-transfer').forEach(b=>b.addEventListener('click',()=>openTransferModal(b.dataset.uid)));
+  grid.querySelectorAll('.uc-edit').forEach(b=>b.addEventListener('click',()=>openUserModal(b.dataset.uid)));
+  grid.querySelectorAll('.uc-del').forEach(b=>b.addEventListener('click',()=>delUser(b.dataset.uid)));
+}
+
+function openUserModal(id=null) {
+  editUserId=id;
+  document.getElementById('userModalTitle').textContent=id?'Editar Usuário':'Novo Usuário';
+  ['u_nome','u_user','u_pass'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+  document.getElementById('u_role').value='funcionario';
+  if(id){const u=users.find(x=>x.id===id);if(u){document.getElementById('u_nome').value=u.nome;document.getElementById('u_user').value=u.user;document.getElementById('u_role').value=u.role;}}
+  document.getElementById('ovUser').classList.add('open');
+}
+
+function saveUser() {
+  const nome=document.getElementById('u_nome').value.trim();
+  const user=document.getElementById('u_user').value.trim();
+  const pass=document.getElementById('u_pass').value;
+  const role=document.getElementById('u_role').value;
+  if(!nome||!user){alert('Preencha Nome e Usuário.');return;}
+  if(editUserId){
+    const i=users.findIndex(u=>u.id===editUserId);
+    users[i]={...users[i],nome,user,role};
+    if(pass) users[i].pass=pass;
+    toast('Usuário atualizado!');
+  } else {
+    if(!pass||pass.length<6){alert('A senha deve ter pelo menos 6 caracteres.');return;}
+    if(users.length>=5){alert('Limite de 5 usuários atingido.');return;}
+    if(users.find(u=>u.user===user)){alert('Este usuário já existe.');return;}
+    users.push({id:uid(),nome,user,pass,role});
+    toast('Usuário criado!');
+  }
+  persist();closeModal('ovUser');renderAdmin();populateOwnerSelects();
+}
+
+function delUser(id) {
+  if(!confirm('Remover este usuário? Seus itens serão transferidos para o Admin.'))return;
+  auds.forEach(a=>{if(a.owner===id)a.owner='admin';});
+  procs.forEach(p=>{if(p.owner===id)p.owner='admin';});
+  prazs.forEach(p=>{if(p.owner===id)p.owner='admin';});
+  users=users.filter(u=>u.id!==id);
+  persist();renderAll();toast('Usuário removido.','🗑️');
+}
+
+// ── TRANSFER ──
+function openTransferModal(fromUid) {
+  transferFromUid=fromUid;
+  const fromUser=users.find(u=>u.id===fromUid);
+  document.getElementById('transferTitle').textContent='Transferir itens de '+fromUser.nome;
+
+  const tOpts=users.filter(u=>u.id!==fromUid).map(u=>'<option value="'+u.id+'">'+u.nome+'</option>').join('');
+  document.getElementById('transferTarget').innerHTML=tOpts;
+
+  const items=[
+    ...auds.filter(a=>a.owner===fromUid).map(a=>({type:'aud',id:a.id,label:'⚖️ '+a.parte+' — '+fmt(a.data)+' '+a.hora})),
+    ...procs.filter(p=>p.owner===fromUid).map(p=>({type:'proc',id:p.id,label:'📂 '+p.parte+' — '+p.num})),
+    ...prazs.filter(p=>p.owner===fromUid).map(p=>({type:'praz',id:p.id,label:'⏰ '+p.desc+' — '+fmt(p.data)})),
+  ];
+
+  document.getElementById('transferList').innerHTML=!items.length?'<p style="color:var(--muted);font-size:.84rem;padding:.5rem 0">Este usuário não tem itens cadastrados.</p>':
+    items.map(item=>`<div class="transfer-item">
+      <input type="checkbox" class="transfer-check" id="tc_${item.id}" value="${item.type}|${item.id}">
+      <label for="tc_${item.id}" class="transfer-info">${item.label}</label>
+    </div>`).join('');
+
+  document.getElementById('ovTransfer').classList.add('open');
+}
+
+function doTransfer() {
+  const targetId=document.getElementById('transferTarget').value;
+  const checks=document.querySelectorAll('.transfer-check:checked');
+  if(!checks.length){alert('Selecione ao menos um item.');return;}
+  checks.forEach(c=>{
+    const [type,id]=c.value.split('|');
+    if(type==='aud'){const i=auds.findIndex(a=>a.id===id);if(i>=0)auds[i].owner=targetId;}
+    if(type==='proc'){const i=procs.findIndex(p=>p.id===id);if(i>=0)procs[i].owner=targetId;}
+    if(type==='praz'){const i=prazs.findIndex(p=>p.id===id);if(i>=0)prazs[i].owner=targetId;}
+  });
+  persist();closeModal('ovTransfer');renderAll();toast(checks.length+' item(ns) transferido(s)!','🔀');
+}
+
+// ══════════════════════════════════════════════════════
 // DETAIL — PROCESSO
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 function openDetProc(id) {
-  const p = procs.find(x => x.id === id); if (!p) return;
-  const ar = auds.filter(a => a.proc === p.num).sort((a,b) => (a.data+a.hora).localeCompare(b.data+b.hora));
-  const pr = prazs.filter(z => z.proc === p.num).sort((a,b) => a.data.localeCompare(b.data));
+  const p=procs.find(x=>x.id===id);if(!p)return;
+  const ar=auds.filter(a=>a.proc===p.num).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora));
+  const pr=prazs.filter(z=>z.proc===p.num).sort((a,b)=>a.data.localeCompare(b.data));
+  document.getElementById('dProcHero').innerHTML='<div class="dh-num">'+p.num+'</div><div class="dh-name">'+p.parte+'</div><div class="dh-chips">'+chipArea(p.area)+' '+chipStatus(p.status)+'</div>';
+  document.getElementById('dProcGrid').innerHTML=dfld('Juízo / Vara',p.juizo||'—')+dfld('Distribuição',fmt(p.data))+dfld('Responsável',getUserName(p.owner));
 
-  document.getElementById('dProcHero').innerHTML =
-    '<div class="dh-num">' + p.num + '</div>' +
-    '<div class="dh-name">' + p.parte + '</div>' +
-    '<div class="dh-chips">' + chipArea(p.area) + ' ' + chipStatus(p.status) + '</div>';
+  const audList = document.getElementById('dProcAuds');
+  audList.innerHTML = !ar.length ? emptyEl('📅','Nenhuma audiência') :
+    ar.map(a=>`<div class="detail-list-item" data-id="${a.id}">
+      <div class="time-box ${daysLeft(a.data)===0?'tb-today':''}"><span class="tb-h">${a.hora}</span><span class="tb-d">${fmt(a.data)}</span></div>
+      <div class="ag-body"><div class="ag-name">${a.tipo}</div><div class="ag-sub">${a.vara||'—'}</div></div>
+      ${pill(daysLeft(a.data))} <span style="color:var(--muted);font-size:1.1rem;margin-left:.5rem">›</span>
+    </div>`).join('');
+  audList.querySelectorAll('.detail-list-item').forEach(el=>el.addEventListener('click',()=>openDetAud(el.dataset.id)));
 
-  document.getElementById('dProcGrid').innerHTML =
-    dfld('Juízo / Vara', p.juizo||'—') +
-    dfld('Distribuição', fmt(p.data)) +
-    dfld('Audiências', ar.length + ' cadastradas');
+  const prazList = document.getElementById('dProcPrazs');
+  prazList.innerHTML = !pr.length ? emptyEl('⏰','Nenhum prazo') :
+    pr.map(z=>{const d=daysLeft(z.data);return `<div class="detail-list-item" data-id="${z.id}">
+      <div class="time-box ${d<=2&&z.status==='pendente'?'tb-urgent':''}"><span class="tb-h">${z.status==='concluido'?'✅':d===0?'HOJE':d+'d'}</span><span class="tb-d">${fmt(z.data)}</span></div>
+      <div class="ag-body"><div class="ag-name">${z.desc}</div><div class="ag-sub">${z.tipo}</div></div>
+      ${chipTipo(z.tipo)} ${chipPrazStatus(z.status)} <span style="color:var(--muted);font-size:1.1rem;margin-left:.5rem">›</span>
+    </div>`;}).join('');
+  prazList.querySelectorAll('.detail-list-item').forEach(el=>el.addEventListener('click',()=>openDetPraz(el.dataset.id)));
 
-  document.getElementById('dProcAuds').innerHTML = !ar.length ? emptyEl('📅','Nenhuma audiência') :
-    ar.map(a => detItem(
-      daysLeft(a.data) === 0 ? 'tb-today' : '',
-      a.hora, fmt(a.data),
-      a.tipo, a.vara||'—',
-      pill(daysLeft(a.data)),
-      'openDetAud(\'' + a.id + '\')'
-    )).join('');
+  document.getElementById('dProcObs').innerHTML=p.obs?'<div class="detail-sec" style="margin-top:1.25rem">Observações</div><div class="detail-obs">'+p.obs+'</div>':'';
 
-  document.getElementById('dProcPrazs').innerHTML = !pr.length ? emptyEl('⏰','Nenhum prazo') :
-    pr.map(z => {
-      const d = daysLeft(z.data);
-      return detItem(
-        d<=2 ? 'tb-urgent' : '',
-        d===0 ? 'HOJE' : d+'d', fmt(z.data),
-        z.desc, z.tipo,
-        pill(d) + ' ' + chipTipo(z.tipo),
-        'openDetPraz(\'' + z.id + '\')'
-      );
-    }).join('');
-
-  document.getElementById('dProcObs').innerHTML = p.obs ?
-    '<div class="detail-sec" style="margin-top:1.25rem">Observações</div><div class="detail-obs">' + p.obs + '</div>' : '';
-
-  document.getElementById('dProcActions').innerHTML =
-    '<button class="btn btn-navy" onclick="openProcModal(\'' + p.id + '\')">✏️ Editar Processo</button>' +
-    '<button class="btn btn-ghost" onclick="openAudModal(); setTimeout(()=>document.getElementById(\'a_proc\').value=\'' + p.num + '\',50)">+ Audiência</button>' +
-    '<button class="btn btn-ghost" onclick="openPrazModal(); setTimeout(()=>document.getElementById(\'z_proc\').value=\'' + p.num + '\',50)">+ Prazo</button>';
+  const actEl = document.getElementById('dProcActions');
+  actEl.innerHTML='<button class="btn btn-navy" id="dpa-edit">✏️ Editar</button><button class="btn btn-ghost" id="dpa-aud">+ Audiência</button><button class="btn btn-ghost" id="dpa-praz">+ Prazo</button>';
+  document.getElementById('dpa-edit').onclick=()=>openProcModal(p.id);
+  document.getElementById('dpa-aud').onclick=()=>{openAudModal();setTimeout(()=>document.getElementById('a_proc').value=p.num,50);};
+  document.getElementById('dpa-praz').onclick=()=>{openPrazModal();setTimeout(()=>document.getElementById('z_proc').value=p.num,50);};
 
   showView('det-proc');
-  setNav('processos');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-processos').classList.add('active');
 }
 
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 // DETAIL — AUDIÊNCIA
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 function openDetAud(id) {
-  const a = auds.find(x => x.id === id); if (!a) return;
-  const d = daysLeft(a.data);
-
-  document.getElementById('dAudHero').innerHTML =
-    '<div class="dh-num">' + a.proc + '</div>' +
-    '<div class="dh-name">' + a.parte + '</div>' +
-    '<div class="dh-chips">' + chipArea(a.area) + ' <span class="chip" style="background:rgba(255,255,255,.15);color:#fff">' + a.tipo + '</span> ' + pill(d) + '</div>';
-
-  document.getElementById('dAudGrid').innerHTML =
-    dfld('Data', fmt(a.data)) +
-    dfld('Horário', a.hora) +
-    dfld('Vara / Tribunal', a.vara||'—');
-
-  document.getElementById('dAudObs').innerHTML = a.obs ?
-    '<div class="detail-sec" style="margin-top:1.25rem">Observações</div><div class="detail-obs">' + a.obs + '</div>' : '';
-
-  const proc = procs.find(p => p.num === a.proc);
-  document.getElementById('dAudActions').innerHTML =
-    '<button class="btn btn-navy" onclick="openAudModal(\'' + a.id + '\')">✏️ Editar Audiência</button>' +
-    (proc ? '<button class="btn btn-ghost" onclick="openDetProc(\'' + proc.id + '\')">📂 Ver Processo</button>' : '');
-
+  const a=auds.find(x=>x.id===id);if(!a)return;
+  const d=daysLeft(a.data);
+  document.getElementById('dAudHero').innerHTML='<div class="dh-num">'+a.proc+'</div><div class="dh-name">'+a.parte+'</div><div class="dh-chips">'+chipArea(a.area)+' <span class="chip" style="background:rgba(255,255,255,.15);color:#fff">'+a.tipo+'</span> '+pill(d)+'</div>';
+  document.getElementById('dAudGrid').innerHTML=dfld('Data',fmt(a.data))+dfld('Horário',a.hora)+dfld('Vara / Tribunal',a.vara||'—');
+  document.getElementById('dAudObs').innerHTML=a.obs?'<div class="detail-sec" style="margin-top:1.25rem">Observações</div><div class="detail-obs">'+a.obs+'</div>':'';
+  const proc=procs.find(p=>p.num===a.proc);
+  const actEl=document.getElementById('dAudActions');
+  actEl.innerHTML='<button class="btn btn-navy" id="daa-edit">✏️ Editar</button>'+(proc?'<button class="btn btn-ghost" id="daa-proc">📂 Ver Processo</button>':'');
+  document.getElementById('daa-edit').onclick=()=>openAudModal(a.id);
+  if(proc)document.getElementById('daa-proc').onclick=()=>openDetProc(proc.id);
   showView('det-aud');
-  setNav('audiencias');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-audiencias').classList.add('active');
 }
 
-// ──────────────────────────────────────────
-// DETAIL — PRAZO
-// ──────────────────────────────────────────
 function openDetPraz(id) {
-  const z = prazs.find(x => x.id === id); if (!z) return;
-  const d = daysLeft(z.data); const venc = d !== null && d < 0;
-
-  document.getElementById('dPrazHero').innerHTML =
-    '<div class="dh-num">' + z.proc + '</div>' +
-    '<div class="dh-name">' + z.desc + '</div>' +
-    '<div class="dh-chips">' + chipTipo(z.tipo) + ' ' + pill(d) +
-    ' <span class="chip ' + (venc?'ch-vencido':'ch-pendente') + '">' + (venc?'Vencido':'Pendente') + '</span></div>';
-
-  const restLabel = d===null ? '—' : d<0 ? Math.abs(d)+' dias atrás' : d===0 ? 'Hoje' : d===1 ? 'Amanhã' : d+' dias';
-  document.getElementById('dPrazGrid').innerHTML =
-    dfld('Vencimento', fmt(z.data)) +
-    dfld('Dias Restantes', restLabel) +
-    dfld('Tipo', z.tipo);
-
-  document.getElementById('dPrazObs').innerHTML = z.obs ?
-    '<div class="detail-sec" style="margin-top:1.25rem">Observações</div><div class="detail-obs">' + z.obs + '</div>' : '';
-
-  const proc = procs.find(p => p.num === z.proc);
-  document.getElementById('dPrazActions').innerHTML =
-    (proc ? '<button class="btn btn-navy" onclick="openDetProc(\'' + proc.id + '\')">📂 Ver Processo</button>' : '') +
-    '<button class="btn btn-ghost" onclick="if(confirm(\'Remover este prazo?\')){ delPraz(\'' + z.id + '\'); backTo(\'prazos\'); }">🗑️ Remover</button>';
-
+  const z=prazs.find(x=>x.id===id);if(!z)return;
+  const d=daysLeft(z.data);
+  document.getElementById('dPrazHero').innerHTML='<div class="dh-num">'+z.proc+'</div><div class="dh-name">'+z.desc+'</div><div class="dh-chips">'+chipTipo(z.tipo)+' '+chipPrazStatus(z.status)+'</div>';
+  const restLabel=d===null?'—':d<0?Math.abs(d)+' dias atrás':d===0?'Hoje':d===1?'Amanhã':d+' dias';
+  document.getElementById('dPrazGrid').innerHTML=dfld('Vencimento',fmt(z.data))+dfld('Dias Restantes',restLabel)+dfld('Responsável',getUserName(z.owner));
+  document.getElementById('dPrazObs').innerHTML=z.obs?'<div class="detail-sec" style="margin-top:1.25rem">Observações</div><div class="detail-obs">'+z.obs+'</div>':'';
+  const proc=procs.find(p=>p.num===z.proc);
+  const actEl=document.getElementById('dPrazActions');
+  let btns='';
+  btns+='<button class="btn btn-navy" id="dpa-edit">✏️ Editar Prazo</button>';
+  if(z.status!=='concluido') btns+='<button class="btn btn-green" id="dpa-ok">✅ Marcar como Concluído</button>';
+  if(z.status==='concluido') btns+='<button class="btn btn-ghost" id="dpa-reopen">↩️ Reabrir Prazo</button>';
+  if(proc) btns+='<button class="btn btn-ghost" id="dpa-proc">📂 Ver Processo</button>';
+  btns+='<button class="btn btn-ghost" id="dpa-del" style="color:var(--red)">🗑️ Remover</button>';
+  actEl.innerHTML=btns;
+  document.getElementById('dpa-edit').onclick=()=>openEditPrazModal(z.id);
+  if(z.status!=='concluido') document.getElementById('dpa-ok').onclick=()=>{concluirPraz(z.id);backTo('prazos');};
+  if(z.status==='concluido') document.getElementById('dpa-reopen').onclick=()=>reabrirPraz(z.id);
+  if(proc) document.getElementById('dpa-proc').onclick=()=>openDetProc(proc.id);
+  document.getElementById('dpa-del').onclick=()=>{if(confirm('Remover este prazo?')){delPraz(z.id);backTo('prazos');}};
   showView('det-praz');
-  setNav('prazos');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-prazos').classList.add('active');
+}
+
+function reabrirPraz(id) {
+  const p=prazs.find(x=>x.id===id);if(!p)return;
+  p.status = p.data < todayStr ? 'atrasado' : 'pendente';
+  persist(); renderAll(); backTo('prazos'); toast('Prazo reaberto!','↩️');
+}
+
+function openEditPrazModal(id) {
+  const z=prazs.find(x=>x.id===id);if(!z)return;
+  // store id for save
+  document.getElementById('ovEditPraz').dataset.prazId=id;
+  // populate fields
+  document.getElementById('ep_desc').value=z.desc||'';
+  document.getElementById('ep_data').value=z.data||'';
+  document.getElementById('ep_tipo').value=z.tipo||'Outro';
+  document.getElementById('ep_obs').value=z.obs||'';
+  // populate owner select
+  const ownerSel=document.getElementById('ep_owner');
+  ownerSel.innerHTML=users.map(u=>`<option value="${u.id}">${u.role==='admin'?'👑 ':''} ${u.nome}</option>`).join('');
+  ownerSel.value=z.owner||'admin';
+  document.getElementById('ovEditPraz').classList.add('open');
+}
+
+function saveEditPraz() {
+  const id=document.getElementById('ovEditPraz').dataset.prazId;
+  const z=prazs.find(x=>x.id===id);if(!z)return;
+  const novaData=document.getElementById('ep_data').value;
+  const novoDesc=document.getElementById('ep_desc').value.trim();
+  const novoTipo=document.getElementById('ep_tipo').value;
+  const novoOwner=document.getElementById('ep_owner').value;
+  const novoObs=document.getElementById('ep_obs').value.trim();
+  if(!novaData){alert('A data de vencimento é obrigatória.');return;}
+  if(!novoDesc){alert('A descrição é obrigatória.');return;}
+  z.desc=novoDesc;
+  z.data=novaData;
+  z.tipo=novoTipo;
+  z.owner=novoOwner;
+  z.obs=novoObs;
+  // recalculate status (only if not concluded)
+  if(z.status!=='concluido'){
+    z.status = novaData < todayStr ? 'atrasado' : 'pendente';
+  }
+  persist();
+  closeModal('ovEditPraz');
+  // refresh detail view with updated data
+  openDetPraz(id);
+  renderPrazs();
+  updateBadge();
+  toast('Prazo atualizado com sucesso!','✏️');
 }
 
 // helpers
-function dfld(label, val) {
-  return '<div class="detail-field"><label>' + label + '</label><p>' + val + '</p></div>';
-}
-function detItem(boxCls, h, d, name, sub, pillHtml, onclick) {
-  return '<div class="detail-list-item" onclick="' + onclick + '">' +
-    '<div class="time-box ' + boxCls + '"><span class="tb-h">' + h + '</span><span class="tb-d">' + d + '</span></div>' +
-    '<div class="ag-body"><div class="ag-name">' + name + '</div><div class="ag-sub">' + sub + '</div></div>' +
-    pillHtml + ' <span style="color:var(--muted);font-size:1.1rem;margin-left:.5rem">›</span>' +
-  '</div>';
+function dfld(label,val){return '<div class="detail-field"><label>'+label+'</label><p>'+val+'</p></div>';}
+function detItem(boxCls,h,d,name,sub,extra,onclick){
+  return '<div class="detail-list-item" onclick="'+onclick+'">'+
+    '<div class="time-box '+boxCls+'"><span class="tb-h">'+h+'</span><span class="tb-d">'+d+'</span></div>'+
+    '<div class="ag-body"><div class="ag-name">'+name+'</div><div class="ag-sub">'+sub+'</div></div>'+
+    extra+' <span style="color:var(--muted);font-size:1.1rem;margin-left:.5rem">›</span></div>';
 }
 
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 // CRUD — AUDIÊNCIA
-// ──────────────────────────────────────────
-function openAudModal(id = null) {
-  editAudId = id;
-  document.getElementById('audModalTitle').textContent = id ? 'Editar Audiência' : 'Nova Audiência';
-  ['a_data','a_hora','a_proc','a_parte','a_vara','a_obs'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
-  document.getElementById('a_area').value = 'civel';
-  document.getElementById('a_tipo').selectedIndex = 0;
-  if (!id) document.getElementById('a_data').value = todayStr;
-  if (id) {
-    const a = auds.find(x => x.id === id);
-    if (a) {
-      document.getElementById('a_data').value  = a.data;
-      document.getElementById('a_hora').value  = a.hora;
-      document.getElementById('a_proc').value  = a.proc;
-      document.getElementById('a_parte').value = a.parte;
-      document.getElementById('a_vara').value  = a.vara;
-      document.getElementById('a_area').value  = a.area;
-      document.getElementById('a_tipo').value  = a.tipo;
-      document.getElementById('a_obs').value   = a.obs;
-    }
-  }
+// ══════════════════════════════════════════════════════
+function openAudModal(id=null) {
+  editAudId=id;
+  document.getElementById('audModalTitle').textContent=id?'Editar Audiência':'Nova Audiência';
+  ['a_data','a_hora','a_proc','a_parte','a_vara','a_obs'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+  document.getElementById('a_area').value='civel';
+  document.getElementById('a_tipo').selectedIndex=0;
+  if(!id)document.getElementById('a_data').value=todayStr;
+  if(currentUser)document.getElementById('a_owner').value=currentUser.id;
+  if(id){const a=auds.find(x=>x.id===id);if(a){document.getElementById('a_data').value=a.data;document.getElementById('a_hora').value=a.hora;document.getElementById('a_proc').value=a.proc;document.getElementById('a_parte').value=a.parte;document.getElementById('a_vara').value=a.vara;document.getElementById('a_area').value=a.area;document.getElementById('a_tipo').value=a.tipo;document.getElementById('a_obs').value=a.obs;document.getElementById('a_owner').value=a.owner||'admin';}}
   document.getElementById('ovAud').classList.add('open');
 }
-
 function saveAud() {
-  const d = {
-    data:  document.getElementById('a_data').value,
-    hora:  document.getElementById('a_hora').value,
-    proc:  document.getElementById('a_proc').value.trim(),
-    parte: document.getElementById('a_parte').value.trim(),
-    vara:  document.getElementById('a_vara').value.trim(),
-    area:  document.getElementById('a_area').value,
-    tipo:  document.getElementById('a_tipo').value,
-    obs:   document.getElementById('a_obs').value.trim(),
-  };
-  if (!d.data || !d.hora || !d.proc || !d.parte) { alert('Preencha: Data, Hora, Processo e Parte.'); return; }
-  if (editAudId) {
-    const i = auds.findIndex(a => a.id === editAudId);
-    auds[i] = { ...auds[i], ...d };
-    toast('Audiência atualizada!');
-  } else {
-    auds.push({ id: uid(), ...d });
-    toast('Audiência cadastrada!');
-  }
-  persist(); closeModal('ovAud'); renderAll();
+  const d={data:document.getElementById('a_data').value,hora:document.getElementById('a_hora').value,proc:document.getElementById('a_proc').value.trim(),parte:document.getElementById('a_parte').value.trim(),vara:document.getElementById('a_vara').value.trim(),area:document.getElementById('a_area').value,tipo:document.getElementById('a_tipo').value,obs:document.getElementById('a_obs').value.trim(),owner:document.getElementById('a_owner').value};
+  if(!d.data||!d.hora||!d.proc||!d.parte){alert('Preencha: Data, Hora, Processo e Parte.');return;}
+  if(editAudId){const i=auds.findIndex(a=>a.id===editAudId);auds[i]={...auds[i],...d};toast('Audiência atualizada!');}
+  else{auds.push({id:uid(),...d});toast('Audiência cadastrada!');}
+  persist();closeModal('ovAud');renderAll();
 }
+function delAud(id){if(!confirm('Remover esta audiência?'))return;auds=auds.filter(a=>a.id!==id);persist();renderAll();toast('Removida.','🗑️');}
 
-function delAud(id) {
-  if (!confirm('Remover esta audiência?')) return;
-  auds = auds.filter(a => a.id !== id);
-  persist(); renderAll(); toast('Audiência removida.');
-}
-
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 // CRUD — PROCESSO
-// ──────────────────────────────────────────
-function openProcModal(id = null) {
-  editProcId = id;
-  document.getElementById('procModalTitle').textContent = id ? 'Editar Processo' : 'Novo Processo';
-  ['p_num','p_parte','p_juizo','p_obs'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
-  document.getElementById('p_area').value   = 'civel';
-  document.getElementById('p_status').value = 'ativo';
-  document.getElementById('p_data').value   = '';
-  if (id) {
-    const p = procs.find(x => x.id === id);
-    if (p) {
-      document.getElementById('p_num').value    = p.num;
-      document.getElementById('p_parte').value  = p.parte;
-      document.getElementById('p_area').value   = p.area;
-      document.getElementById('p_status').value = p.status;
-      document.getElementById('p_juizo').value  = p.juizo;
-      document.getElementById('p_data').value   = p.data;
-      document.getElementById('p_obs').value    = p.obs || '';
-    }
-  }
+// ══════════════════════════════════════════════════════
+function openProcModal(id=null) {
+  editProcId=id;
+  document.getElementById('procModalTitle').textContent=id?'Editar Processo':'Novo Processo';
+  ['p_num','p_parte','p_juizo','p_obs'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+  document.getElementById('p_area').value='civel';document.getElementById('p_status').value='ativo';document.getElementById('p_data').value='';
+  if(currentUser)document.getElementById('p_owner').value=currentUser.id;
+  if(id){const p=procs.find(x=>x.id===id);if(p){document.getElementById('p_num').value=p.num;document.getElementById('p_parte').value=p.parte;document.getElementById('p_area').value=p.area;document.getElementById('p_status').value=p.status;document.getElementById('p_juizo').value=p.juizo;document.getElementById('p_data').value=p.data;document.getElementById('p_obs').value=p.obs||'';document.getElementById('p_owner').value=p.owner||'admin';}}
   document.getElementById('ovProc').classList.add('open');
 }
-
 function saveProc() {
-  const d = {
-    num:    document.getElementById('p_num').value.trim(),
-    parte:  document.getElementById('p_parte').value.trim(),
-    area:   document.getElementById('p_area').value,
-    status: document.getElementById('p_status').value,
-    juizo:  document.getElementById('p_juizo').value.trim(),
-    data:   document.getElementById('p_data').value,
-    obs:    document.getElementById('p_obs').value.trim(),
-  };
-  if (!d.num || !d.parte) { alert('Preencha o Número do Processo e a Parte.'); return; }
-  if (editProcId) {
-    const i = procs.findIndex(p => p.id === editProcId);
-    procs[i] = { ...procs[i], ...d };
-    toast('Processo atualizado!');
-  } else {
-    procs.push({ id: uid(), ...d });
-    toast('Processo cadastrado!');
-  }
-  persist(); closeModal('ovProc'); renderAll();
+  const d={num:document.getElementById('p_num').value.trim(),parte:document.getElementById('p_parte').value.trim(),area:document.getElementById('p_area').value,status:document.getElementById('p_status').value,juizo:document.getElementById('p_juizo').value.trim(),data:document.getElementById('p_data').value,obs:document.getElementById('p_obs').value.trim(),owner:document.getElementById('p_owner').value};
+  if(!d.num||!d.parte){alert('Preencha Número do Processo e Parte.');return;}
+  if(editProcId){const i=procs.findIndex(p=>p.id===editProcId);procs[i]={...procs[i],...d};toast('Processo atualizado!');}
+  else{procs.push({id:uid(),...d});toast('Processo cadastrado!');}
+  persist();closeModal('ovProc');renderAll();
 }
+function delProc(id){if(!confirm('Remover este processo?'))return;procs=procs.filter(p=>p.id!==id);persist();renderAll();toast('Removido.','🗑️');}
 
-function delProc(id) {
-  if (!confirm('Remover este processo?')) return;
-  procs = procs.filter(p => p.id !== id);
-  persist(); renderAll(); toast('Processo removido.');
-}
-
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 // CRUD — PRAZO
-// ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════
 function openPrazModal() {
-  ['z_proc','z_desc','z_obs'].forEach(f => { const el = document.getElementById(f); if (el) el.value = ''; });
-  document.getElementById('z_tipo').selectedIndex = 0;
-  document.getElementById('z_data').value = '';
+  ['z_proc','z_desc','z_obs'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+  document.getElementById('z_tipo').selectedIndex=0;document.getElementById('z_data').value='';
+  if(currentUser)document.getElementById('z_owner').value=currentUser.id;
   document.getElementById('ovPraz').classList.add('open');
 }
-
 function savePraz() {
-  const d = {
-    proc: document.getElementById('z_proc').value.trim(),
-    desc: document.getElementById('z_desc').value.trim(),
-    data: document.getElementById('z_data').value,
-    tipo: document.getElementById('z_tipo').value,
-    obs:  document.getElementById('z_obs').value.trim(),
-  };
-  if (!d.proc || !d.desc || !d.data) { alert('Preencha Processo, Descrição e Data.'); return; }
-  prazs.push({ id: uid(), ...d });
-  persist(); closeModal('ovPraz'); renderAll(); toast('Prazo cadastrado!');
+  const d={proc:document.getElementById('z_proc').value.trim(),desc:document.getElementById('z_desc').value.trim(),data:document.getElementById('z_data').value,tipo:document.getElementById('z_tipo').value,obs:document.getElementById('z_obs').value.trim(),owner:document.getElementById('z_owner').value,status:'pendente'};
+  if(!d.proc||!d.desc||!d.data){alert('Preencha Processo, Descrição e Data.');return;}
+  prazs.push({id:uid(),...d});persist();closeModal('ovPraz');renderAll();toast('Prazo cadastrado!');
 }
+function delPraz(id){if(!confirm('Remover este prazo?'))return;prazs=prazs.filter(p=>p.id!==id);persist();renderAll();toast('Removido.','🗑️');}
 
-function delPraz(id) {
-  if (!confirm('Remover este prazo?')) return;
-  prazs = prazs.filter(p => p.id !== id);
-  persist(); renderAll(); toast('Prazo removido.');
-}
+// ══════════════════════════════════════════════════════
+// MODAL UTILS
+// ══════════════════════════════════════════════════════
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)closeModal(el.id);});});
 
-// ──────────────────────────────────────────
-// MODALS
-// ──────────────────────────────────────────
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.overlay').forEach(el => {
-  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
-});
-
-// ──────────────────────────────────────────
-// INIT
-// ──────────────────────────────────────────
-renderAll();
+// Init: show login screen, hide app
+document.getElementById('appScreen').classList.remove('on');
 </script>
 </body>
 </html>
