@@ -26,30 +26,73 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 #loginScreen{
   display:flex;align-items:center;justify-content:center;
   min-height:100vh;background:var(--navy);
-  animation:fadeUp .4s ease;
 }
-.login-box{
+.login-wrap{
+  width:100%;max-width:460px;margin:1rem;
+  perspective:1000px;
+}
+/* card flip container */
+.login-card{
   background:var(--white);border-radius:20px;
-  padding:2.5rem 2rem;width:100%;max-width:400px;
+  padding:2.25rem 2rem;width:100%;
   box-shadow:0 24px 60px rgba(0,0,0,.3);
-  margin:1rem;
+  animation:fadeUp .35s ease;
+  transition:all .2s;
 }
-.login-logo{
-  text-align:center;margin-bottom:2rem;
-}
+.login-logo{text-align:center;margin-bottom:1.75rem;}
 .login-logo-mark{
   font-family:'Fraunces',serif;font-size:3rem;font-weight:900;
   color:var(--navy);letter-spacing:.04em;line-height:1;
 }
 .login-logo-mark span{color:#c9a84c;}
 .login-logo p{color:var(--muted);font-size:.82rem;margin-top:.3rem;letter-spacing:.1em;text-transform:uppercase;}
-.login-box h2{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--navy);margin-bottom:1.25rem;}
+.login-card h2{font-family:'Fraunces',serif;font-size:1.15rem;color:var(--navy);margin-bottom:1.25rem;}
 .login-err{
   background:var(--red-light);border:1px solid var(--red);
   color:var(--red);border-radius:8px;padding:.65rem 1rem;
   font-size:.84rem;margin-bottom:1rem;display:none;
 }
 .login-err.on{display:block;}
+.login-ok{
+  background:var(--green-light);border:1px solid var(--green);
+  color:var(--green);border-radius:8px;padding:.65rem 1rem;
+  font-size:.84rem;margin-bottom:1rem;display:none;
+}
+.login-ok.on{display:block;}
+.login-switch{
+  text-align:center;margin-top:1.1rem;
+  font-size:.8rem;color:var(--muted);
+}
+.login-switch a{
+  color:var(--blue);font-weight:600;cursor:pointer;text-decoration:none;
+}
+.login-switch a:hover{text-decoration:underline;}
+.login-divider{
+  display:flex;align-items:center;gap:.75rem;
+  margin:.75rem 0;color:var(--muted);font-size:.75rem;
+}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* UF select no cadastro */
+.reg-uf-row{display:grid;grid-template-columns:1fr 1fr;gap:.85rem;}
+
+/* steps indicator */
+.reg-steps{display:flex;justify-content:center;gap:.5rem;margin-bottom:1.5rem;}
+.reg-step{
+  width:28px;height:4px;border-radius:4px;
+  background:var(--border);transition:background .3s;
+}
+.reg-step.active{background:var(--navy);}
+.reg-step.done{background:var(--green);}
+
+/* progress bar on register btn */
+.btn-loading{position:relative;overflow:hidden;}
+.btn-loading::after{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:30%;background:rgba(255,255,255,.25);
+  animation:btnLoad 1s ease-in-out infinite;
+}
+@keyframes btnLoad{0%{left:-30%}100%{left:110%}}
 
 /* ════ LAYOUT ════ */
 #appScreen{ display:none; }
@@ -359,29 +402,154 @@ textarea.finput{min-height:80px;resize:vertical;}
 <body>
 
 <!-- ═══════════════════════════════════════
-     LOGIN
+     LOGIN / CADASTRO
 ════════════════════════════════════════ -->
 <div id="loginScreen">
-  <div class="login-box">
-    <div class="login-logo">
-      <div class="login-logo-mark">L<span>E</span>X</div>
-      <p>Gestão Jurídica</p>
+  <div class="login-wrap">
+
+    <!-- ── PAINEL LOGIN ── -->
+    <div class="login-card" id="panelLogin">
+      <div class="login-logo">
+        <div class="login-logo-mark">L<span>E</span>X</div>
+        <p>Gestão Jurídica</p>
+      </div>
+      <h2>Entrar no sistema</h2>
+
+      <div class="login-err" id="loginErr">E-mail ou senha incorretos.</div>
+
+      <div class="fg">
+        <label class="flabel">E-mail</label>
+        <input class="finput" type="email" id="loginUser" placeholder="seu@email.com.br"
+               autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="fg">
+        <label class="flabel">Senha</label>
+        <div style="position:relative">
+          <input class="finput" type="password" id="loginPass" placeholder="••••••••"
+                 autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"
+                 style="padding-right:2.5rem">
+          <button type="button" onclick="togglePassVis('loginPass','passEye')"
+                  style="position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;" id="passEye">👁</button>
+        </div>
+      </div>
+
+      <button class="btn btn-navy" style="width:100%;justify-content:center;padding:.7rem;margin-top:.25rem"
+              onclick="doLogin()" id="loginBtn">Entrar →</button>
+
+      <div class="login-divider">ou</div>
+
+      <div class="login-switch">
+        Não tem conta? <a onclick="showPanel('register')">Criar conta →</a>
+      </div>
+      <p style="font-size:.7rem;color:var(--muted);text-align:center;margin-top:.75rem">
+        Admin padrão: <b>admin@lex.com</b> / <b>admin123</b>
+      </p>
     </div>
-    <h2>Entrar no sistema</h2>
-    <div class="login-err" id="loginErr">E-mail ou senha incorretos.</div>
-    <div class="fg">
-      <label class="flabel">E-mail</label>
-      <input class="finput" type="email" id="loginUser" placeholder="seu@email.com.br" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div class="fg">
-      <label class="flabel">Senha</label>
-      <div style="position:relative">
-        <input class="finput" type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:2.5rem">
-        <button type="button" onclick="togglePassVis()" style="position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;" id="passEye">👁</button>
+
+    <!-- ── PAINEL CADASTRO ── -->
+    <div class="login-card" id="panelRegister" style="display:none">
+      <div class="login-logo">
+        <div class="login-logo-mark">L<span>E</span>X</div>
+        <p>Gestão Jurídica</p>
+      </div>
+      <h2>Criar nova conta</h2>
+
+      <!-- step indicator -->
+      <div class="reg-steps">
+        <div class="reg-step active" id="step1dot"></div>
+        <div class="reg-step" id="step2dot"></div>
+      </div>
+
+      <div class="login-err" id="regErr"></div>
+      <div class="login-ok"  id="regOk"></div>
+
+      <!-- STEP 1: dados pessoais -->
+      <div id="regStep1">
+        <div class="fg">
+          <label class="flabel">Nome Completo *</label>
+          <input class="finput" type="text" id="reg_nome" placeholder="Dr(a). Nome Sobrenome">
+        </div>
+        <div class="fg">
+          <label class="flabel">E-mail *</label>
+          <input class="finput" type="email" id="reg_email" placeholder="seu@email.com.br">
+        </div>
+        <div class="fg">
+          <label class="flabel">Senha * <span style="font-weight:400;color:var(--muted)">(mín. 8 caracteres)</span></label>
+          <div style="position:relative">
+            <input class="finput" type="password" id="reg_pass" placeholder="••••••••" style="padding-right:2.5rem"
+                   onkeydown="if(event.key==='Enter')regStep1Next()">
+            <button type="button" onclick="togglePassVis('reg_pass','regPassEye')"
+                    style="position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;" id="regPassEye">👁</button>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="flabel">Confirmar Senha *</label>
+          <input class="finput" type="password" id="reg_pass2" placeholder="••••••••"
+                 onkeydown="if(event.key==='Enter')regStep1Next()">
+        </div>
+        <button class="btn btn-navy" style="width:100%;justify-content:center;padding:.7rem"
+                onclick="regStep1Next()">Próximo →</button>
+      </div>
+
+      <!-- STEP 2: dados OAB -->
+      <div id="regStep2" style="display:none">
+        <p style="font-size:.82rem;color:var(--text2);margin-bottom:1.1rem;line-height:1.5">
+          Informe sua OAB para que o sistema possa buscar suas <b>publicações e intimações</b> automaticamente no DJEN.
+        </p>
+        <div class="fg">
+          <label class="flabel">Número da OAB *</label>
+          <input class="finput" type="text" id="reg_oab" placeholder="Ex: 123456"
+                 onkeydown="if(event.key==='Enter')regFinalizar()">
+        </div>
+        <div class="reg-uf-row">
+          <div class="fg">
+            <label class="flabel">Estado (Seccional) *</label>
+            <select class="finput" id="reg_uf">
+              <option value="SP">SP — São Paulo</option><option value="MG">MG — Minas Gerais</option>
+              <option value="RJ">RJ — Rio de Janeiro</option><option value="RS">RS — Rio Grande do Sul</option>
+              <option value="PR">PR — Paraná</option><option value="SC">SC — Santa Catarina</option>
+              <option value="BA">BA — Bahia</option><option value="GO">GO — Goiás</option>
+              <option value="DF">DF — Distrito Federal</option><option value="PE">PE — Pernambuco</option>
+              <option value="CE">CE — Ceará</option><option value="PA">PA — Pará</option>
+              <option value="MT">MT — Mato Grosso</option><option value="MS">MS — Mato Grosso do Sul</option>
+              <option value="ES">ES — Espírito Santo</option><option value="RN">RN — R. G. Norte</option>
+              <option value="AM">AM — Amazonas</option><option value="AL">AL — Alagoas</option>
+              <option value="SE">SE — Sergipe</option><option value="PB">PB — Paraíba</option>
+              <option value="PI">PI — Piauí</option><option value="MA">MA — Maranhão</option>
+              <option value="RO">RO — Rondônia</option><option value="TO">TO — Tocantins</option>
+              <option value="AC">AC — Acre</option><option value="AP">AP — Amapá</option>
+              <option value="RR">RR — Roraima</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="flabel">Área Principal</label>
+            <select class="finput" id="reg_area">
+              <option value="civel">Cível</option>
+              <option value="trabalhista">Trabalhista</option>
+              <option value="criminal">Criminal</option>
+              <option value="familia">Família</option>
+              <option value="administrativo">Administrativo</option>
+            </select>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="flabel">Telefone <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+          <input class="finput" type="tel" id="reg_tel" placeholder="(11) 99999-9999">
+        </div>
+
+        <div style="display:flex;gap:.65rem;">
+          <button class="btn btn-ghost" style="flex:1;justify-content:center"
+                  onclick="regStep1Back()">← Voltar</button>
+          <button class="btn btn-navy" style="flex:2;justify-content:center"
+                  onclick="regFinalizar()" id="regFinalBtn">Criar Conta ✓</button>
+        </div>
+      </div>
+
+      <div class="login-switch" style="margin-top:1rem">
+        Já tem conta? <a onclick="showPanel('login')">← Entrar</a>
       </div>
     </div>
-    <button class="btn btn-navy" style="width:100%;justify-content:center;padding:.7rem;margin-top:.25rem" onclick="doLogin()" id="loginBtn">Entrar →</button>
-    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:1rem">Admin padrão: <b>admin@lex.com</b> / <b>admin123</b></p>
+
   </div>
 </div>
 
@@ -867,7 +1035,7 @@ textarea.finput{min-height:80px;resize:vertical;}
 // ══════════════════════════════════════════════════════
 // STORAGE KEYS
 // ══════════════════════════════════════════════════════
-const SK = { a:'lex6_aud', p:'lex6_proc', z:'lex6_praz', u:'lex6_users', pub:'lex6_pub', adv:'lex6_adv' };
+const SK = { a:'lex7_aud', p:'lex7_proc', z:'lex7_praz', u:'lex7_users', pub:'lex7_pub', adv:'lex7_adv' };
 
 let auds  = JSON.parse(localStorage.getItem(SK.a)   || '[]');
 let procs = JSON.parse(localStorage.getItem(SK.p)   || '[]');
@@ -893,20 +1061,37 @@ const persist = () => {
 // ══════════════════════════════════════════════════════
 // SEED
 // ══════════════════════════════════════════════════════
-(function seed() {
+const seedReady = (async function seed() {
   // Users seed
   if (!users.length) {
+    // hash first, then store — avoids the race condition where login runs before hashes exist
+    const [h0, h1, h2] = await Promise.all([
+      hashPass('admin123'),
+      hashPass('func123'),
+      hashPass('func123'),
+    ]);
     users = [
-      { id:'admin', nome:'Administrador', email:'admin@lex.com', passHash:'', role:'admin' },
-      { id:uid(), nome:'Maria Fernanda', email:'maria.fernanda@lex.com', passHash:'', role:'funcionario' },
-      { id:uid(), nome:'Carlos Eduardo', email:'carlos.eduardo@lex.com', passHash:'', role:'funcionario' },
+      { id:'admin', nome:'Administrador', email:'admin@lex.com', passHash:h0, role:'admin' },
+      { id:uid(),   nome:'Maria Fernanda', email:'maria.fernanda@lex.com', passHash:h1, role:'funcionario' },
+      { id:uid(),   nome:'Carlos Eduardo', email:'carlos.eduardo@lex.com', passHash:h2, role:'funcionario' },
     ];
-    // hash default passwords async, then persist
-    Promise.all([
-      hashPass('admin123').then(h => { users[0].passHash = h; }),
-      hashPass('func123').then(h  => { users[1].passHash = h; }),
-      hashPass('func123').then(h  => { users[2].passHash = h; }),
-    ]).then(() => persist());
+    persist();
+  } else {
+    // Migrate old records that used plain 'pass' instead of 'passHash'
+    let migrated = false;
+    for (const u of users) {
+      if (u.pass && !u.passHash) {
+        u.passHash = await hashPass(u.pass);
+        delete u.pass;
+        migrated = true;
+      }
+      // Ensure email field exists (migrate from old 'user' field)
+      if (!u.email && u.user) {
+        u.email = u.user.includes('@') ? u.user : u.user + '@lex.com';
+        migrated = true;
+      }
+    }
+    if (migrated) persist();
   }
 
   if (auds.length || procs.length) return;
@@ -1032,11 +1217,141 @@ async function hashPass(plain) {
   return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-function togglePassVis() {
-  const f = document.getElementById('loginPass');
-  const e = document.getElementById('passEye');
+function togglePassVis(fieldId='loginPass', eyeId='passEye') {
+  const f = document.getElementById(fieldId);
+  const e = document.getElementById(eyeId);
   f.type = f.type === 'password' ? 'text' : 'password';
   e.textContent = f.type === 'password' ? '👁' : '🙈';
+}
+
+function showPanel(which) {
+  document.getElementById('panelLogin').style.display    = which === 'login'    ? 'block' : 'none';
+  document.getElementById('panelRegister').style.display = which === 'register' ? 'block' : 'none';
+  // Reset register state when switching
+  if (which === 'register') {
+    showRegStep(1);
+    ['reg_nome','reg_email','reg_pass','reg_pass2','reg_oab','reg_tel'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('regErr').classList.remove('on');
+    document.getElementById('regOk').classList.remove('on');
+  }
+  if (which === 'login') {
+    document.getElementById('loginErr').classList.remove('on');
+  }
+}
+
+function showRegStep(n) {
+  document.getElementById('regStep1').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('regStep2').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('step1dot').className = 'reg-step ' + (n === 1 ? 'active' : 'done');
+  document.getElementById('step2dot').className = 'reg-step ' + (n === 2 ? 'active' : '');
+}
+
+function regShowErr(msg) {
+  const el = document.getElementById('regErr');
+  el.textContent = msg;
+  el.classList.add('on');
+  document.getElementById('regOk').classList.remove('on');
+}
+
+function regShowOk(msg) {
+  const el = document.getElementById('regOk');
+  el.textContent = msg;
+  el.classList.add('on');
+  document.getElementById('regErr').classList.remove('on');
+}
+
+function regStep1Next() {
+  const nome  = document.getElementById('reg_nome').value.trim();
+  const email = document.getElementById('reg_email').value.trim().toLowerCase();
+  const pass  = document.getElementById('reg_pass').value;
+  const pass2 = document.getElementById('reg_pass2').value;
+
+  if (!nome)  { regShowErr('Informe seu nome completo.'); return; }
+  if (!email || !email.includes('@')) { regShowErr('Informe um e-mail válido.'); return; }
+  if (users.find(u => u.email === email)) { regShowErr('Este e-mail já está cadastrado. Faça login.'); return; }
+  if (pass.length < 8) { regShowErr('A senha deve ter pelo menos 8 caracteres.'); return; }
+  if (pass !== pass2)  { regShowErr('As senhas não coincidem.'); return; }
+
+  document.getElementById('regErr').classList.remove('on');
+  showRegStep(2);
+  document.getElementById('reg_oab').focus();
+}
+
+function regStep1Back() {
+  showRegStep(1);
+}
+
+async function regFinalizar() {
+  const oab  = document.getElementById('reg_oab').value.trim().replace(/\D/g,'');
+  const uf   = document.getElementById('reg_uf').value;
+  const area = document.getElementById('reg_area').value;
+  const tel  = document.getElementById('reg_tel').value.trim();
+
+  if (!oab) { regShowErr('Informe o número da OAB.'); return; }
+
+  // Collect step 1 data again
+  const nome  = document.getElementById('reg_nome').value.trim();
+  const email = document.getElementById('reg_email').value.trim().toLowerCase();
+  const plain = document.getElementById('reg_pass').value;
+
+  if (users.length >= 5) {
+    regShowErr('Limite de usuários atingido. Contate o administrador do sistema.');
+    return;
+  }
+
+  // Disable button while hashing
+  const btn = document.getElementById('regFinalBtn');
+  btn.disabled = true;
+  btn.classList.add('btn-loading');
+  btn.textContent = 'Criando conta...';
+
+  await seedReady;
+
+  try {
+    const passHash = await hashPass(plain);
+    const newUser = { id: uid(), nome, email, passHash, role: 'funcionario' };
+    users.push(newUser);
+
+    // Save advogado profile linked to this user
+    // Store per-user adv data (keyed by user id)
+    const advData = { nome, oab, uf, area, tel, email };
+    // If no global adv set yet, use this one
+    if (!adv || !adv.oab) { adv = advData; }
+    // Store per-user adv in a separate key
+    const advPerUser = JSON.parse(localStorage.getItem('lex7_adv_per_user') || '{}');
+    advPerUser[newUser.id] = advData;
+    localStorage.setItem('lex7_adv_per_user', JSON.stringify(advPerUser));
+
+    persist();
+
+    regShowOk(`✅ Conta criada com sucesso! Bem-vindo(a), ${nome.split(' ')[0]}!`);
+
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+    btn.textContent = 'Criar Conta ✓';
+
+    // Auto-login after 1.2s
+    setTimeout(() => {
+      currentUser = newUser;
+      // Load this user's adv profile
+      adv = advData;
+      persist();
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appScreen').classList.add('on');
+      setupSidebar();
+      renderAll();
+      toast(`Bem-vindo(a) ao Lex, ${nome.split(' ')[0]}! Sua OAB ${uf} ${oab} já está configurada.`, '🎉');
+      showPanel('login'); // reset for next time
+    }, 1200);
+
+  } catch(e) {
+    regShowErr('Erro ao criar conta: ' + e.message);
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+    btn.textContent = 'Criar Conta ✓';
+  }
 }
 
 function setLoginLoading(on) {
@@ -1058,6 +1373,10 @@ async function doLogin() {
   }
 
   setLoginLoading(true);
+
+  // Wait for seed to finish hashing default passwords (first run only)
+  await seedReady;
+
   const hashed = await hashPass(plain);
   const found  = users.find(x => x.email === email && x.passHash === hashed);
   setLoginLoading(false);
@@ -1065,12 +1384,16 @@ async function doLogin() {
   if (!found) {
     errEl.textContent = 'E-mail ou senha incorretos.';
     errEl.classList.add('on');
-    // breve delay para dificultar força bruta
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 600));
     return;
   }
 
   currentUser = found;
+
+  // Load this user's personal adv profile if it exists
+  const advPerUser = JSON.parse(localStorage.getItem('lex7_adv_per_user') || '{}');
+  if (advPerUser[found.id]) adv = advPerUser[found.id];
+
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appScreen').classList.add('on');
   setupSidebar();
@@ -1086,6 +1409,7 @@ function doLogout() {
   document.getElementById('loginPass').type  = 'password';
   document.getElementById('passEye').textContent = '👁';
   document.getElementById('loginErr').classList.remove('on');
+  showPanel('login');
 }
 
 function setupSidebar() {
@@ -1684,7 +2008,14 @@ function openAdvModal() {
 function saveAdv() {
   const d={nome:document.getElementById('adv_nome').value.trim(),oab:document.getElementById('adv_oab').value.trim(),uf:document.getElementById('adv_uf').value,area:document.getElementById('adv_area').value,email:document.getElementById('adv_email').value.trim(),tel:document.getElementById('adv_tel').value.trim()};
   if(!d.nome||!d.oab){alert('Preencha Nome e OAB.');return;}
-  adv=d;persist();closeModal('ovAdv');renderAdv();toast('Perfil salvo!');
+  adv=d;
+  // Also persist in per-user store so it loads on next login
+  if (currentUser) {
+    const advPerUser = JSON.parse(localStorage.getItem('lex7_adv_per_user') || '{}');
+    advPerUser[currentUser.id] = d;
+    localStorage.setItem('lex7_adv_per_user', JSON.stringify(advPerUser));
+  }
+  persist();closeModal('ovAdv');renderAdv();toast('Perfil salvo!');
 }
 
 // ══════════════════════════════════════════════════════
@@ -2018,8 +2349,24 @@ function delPraz(id){if(!confirm('Remover este prazo?'))return;prazs=prazs.filte
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.overlay').forEach(el=>{el.addEventListener('click',e=>{if(e.target===el)closeModal(el.id);});});
 
-// Init: show login screen, hide app
+// Init: wait for seed (async password hashing) then show login
 document.getElementById('appScreen').classList.remove('on');
+// seed() is already called above as an async IIFE — its Promise is stored here
+// so we show a tiny loading state while hashes are computed on first load
+(async () => {
+  const loginScreen = document.getElementById('loginScreen');
+  // briefly show a loading label while crypto runs
+  const loadEl = document.createElement('p');
+  loadEl.style = 'text-align:center;color:rgba(255,255,255,.4);font-size:.78rem;margin-top:1rem;font-family:DM Mono,monospace';
+  loadEl.id = 'initMsg';
+  loginScreen.querySelector('.login-box').appendChild(loadEl);
+
+  // wait for any pending hash operations (seed may still be running)
+  await new Promise(r => setTimeout(r, 200));
+
+  const msg = document.getElementById('initMsg');
+  if (msg) msg.remove();
+})();
 </script>
 </body>
 </html>
