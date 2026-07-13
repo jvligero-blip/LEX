@@ -294,6 +294,18 @@ textarea.finput{min-height:80px;resize:vertical;}
 .transfer-info{flex:1;font-size:.86rem;color:var(--text);}
 .transfer-info span{display:block;font-size:.72rem;color:var(--muted);margin-top:1px;}
 
+/* ════ FILA DE SUGESTÕES DJEN ════ */
+.sug-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);border-left:4px solid var(--orange);padding:1.1rem 1.25rem;margin-bottom:.85rem;}
+.sug-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;margin-bottom:.65rem;}
+.sug-card-title{font-weight:700;font-size:.9rem;color:var(--navy);}
+.sug-card-meta{font-size:.75rem;color:var(--muted);margin-top:3px;}
+.sug-card-chain{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.75rem;align-items:center;font-size:.78rem;color:var(--text2);}
+.sug-card-chain span{background:var(--bg);border-radius:6px;padding:.18rem .55rem;}
+.sug-card-chain .arrow{color:var(--muted);}
+.sug-card-body{font-size:.82rem;color:var(--text2);line-height:1.55;max-height:80px;overflow:hidden;position:relative;}
+.sug-card-body::after{content:'';position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(transparent,var(--white));}
+.sug-card-actions{display:flex;gap:.65rem;margin-top:.9rem;}
+
 /* ════ PUBLICAÇÕES ════ */
 .pub-list{display:flex;flex-direction:column;gap:.85rem;}
 .pub-card{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border-left:4px solid var(--blue);}
@@ -356,17 +368,20 @@ textarea.finput{min-height:80px;resize:vertical;}
       <p>Gestão Jurídica</p>
     </div>
     <h2>Entrar no sistema</h2>
-    <div class="login-err" id="loginErr">Usuário ou senha incorretos.</div>
+    <div class="login-err" id="loginErr">E-mail ou senha incorretos.</div>
     <div class="fg">
-      <label class="flabel">Usuário</label>
-      <input class="finput" type="text" id="loginUser" placeholder="seu.usuario" onkeydown="if(event.key==='Enter')doLogin()">
+      <label class="flabel">E-mail</label>
+      <input class="finput" type="email" id="loginUser" placeholder="seu@email.com.br" autocomplete="email" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div class="fg">
       <label class="flabel">Senha</label>
-      <input class="finput" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      <div style="position:relative">
+        <input class="finput" type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:2.5rem">
+        <button type="button" onclick="togglePassVis()" style="position:absolute;right:.65rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;" id="passEye">👁</button>
+      </div>
     </div>
-    <button class="btn btn-navy" style="width:100%;justify-content:center;padding:.7rem" onclick="doLogin()">Entrar →</button>
-    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:1rem">Admin padrão: <b>admin</b> / <b>admin123</b></p>
+    <button class="btn btn-navy" style="width:100%;justify-content:center;padding:.7rem;margin-top:.25rem" onclick="doLogin()" id="loginBtn">Entrar →</button>
+    <p style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:1rem">Admin padrão: <b>admin@lex.com</b> / <b>admin123</b></p>
   </div>
 </div>
 
@@ -535,8 +550,29 @@ textarea.finput{min-height:80px;resize:vertical;}
   <div class="view" id="v-publicacoes">
     <div class="page-header">
       <div><h1>Publicações</h1><p>Diário de Justiça e publicações dos tribunais</p></div>
-      <button class="btn btn-navy" onclick="openPubModal()">+ Nova Publicação</button>
+      <div style="display:flex;gap:.65rem;flex-wrap:wrap">
+        <button class="btn btn-ghost" id="syncBtn" onclick="sincronizarDJEN()">🔄 Sincronizar DJEN</button>
+        <button class="btn btn-navy" onclick="openPubModal()">+ Manual</button>
+      </div>
     </div>
+
+    <!-- SYNC STATUS BAR -->
+    <div id="syncBar" style="display:none;background:var(--blue-light);border:1.5px solid var(--blue);border-radius:10px;padding:.75rem 1.1rem;margin-bottom:1.25rem;font-size:.84rem;color:var(--blue);display:none;align-items:center;gap:.75rem;">
+      <span id="syncSpinner" style="animation:spin 1s linear infinite;display:inline-block">⏳</span>
+      <span id="syncMsg">Buscando no DJEN...</span>
+    </div>
+    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+    <!-- FILA DE CONFIRMAÇÃO DE PRAZOS SUGERIDOS -->
+    <div id="filaSugestoes" style="display:none;margin-bottom:1.5rem">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem">
+        <div style="font-family:Fraunces,serif;font-size:1rem;font-weight:700;color:var(--navy)">⏰ Prazos sugeridos pelo DJEN</div>
+        <span id="filaBadge" class="nav-badge" style="position:static;display:inline">0</span>
+        <span style="color:var(--muted);font-size:.78rem">— Revise e confirme antes de salvar</span>
+      </div>
+      <div id="filaList"></div>
+    </div>
+
     <div class="toolbar">
       <input class="f-search" id="sPub" type="text" placeholder="🔍 Buscar publicação..." oninput="renderPubs()">
       <select class="f-select" id="fPubTrib" onchange="renderPubs()">
@@ -795,14 +831,15 @@ textarea.finput{min-height:80px;resize:vertical;}
     <div class="modal-body">
       <div class="form-row">
         <div class="fg"><label class="flabel">Nome Completo *</label><input class="finput" type="text" id="u_nome" placeholder="Nome do funcionário"></div>
-        <div class="fg"><label class="flabel">Usuário (login) *</label><input class="finput" type="text" id="u_user" placeholder="nome.sobrenome"></div>
+        <div class="fg"><label class="flabel">E-mail (login) *</label><input class="finput" type="email" id="u_email" placeholder="funcionario@escritorio.com"></div>
       </div>
       <div class="form-row">
-        <div class="fg"><label class="flabel">Senha *</label><input class="finput" type="password" id="u_pass" placeholder="Mínimo 6 caracteres"></div>
+        <div class="fg"><label class="flabel">Senha *</label><input class="finput" type="password" id="u_pass" placeholder="Mínimo 8 caracteres"></div>
         <div class="fg"><label class="flabel">Perfil</label>
           <select class="finput" id="u_role"><option value="funcionario">Funcionário</option><option value="admin">Administrador</option></select>
         </div>
       </div>
+      <div id="u_edit_hint" style="display:none;font-size:.78rem;color:var(--muted);margin-top:-.5rem;margin-bottom:.5rem">💡 Deixe a senha em branco para manter a senha atual.</div>
     </div>
     <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovUser')">Cancelar</button><button class="btn btn-navy" onclick="saveUser()">Salvar</button></div>
   </div>
@@ -860,10 +897,16 @@ const persist = () => {
   // Users seed
   if (!users.length) {
     users = [
-      { id:'admin', nome:'Administrador', user:'admin', pass:'admin123', role:'admin' },
-      { id:uid(), nome:'Maria Fernanda', user:'maria.fernanda', pass:'func123', role:'funcionario' },
-      { id:uid(), nome:'Carlos Eduardo', user:'carlos.eduardo', pass:'func123', role:'funcionario' },
+      { id:'admin', nome:'Administrador', email:'admin@lex.com', passHash:'', role:'admin' },
+      { id:uid(), nome:'Maria Fernanda', email:'maria.fernanda@lex.com', passHash:'', role:'funcionario' },
+      { id:uid(), nome:'Carlos Eduardo', email:'carlos.eduardo@lex.com', passHash:'', role:'funcionario' },
     ];
+    // hash default passwords async, then persist
+    Promise.all([
+      hashPass('admin123').then(h => { users[0].passHash = h; }),
+      hashPass('func123').then(h  => { users[1].passHash = h; }),
+      hashPass('func123').then(h  => { users[2].passHash = h; }),
+    ]).then(() => persist());
   }
 
   if (auds.length || procs.length) return;
@@ -981,15 +1024,52 @@ function toast(msg, icon='✅') {
 // ══════════════════════════════════════════════════════
 // LOGIN / LOGOUT
 // ══════════════════════════════════════════════════════
-function doLogin() {
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  const found = users.find(x => x.user === u && x.pass === p);
-  if (!found) {
-    document.getElementById('loginErr').classList.add('on');
+// ══════════════════════════════════════════════════════
+// CRYPTO — SHA-256 via WebCrypto (nativo no browser, sem deps)
+// ══════════════════════════════════════════════════════
+async function hashPass(plain) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function togglePassVis() {
+  const f = document.getElementById('loginPass');
+  const e = document.getElementById('passEye');
+  f.type = f.type === 'password' ? 'text' : 'password';
+  e.textContent = f.type === 'password' ? '👁' : '🙈';
+}
+
+function setLoginLoading(on) {
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = on;
+  btn.textContent = on ? 'Aguarde...' : 'Entrar →';
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginUser').value.trim().toLowerCase();
+  const plain  = document.getElementById('loginPass').value;
+  const errEl  = document.getElementById('loginErr');
+  errEl.classList.remove('on');
+
+  if (!email || !plain) {
+    errEl.textContent = 'Preencha o e-mail e a senha.';
+    errEl.classList.add('on');
     return;
   }
-  document.getElementById('loginErr').classList.remove('on');
+
+  setLoginLoading(true);
+  const hashed = await hashPass(plain);
+  const found  = users.find(x => x.email === email && x.passHash === hashed);
+  setLoginLoading(false);
+
+  if (!found) {
+    errEl.textContent = 'E-mail ou senha incorretos.';
+    errEl.classList.add('on');
+    // breve delay para dificultar força bruta
+    await new Promise(r => setTimeout(r, 800));
+    return;
+  }
+
   currentUser = found;
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appScreen').classList.add('on');
@@ -1003,6 +1083,9 @@ function doLogout() {
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('loginUser').value = '';
   document.getElementById('loginPass').value = '';
+  document.getElementById('loginPass').type  = 'password';
+  document.getElementById('passEye').textContent = '👁';
+  document.getElementById('loginErr').classList.remove('on');
 }
 
 function setupSidebar() {
@@ -1075,6 +1158,7 @@ function renderAll() {
   renderProcs();
   renderPrazs();
   renderPubs();
+  renderFilaSugestoes();
   renderAdv();
   renderAdmin();
   updateBadge();
@@ -1331,6 +1415,241 @@ function delPub(id){if(!confirm('Remover esta publicação?'))return;pubs=pubs.f
 // ══════════════════════════════════════════════════════
 // ADVOGADO
 // ══════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// DJEN — SINCRONIZAÇÃO DE INTIMAÇÕES
+// ══════════════════════════════════════════════════════
+
+// Inline do lex-sync.js (motor de cálculo de prazo em dias úteis)
+const FERIADOS_LEX = [
+  '2026-01-01','2026-02-16','2026-02-17','2026-02-18','2026-04-03',
+  '2026-04-21','2026-05-01','2026-06-04','2026-07-09','2026-08-11',
+  '2026-09-07','2026-10-12','2026-10-28','2026-11-02','2026-11-15',
+  '2026-11-20','2026-12-08','2026-12-25',
+];
+const isoDate = d => d.toISOString().slice(0,10);
+const emSuspensao = d => { const m=d.getMonth()+1,dia=d.getDate(); return (m===12&&dia>=20)||(m===1&&dia<=20); };
+function ehDiaUtil(d){ const s=d.getDay(); return s!==0&&s!==6&&!FERIADOS_LEX.includes(isoDate(d))&&!emSuspensao(d); }
+function proxDiaUtil(d){ const r=new Date(d); do{r.setDate(r.getDate()+1);}while(!ehDiaUtil(r)); return r; }
+
+function calcularPrazoForense(dataDisp, diasUteis) {
+  const disp = new Date(`${String(dataDisp).slice(0,10)}T12:00:00`);
+  if(isNaN(disp)||!diasUteis) return null;
+  const pub = proxDiaUtil(disp);
+  let cursor = proxDiaUtil(pub);
+  for(let i=1;i<diasUteis;i++) cursor = proxDiaUtil(cursor);
+  return { disponibilizacao:isoDate(disp), publicacao:isoDate(pub), inicioContagem:isoDate(proxDiaUtil(pub)), vencimento:isoDate(cursor), diasUteis };
+}
+
+function limparTextoHtml(html=''){
+  return String(html)
+    .replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<head[\s\S]*?<\/head>/gi,' ')
+    .replace(/<[^>]+>/g,' ')
+    .replace(/&([a-zA-Z]+);/g,(_,e)=>({Aacute:'Á',Eacute:'É',Iacute:'Í',Oacute:'Ó',Uacute:'Ú',aacute:'á',eacute:'é',iacute:'í',oacute:'ó',uacute:'ú',Atilde:'Ã',Otilde:'Õ',atilde:'ã',otilde:'õ',Ccedil:'Ç',ccedil:'ç',Ecirc:'Ê',ecirc:'ê',acirc:'â',ocirc:'ô',nbsp:' ',amp:'&',quot:'"',ordm:'º',ordf:'ª',sect:'§'}[e]||' '))
+    .replace(/&#\d+;/g,' ').replace(/\s+/g,' ').trim();
+}
+
+const SEM_PRAZO = [/ata de sess/i,/lista de distribui/i,/pauta/i,/arquivem-se definitivamente/i,/expedi[çc][ãa]o de alvar/i,/processo sigiloso/i];
+function geraPrazoPublicacao(tipo='',texto=''){return !SEM_PRAZO.some(r=>r.test(tipo)||r.test(texto));}
+
+const EXTENSO_MAP = {tres:3,'três':3,cinco:5,dez:10,quinze:15,vinte:20,trinta:30};
+function extrairDiasDoPrazo(texto=''){
+  const num=texto.match(/prazo\s+de\s+(\d{1,2})\s*(?:\([^)]*\))?\s*dias/i);
+  if(num) return {dias:parseInt(num[1],10),fonte:'texto da intimação'};
+  const ext=texto.match(/prazo\s+de\s+([a-zA-Zçãéêóô]+)\s+dias/i);
+  const ch=ext&&ext[1].toLowerCase();
+  if(ch&&EXTENSO_MAP[ch]) return {dias:EXTENSO_MAP[ch],fonte:'texto da intimação'};
+  return null;
+}
+
+const REGRAS_TIPO = [
+  {tipo:'Embargos',    dias:5,  test:(t)=>/embargos de declara/i.test(t)},
+  {tipo:'Apelação',   dias:15, test:(t,d)=>/senten[çc]a/i.test(d)},
+  {tipo:'Contestação',dias:15, test:(t)=>/contesta[çc]|apresentar defesa/i.test(t)},
+  {tipo:'Impugnação', dias:15, test:(t)=>/impugna[çc][ãa]o/i.test(t)},
+  {tipo:'Manifestação',dias:5, test:(t)=>/manifeste-se|manifestar-se/i.test(t)},
+  {tipo:'Juntada',    dias:5,  test:(t)=>/junte|emende|apresente documento/i.test(t)},
+  {tipo:'Recurso',    dias:10, test:(t)=>/recurso/i.test(t)},
+];
+function classificarPublicacao(texto='',tipoDoc=''){
+  const extraido=extrairDiasDoPrazo(texto);
+  for(const r of REGRAS_TIPO){ if(r.test(texto,tipoDoc)) return {tipo:r.tipo,dias:extraido?.dias??r.dias,fonte:extraido?.fonte??'regra por tipo de ato'}; }
+  if(extraido) return {tipo:'Outro',dias:extraido.dias,fonte:extraido.fonte};
+  return {tipo:'Outro',dias:5,fonte:'art. 218, §3º CPC — prazo supletivo'};
+}
+
+// Fila de sugestões pendentes de confirmação
+let filaSugestoes = JSON.parse(localStorage.getItem('lex6_fila')||'[]');
+function persistFila(){ localStorage.setItem('lex6_fila', JSON.stringify(filaSugestoes)); }
+
+function setSyncStatus(on, msg='') {
+  const bar=document.getElementById('syncBar');
+  const btn=document.getElementById('syncBtn');
+  bar.style.display = on ? 'flex' : 'none';
+  document.getElementById('syncMsg').textContent = msg;
+  btn.disabled = on;
+  btn.textContent = on ? '⏳ Sincronizando...' : '🔄 Sincronizar DJEN';
+}
+
+async function sincronizarDJEN() {
+  if(!adv||!adv.oab||!adv.uf){
+    alert('Cadastre primeiro o perfil do advogado (OAB e Estado) para sincronizar.');
+    navTo('advogado');
+    return;
+  }
+
+  setSyncStatus(true, `Buscando intimações da OAB ${adv.uf} ${adv.oab} no DJEN...`);
+
+  try {
+    // Tenta buscar da API Vercel (/api/publicacoes), com fallback para direto no DJEN
+    const oab = adv.oab.replace(/\D/g,'');
+    const uf  = adv.uf;
+    let items = [];
+
+    try {
+      // Primeira tentativa: via proxy Vercel (resolve CORS)
+      const r = await fetch(`/api/publicacoes?oab=${oab}&uf=${uf}&dias=30`);
+      if(r.ok){ const data=await r.json(); items=data.items||[]; }
+      else throw new Error('proxy indisponível');
+    } catch {
+      // Fallback: direto no DJEN (pode falhar por CORS fora do Vercel)
+      setSyncStatus(true,'Conectando diretamente ao DJEN...');
+      const hoje = new Date().toISOString().slice(0,10);
+      const inicio = new Date(); inicio.setDate(inicio.getDate()-30);
+      const inicioStr = inicio.toISOString().slice(0,10);
+      const params = new URLSearchParams({
+        numeroOab: oab, ufOab: uf.toUpperCase(),
+        dataDisponibilizacaoInicio: inicioStr,
+        dataDisponibilizacaoFim: hoje,
+        pagina:'1', itensPorPagina:'100'
+      });
+      const r2 = await fetch(`https://comunicaapi.pje.jus.br/api/v1/comunicacao?${params}`,{headers:{Accept:'application/json'}});
+      if(!r2.ok) throw new Error(`DJEN respondeu ${r2.status}`);
+      const data2 = await r2.json();
+      items = data2.items||[];
+    }
+
+    if(!items.length){
+      setSyncStatus(false);
+      toast('Nenhuma publicação encontrada nos últimos 30 dias.','📭');
+      return;
+    }
+
+    setSyncStatus(true,`Processando ${items.length} publicação(ões)...`);
+    const numerosProcs = procs.map(p=>p.num.replace(/\D/g,''));
+    let novasPubs=0, novasSugest=0;
+
+    for(const it of items){
+      const texto   = limparTextoHtml(it.texto);
+      const numero  = it.numeroprocessocommascara || it.numero_processo || '—';
+      const trib    = it.siglaTribunal || 'Outro';
+      const idCNJ   = it.id || uid();
+
+      // Evita duplicar publicações já importadas
+      if(pubs.find(p=>p.idCNJ===idCNJ)) continue;
+
+      // Salva a publicação
+      pubs.push({
+        id:uid(), idCNJ,
+        data: it.data_disponibilizacao || new Date().toISOString().slice(0,10),
+        trib, titulo: numero + (it.tipoComunicacao?' — '+it.tipoComunicacao:''),
+        adv: adv?`${adv.nome} — OAB/${adv.uf} ${adv.oab}`:'',
+        corpo: texto.slice(0,2000),
+        urg: '0',
+        link: it.link||'',
+      });
+      novasPubs++;
+
+      // Verifica se gera prazo
+      if(!geraPrazoPublicacao(it.tipoComunicacao||'',texto)) continue;
+      if(filaSugestoes.find(s=>s.idCNJ===idCNJ)) continue;
+
+      const {tipo,dias,fonte} = classificarPublicacao(texto, it.tipoComunicacao||'');
+      const prazoCalc = calcularPrazoForense(it.data_disponibilizacao, dias);
+      if(!prazoCalc) continue;
+
+      filaSugestoes.push({
+        id:uid(), idCNJ,
+        proc: numero,
+        tipo, dias, fonte,
+        descricao: texto.slice(0,180),
+        ...prazoCalc,
+        trib,
+        link: it.link||'',
+        confirmado: false,
+        vinculado: numerosProcs.includes(numero.replace(/\D/g,'')),
+      });
+      novasSugest++;
+    }
+
+    persist();
+    persistFila();
+    setSyncStatus(false);
+    renderPubs();
+    renderFilaSugestoes();
+    toast(`✅ ${novasPubs} publicação(ões) importada(s). ${novasSugest} prazo(s) sugerido(s) para revisão.`,'🔄');
+
+  } catch(e) {
+    setSyncStatus(false);
+    alert('Erro ao sincronizar com o DJEN:\n\n'+e.message+'\n\nVerifique se o sistema está publicado na Vercel com a rota /api/publicacoes, ou se há conectividade com o DJEN.');
+  }
+}
+
+function renderFilaSugestoes() {
+  const pendentes = filaSugestoes.filter(s=>!s.confirmado);
+  const wrap = document.getElementById('filaSugestoes');
+  const badge = document.getElementById('filaBadge');
+  if(!pendentes.length){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  badge.textContent=pendentes.length;
+
+  document.getElementById('filaList').innerHTML = pendentes.map(s=>`
+    <div class="sug-card" id="sug_${s.id}">
+      <div class="sug-card-head">
+        <div>
+          <div class="sug-card-title">${s.proc} ${!s.vinculado?'<span class="chip ch-atrasado" style="font-size:.6rem">Processo não cadastrado</span>':''}</div>
+          <div class="sug-card-meta">${s.trib} · ${chipTipo(s.tipo)} · Fonte: <i>${s.fonte}</i></div>
+        </div>
+        <span class="chip ch-pendente">⏳ Aguardando revisão</span>
+      </div>
+      <div class="sug-card-chain">
+        <span>📅 Disponibilizado: <b>${fmt(s.disponibilizacao)}</b></span>
+        <span class="arrow">→</span>
+        <span>Publicado: <b>${fmt(s.publicacao)}</b></span>
+        <span class="arrow">→</span>
+        <span>Início: <b>${fmt(s.inicioContagem)}</b></span>
+        <span class="arrow">→</span>
+        <span style="color:var(--red);font-weight:700">Vence: ${fmt(s.vencimento)} (${s.diasUteis}d úteis)</span>
+      </div>
+      <div class="sug-card-body">${s.descricao}</div>
+      <div class="sug-card-actions">
+        <button class="btn btn-green btn-sm" data-sid="${s.id}" onclick="confirmarSugestao(this.dataset.sid)">✅ Confirmar prazo</button>
+        <button class="btn btn-ghost btn-sm" data-sid="${s.id}" onclick="descartarSugestao(this.dataset.sid)">✕ Descartar</button>
+        ${s.link?`<a href="${s.link}" target="_blank" class="btn btn-ghost btn-sm">🔗 Ver no tribunal</a>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function confirmarSugestao(id) {
+  const s = filaSugestoes.find(x=>x.id===id); if(!s) return;
+  // cria prazo real
+  prazs.push({
+    id:uid(), proc:s.proc, desc:'[DJEN] '+s.descricao.slice(0,120),
+    data:s.vencimento, tipo:s.tipo, obs:`Prazo de ${s.diasUteis} dias úteis. Disponibilizado ${fmt(s.disponibilizacao)}. Fonte: ${s.fonte}`,
+    status:'pendente', owner:currentUser?.id||'admin',
+  });
+  s.confirmado=true;
+  persist(); persistFila();
+  renderFilaSugestoes(); renderPrazs(); updateBadge();
+  toast('Prazo confirmado e adicionado!','✅');
+}
+
+function descartarSugestao(id) {
+  const s = filaSugestoes.find(x=>x.id===id); if(!s) return;
+  s.confirmado=true;
+  persistFila(); renderFilaSugestoes();
+  toast('Sugestão descartada.','✕');
+}
+
 function renderAdv() {
   const el = document.getElementById('advCard');
   if (!adv||!adv.nome) {
@@ -1384,7 +1703,7 @@ function renderAdmin() {
         <div class="user-avatar-lg" style="background:${isAdmin?'var(--gold)':'var(--navy)'}">${u.nome[0]}</div>
         <div>
           <div class="user-card-name">${u.nome} ${isAdmin?'👑':''}</div>
-          <div class="user-card-meta">@${u.user} · ${isAdmin?'Administrador':'Funcionário'}</div>
+          <div class="user-card-meta">${u.email} · ${isAdmin?'Administrador':'Funcionário'}</div>
         </div>
       </div>
       <div class="user-card-stats">
@@ -1407,28 +1726,36 @@ function renderAdmin() {
 function openUserModal(id=null) {
   editUserId=id;
   document.getElementById('userModalTitle').textContent=id?'Editar Usuário':'Novo Usuário';
-  ['u_nome','u_user','u_pass'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+  ['u_nome','u_email','u_pass'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
   document.getElementById('u_role').value='funcionario';
-  if(id){const u=users.find(x=>x.id===id);if(u){document.getElementById('u_nome').value=u.nome;document.getElementById('u_user').value=u.user;document.getElementById('u_role').value=u.role;}}
+  document.getElementById('u_edit_hint').style.display = id ? 'block' : 'none';
+  if(id){
+    const u=users.find(x=>x.id===id);
+    if(u){ document.getElementById('u_nome').value=u.nome; document.getElementById('u_email').value=u.email||''; document.getElementById('u_role').value=u.role; }
+  }
   document.getElementById('ovUser').classList.add('open');
 }
 
-function saveUser() {
-  const nome=document.getElementById('u_nome').value.trim();
-  const user=document.getElementById('u_user').value.trim();
-  const pass=document.getElementById('u_pass').value;
-  const role=document.getElementById('u_role').value;
-  if(!nome||!user){alert('Preencha Nome e Usuário.');return;}
+async function saveUser() {
+  const nome  = document.getElementById('u_nome').value.trim();
+  const email = document.getElementById('u_email').value.trim().toLowerCase();
+  const plain = document.getElementById('u_pass').value;
+  const role  = document.getElementById('u_role').value;
+  if(!nome||!email){alert('Preencha Nome e E-mail.');return;}
+  if(!email.includes('@')){alert('Informe um e-mail válido.');return;}
   if(editUserId){
     const i=users.findIndex(u=>u.id===editUserId);
-    users[i]={...users[i],nome,user,role};
-    if(pass) users[i].pass=pass;
+    users[i]={...users[i],nome,email,role};
+    if(plain){
+      if(plain.length<8){alert('A senha deve ter pelo menos 8 caracteres.');return;}
+      users[i].passHash=await hashPass(plain);
+    }
     toast('Usuário atualizado!');
   } else {
-    if(!pass||pass.length<6){alert('A senha deve ter pelo menos 6 caracteres.');return;}
+    if(!plain||plain.length<8){alert('A senha deve ter pelo menos 8 caracteres.');return;}
     if(users.length>=5){alert('Limite de 5 usuários atingido.');return;}
-    if(users.find(u=>u.user===user)){alert('Este usuário já existe.');return;}
-    users.push({id:uid(),nome,user,pass,role});
+    if(users.find(u=>u.email===email)){alert('Já existe um usuário com este e-mail.');return;}
+    users.push({id:uid(),nome,email,passHash:await hashPass(plain),role});
     toast('Usuário criado!');
   }
   persist();closeModal('ovUser');renderAdmin();populateOwnerSelects();
