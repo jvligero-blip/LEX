@@ -15,6 +15,7 @@
 // o CNJ pode trocá-la a qualquer momento — assim você atualiza sem redeploy
 // de código.
 
+import {authenticate,fail} from '../lib/server.js';
 const DATAJUD_BASE = 'https://api-publica.datajud.cnj.jus.br';
 
 // Deriva o alias do tribunal a partir do número CNJ: NNNNNNN-DD.AAAA.J.TR.OOOO
@@ -41,6 +42,9 @@ function aliasPeloNumeroCNJ(numero) {
 }
 
 export default async function handler(req, res) {
+  res.setHeader('Cache-Control','no-store');
+  if(req.method!=='GET') return res.status(405).json({erro:'Use GET.'});
+  try { const {db}=await authenticate(req); if(!await db('rpc/reservar_consulta',{})) return res.status(429).json({erro:'Limite de consultas. Aguarde um minuto.'}); } catch(e){return fail(res,e);}
   const { processo, tribunal, raw } = req.query;
 
   if (!processo) {
@@ -51,7 +55,7 @@ export default async function handler(req, res) {
   }
 
   const alias = tribunal || aliasPeloNumeroCNJ(processo);
-  if (!alias) {
+  if (!alias || !/^(tjsp|tjrj|tjmg|tjrs|tjsc|tjpr|tjba|tjce|tjdft|tjes|tjpe|tjal|tjse|tjgo|trf[1-6]|trt(?:[1-9]|1[0-9]|2[0-4])|stj)$/.test(alias)) {
     return res.status(400).json({
       erro: 'Não consegui identificar o tribunal pelo número. Passe ?tribunal=tjsp explicitamente.',
     });
@@ -67,6 +71,7 @@ export default async function handler(req, res) {
 
   try {
     const r = await fetch(url, {
+      signal: AbortSignal.timeout(10000),
       method: 'POST',
       headers: {
         Authorization: `APIKey ${apiKey}`,
