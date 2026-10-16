@@ -1,0 +1,14 @@
+<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LEX · Exportar legado</title>
+<style>body{max-width:720px;margin:4rem auto;padding:1rem;font:16px system-ui;line-height:1.6;color:#172d4b}button{padding:1rem;background:#172d4b;color:white;border:0;border-radius:8px;cursor:pointer}pre{white-space:pre-wrap}</style>
+<h1>Backup legado do LEX</h1><p>Abra esta página <b>no mesmo domínio, perfil e navegador</b> usados pelo LEX antigo. A exportação lê os dados antigos sem alterá-los.</p><p>Não limpe o armazenamento do navegador até conferir a migração. Guarde o JSON em local protegido.</p>
+<button id="export">Exportar backup legado (JSON)</button><pre id="result" role="status"></pre><a href="/">Voltar ao LEX</a>
+<script>
+const clean=v=>Array.isArray(v)?v.map(clean):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).filter(([k])=>!/(pass|senha|token|secret|session)/i.test(k)).map(([k,x])=>[k,clean(x)])):v;
+document.getElementById('export').onclick=()=>{try{
+ const data={},errors=[];for(const key of ['lex7_aud','lex7_proc','lex7_praz','lex7_pub','lex6_fila','lex7_adv','lex7_adv_per_user']){const raw=localStorage.getItem(key);if(raw){try{data[key]=clean(JSON.parse(raw));}catch{errors.push({key,erro:'JSON inválido',conteudo:raw});}}}
+ try{data.responsaveis=JSON.parse(localStorage.getItem('lex7_users')||'[]').map(u=>({id:u.id,nome:u.nome,email:u.email}));}catch{}
+ const out={format:'lex-legacy',version:1,exported_at:new Date().toISOString(),data,errors};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='LEX-legado-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ document.getElementById('result').textContent='Backup exportado. Chaves encontradas: '+Object.keys(data).join(', ')+'. Erros: '+errors.length+'. Os dados originais foram preservados.';
+}catch(e){document.getElementById('result').textContent='Falha na exportação: '+e.message;}};
+</script></html>
