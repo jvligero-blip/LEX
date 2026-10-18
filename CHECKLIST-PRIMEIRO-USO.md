@@ -1,3 +1,5 @@
+> Referência histórica da base anterior. Para atualizar, use README-IMPLANTACAO-V3.md e somente a migration 004; não reinicialize o banco.
+
 # LEX — checklist de primeiro uso
 
 - [ ] Exportar o legado no domínio/navegador antigo de cada usuário; guardar o JSON sem limpar o armazenamento.

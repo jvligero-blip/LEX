@@ -1,3 +1,5 @@
+> Referência histórica da base anterior. Para atualizar, use README-IMPLANTACAO-V3.md e somente a migration 004; não reinicialize o banco.
+
 # LEX — configuração e implantação
 
 O código do MVP está implementado. **A integração com um projeto Supabase real ainda não foi validada**, pois não foram fornecidas URL, chave pública e duas contas de teste. Não use a aprovação dos testes locais como aprovação da produção.

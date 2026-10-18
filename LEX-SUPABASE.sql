@@ -1,3 +1,5 @@
+-- REFERÊNCIA HISTÓRICA: esquema inicial, NÃO reaplicar em base existente.
+-- Atualização V3: somente supabase/migrations/004_v3_fluxos.sql.
 -- LEX — aplicar este arquivo UMA VEZ em projeto Supabase novo.
 -- Alternativa aos três arquivos individuais; não executar ambas as opções.
 

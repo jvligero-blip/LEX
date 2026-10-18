@@ -19,8 +19,8 @@ test('triagem é permanente; captura e classificação preservadas na revisão',
 });
 test('duas tarefas independentes, conclusão e reabertura; sync não recria',async()=>{
  const p=(await db.query("select * from publicacoes where id_externo='p2'")).rows[0];
- await rpc(db,'classificar_publicacao',[p.id,'Prazo processual','Providenciar documentos','',false]);
  const tasks=(await db.query("insert into compromissos(processo_id,publicacao_id,descricao,data_fatal_confirmada) values($1,$2,'A','2026-10-20'),($1,$2,'B',null) returning *",[p.processo_id,p.id])).rows;
+ await rpc(db,'classificar_publicacao',[p.id,'Prazo processual','Providenciar documentos','',false]);
  await db.query("update compromissos set status='concluido' where id=$1",[tasks[0].id]);
  assert.equal((await db.query('select status from compromissos where id=$1',[tasks[1].id])).rows[0].status,'pendente');
  await rpc(db,'ingest_publicacao',[pub('p2')]);assert.equal(await count(db,'compromissos'),2);

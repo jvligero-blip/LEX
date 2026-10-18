@@ -1,18 +1,22 @@
+import {publicationText} from './publication-view.js';
+import {states,taskOpen,httpsURL,phoneBR,validDocument,folderComplete,suggestDate,dashboardCounts} from '../lib/v3-domain.js';
+import {LexBot} from './lexbot.js';
 import {connect,checked,all,rpc,save,tables} from './store.js';
 import {digits,validCNJ,maskCNJ,today,addDays,esc,safeURL,suggestion,incrementalStart} from '../lib/domain.js';
 import {exportLegacy,ownersOf,selectLegacy,prepareLegacy} from '../lib/legacy.js';
 const $=id=>document.getElementById(id), val=id=>$(id).value.trim(), set=(id,v)=>{$(id).value=v??'';}, html=(id,v)=>{$(id).innerHTML=v;}, text=(id,v)=>{$(id).textContent=v??'';};
+let bot=null,activityTarget=null,activityRequest=null,triageQueue=[],taskScope='';
 let db,user=null,data={},generation=0,loading=false,editing={},origin=null,selectedPub=null,syncing=false,stopSync=false,backup=null;
 const uuid=()=>crypto.randomUUID(), fmt=d=>d?d.slice(0,10).split('-').reverse().join('/'):'Sem data', stamp=d=>d?new Date(d).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'}):'—';
 const rows=t=>data[t]||[], process=id=>rows('processos').find(p=>p.id===id), procNum=id=>maskCNJ(process(id)?.numero_cnj)||'Pendente de vínculo';
-const openTasks=()=>rows('compromissos').filter(x=>x.status!=='concluido'), pending=()=>rows('publicacoes').filter(x=>x.triagem_status==='pendente_de_analise');
-const label=p=>p.payload?.parte||'Não informado', empty=message=>`<div class="empty-state"><p>${esc(message)}</p></div>`;
+const openTasks=()=>rows('compromissos').filter(taskOpen), pending=()=>rows('publicacoes').filter(x=>x.triagem_status==='pendente_de_analise');
+const label=p=>p.payload?.apelido||p.payload?.cliente_nome||p.payload?.parte||'Não informado', empty=message=>`<div class="empty-state"><p>${esc(message)}</p></div>`;
 const chip=value=>`<span class="chip">${esc(value||'—')}</span>`, button=(name,arg,label,cls='btn btn-ghost btn-sm')=>`<button class="${cls}" data-action="${name}" data-id="${esc(arg??'')}">${esc(label)}</button>`;
 function toast(message){text('toastMsg',message);$('toast').classList.add('on');setTimeout(()=>$('toast').classList.remove('on'),4500);}
 function error(e){const message=e?.message||String(e);text('connectionState','Operação não confirmada: '+message);toast(message);}
 function modal(id){$(id).classList.add('open');}
 function closeModal(id){$(id).classList.remove('open');}
-function resetMemory(){generation++;user=null;data={};origin=null;selectedPub=null;backup=null;editing={};stopSync=true;document.querySelectorAll('.overlay').forEach(e=>e.classList.remove('open'));document.querySelectorAll('input:not([type=button]),textarea').forEach(e=>{if(!e.id.startsWith('login'))e.value='';});['pubList','tbProc','tbAud','tbPraz','advCard','syncHistory','migrationReview','importPreview','triageText','triageEvents','dProcPubs','dProcHero','dProcGrid','dProcAuds','dProcPrazs','dProcObs','dProcActions','dAudActions','dPrazActions','triageTasks','triageInfo','triageLink','importStatus','syncProgress','dAudHero','dAudGrid','dAudObs','dPrazHero','dPrazGrid','dPrazObs','statsRow','dashAuds','dashPrazos'].forEach(id=>{if($(id))html(id,'');});$('appScreen').classList.remove('on');$('loginScreen').style.display='flex';}
+function resetMemory(){bot?.destroy();bot=null;activityTarget=null;triageQueue=[];taskScope='';document.body.classList.remove('lexbot-space');generation++;user=null;data={};origin=null;selectedPub=null;backup=null;editing={};stopSync=true;document.querySelectorAll('.overlay').forEach(e=>e.classList.remove('open'));document.querySelectorAll('input:not([type=button]),textarea').forEach(e=>{if(!e.id.startsWith('login'))e.value='';});['pubList','tbProc','tbAud','tbPraz','advCard','syncHistory','migrationReview','importPreview','triageText','triageOriginal','triageEvents','dProcPubs','dProcHero','dProcGrid','dProcAuds','dProcPrazs','dProcObs','dProcActions','dAudActions','dPrazActions','triageTasks','triageInfo','triageLink','importStatus','syncProgress','dAudHero','dAudGrid','dAudObs','dPrazHero','dPrazGrid','dPrazObs','statsRow','dashAuds','dashPrazos','activityTimeline','folderActivities','decisionFeedback','urgentContents'].forEach(id=>{if($(id))html(id,'');});$('appScreen').classList.remove('on');$('loginScreen').style.display='flex';}
 async function reload(){
  const epoch=generation,uid=user?.id;if(!uid)return;
  const result=await Promise.all(tables.map(async t=>[t,await all(db,t)]));
@@ -29,7 +33,7 @@ async function enter(session){
   $('loginScreen').style.display='none';$('appScreen').classList.add('on');
   text('sideName',rows('profiles')[0]?.nome||user.email);text('sideAvatar',(rows('profiles')[0]?.nome||user.email)[0]);text('sideRole','Conta pessoal');text('sideDate',fmt(today()));
   for(const id of ['a_owner','p_owner','z_owner'])html(id,`<option value="${user.id}">${esc(rows('profiles')[0]?.nome||user.email)}</option>`);
-  navTo('dashboard');
+  navTo('dashboard');setupAssistant();showUrgencies(true);
  }catch(e){resetMemory();loginMessage('Não foi possível carregar a conta. '+e.message);}
 }
 function loginMessage(message){text('loginErr',message);$('loginErr').style.display='block';}
@@ -52,10 +56,10 @@ function openSidebar(){$('sidebar').classList.add('open');$('sidebarOverlay').cl
 function closeSidebar(){$('sidebar').classList.remove('open');$('sidebarOverlay').classList.remove('visible');}
 function days(d){return d?Math.round((Date.parse(d+'T12:00:00Z')-Date.parse(today()+'T12:00:00Z'))/86400000):null;}
 function taskDate(t){return t.data_fatal_confirmada||t.data_interna||'';}
-function taskStatus(t){return t.status==='concluido'?'concluido':t.data_fatal_confirmada&&t.data_fatal_confirmada<today()?'atrasado':'pendente';}
+function taskStatus(t){return states[t.status]||t.status;}
 function sourceLink(p){const u=safeURL(p?.link_origem);return u?`<a class="btn btn-ghost btn-sm" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Origem oficial ↗</a>`:'';}
 function renderAll(){if(!user)return;renderDash();renderAuds();renderProcs();renderPrazs();renderPubs();renderAdv();renderSync();text('navBadge',openTasks().length);$('navBadge').style.display=openTasks().length?'':'none';}
-function renderDash(){
+function renderDashBase(){
  text('greeting','Olá, '+(rows('profiles')[0]?.nome||user.email));text('greetDate',fmt(today())+' · America/Sao_Paulo');
  const upcoming=rows('audiencias').filter(a=>a.status==='agendada'&&a.data>=today()),due=openTasks().filter(t=>t.data_fatal_confirmada&&days(t.data_fatal_confirmada)<=7);
  html('statsRow',[[pending().length,'Publicações pendentes','publicacoes'],[due.length,'Prazos confirmados até 7 dias','prazos'],[openTasks().length,'Tarefas abertas','prazos'],[upcoming.length,'Audiências futuras','audiencias']].map(([n,label,page])=>`<button class="stat-card" data-action="navTo" data-id="${page}"><div class="stat-num">${n}</div><div class="stat-label">${label}</div></button>`).join(''));
@@ -73,22 +77,24 @@ function renderAuds(){
  const q=val('sAud').toLowerCase(),area=val('fAudArea');
  html('tbAud',rows('audiencias').filter(a=>(!q||(procNum(a.processo_id)+' '+JSON.stringify(a.payload)).toLowerCase().includes(q))&&(!area||a.payload.area===area)).sort((a,b)=>(a.data+a.hora).localeCompare(b.data+b.hora)).map(a=>`<tr><td>${fmt(a.data)} ${esc(a.hora.slice(0,5))}</td><td>${button('openDetAud',a.id,procNum(a.processo_id))}</td><td>${esc(a.payload.parte||label(process(a.processo_id)||{}))}</td><td>${esc(a.payload.vara||'—')}</td><td>${esc(a.payload.area||'—')}</td><td>${esc(a.payload.tipo)} ${chip(a.status)}</td><td>${button('openAudModal',a.id,'Editar')}${button('delAud',a.id,'Remover')}</td></tr>`).join('')||'<tr><td colspan="7">Nenhuma audiência</td></tr>');
 }
-function renderPrazs(){
+function renderPrazsBase(){
  const q=val('sPraz').toLowerCase(),tipo=val('fPrazTipo'),st=val('fPrazStatus'),urg=val('fPrazUrg');
  const list=rows('compromissos').filter(t=>(!q||(t.descricao+' '+procNum(t.processo_id)).toLowerCase().includes(q))&&(!tipo||t.tipo===tipo)&&(!st||taskStatus(t)===st)&&(!urg||(t.data_fatal_confirmada&&({urgente:days(t.data_fatal_confirmada)<=3,proximo:days(t.data_fatal_confirmada)<=7,futuro:days(t.data_fatal_confirmada)>7}[urg]))));
- html('tbPraz',list.sort((a,b)=>(taskDate(a)||'9999').localeCompare(taskDate(b)||'9999')).map(t=>`<tr><td>${fmt(t.data_fatal_confirmada)}${t.data_interna?'<br>Interna: '+fmt(t.data_interna):''}</td><td>${t.data_fatal_confirmada?days(t.data_fatal_confirmada)+'d':'—'}</td><td>${esc(procNum(t.processo_id))}</td><td>${button('openDetPraz',t.id,t.descricao)}</td><td>${esc(t.tipo)}</td><td>${chip(taskStatus(t))}</td><td>${button(t.status==='concluido'?'reabrirPraz':'concluirPraz',t.id,t.status==='concluido'?'Reabrir':'Concluir')}</td></tr>`).join('')||'<tr><td colspan="7">Nenhum compromisso neste filtro</td></tr>');
+ html('tbPraz',list.sort((a,b)=>(taskDate(a)||'9999').localeCompare(taskDate(b)||'9999')).map(t=>`<tr><td>${fmt(t.data_fatal_confirmada)}${t.data_interna?'<br>Interna: '+fmt(t.data_interna):''}</td><td>${t.data_fatal_confirmada?days(t.data_fatal_confirmada)+'d':'—'}</td><td>${esc(procNum(t.processo_id))}</td><td>${button('openDetPraz',t.id,t.descricao)}</td><td>${esc(t.tipo)}</td><td>${chip(taskStatus(t))}</td><td>${button((t.status==='concluido'||t.status==='cancelado')?'reabrirPraz':'concluirPraz',t.id,(t.status==='concluido'||t.status==='cancelado')?'Reabrir':'Concluir')}</td></tr>`).join('')||'<tr><td colspan="7">Nenhum compromisso neste filtro</td></tr>');
 }
 function pubCard(p){
  const capture=rows('publicacao_oabs').filter(o=>o.publicacao_id===p.id).map(o=>rows('oabs_monitoradas').find(a=>a.id===o.oab_id)).filter(Boolean).map(o=>o.numero_oab+'/'+o.uf).join(', ');
- return `<div class="card publication"><div class="card-head"><h3>${esc(p.tipo||'Comunicação')} · ${esc(p.tribunal||'Tribunal não informado')}</h3>${chip(p.triagem_status==='classificada'?'Classificada':'Pendente de análise')}</div><div class="pub-body">${p.processo_id?button('openDetProc',p.processo_id,procNum(p.processo_id)):chip('Pendente de vínculo: '+(p.numero_recebido||'sem CNJ'))}<p>Disponibilização: ${fmt(p.data_disponibilizacao)} · Captura: ${stamp(p.first_seen_at)}${capture?' · OAB '+esc(capture):''}</p>${suggestion(p.texto_integral)?`<p class="hint">${esc(suggestion(p.texto_integral))}</p>`:''}${p.revisao_detectada?'<p class="hint">A fonte apresentou alteração. Original preservado; consulte o histórico.</p>':''}<details><summary>Conteúdo integral</summary><pre class="source-text">${esc(p.texto_integral)}</pre></details>${p.classificacao?`<p>${esc(p.classificacao)} · ${esc(p.providencia)}<br>Análise: ${stamp(p.analisado_em)}</p>`:''}<div class="actions">${button('openTriage',p.id,'Ler e classificar')}${button('taskFromPub',p.id,'+ Acompanhamento')}${button('audFromPub',p.id,'+ Audiência')}${sourceLink(p)}</div></div></div>`;
+ const content=publicationText(p.texto_integral),sug=suggestion(content);
+ return `<article class="card publication"><div class="card-head"><h3>${p.processo_id?button('openDetProc',p.processo_id,procNum(p.processo_id)):esc(p.numero_recebido||'Pendente de vínculo')}</h3>${chip(p.triagem_status==='classificada'?(p.exige_providencia===true?'Classificada · com providência':'Classificada'):'A analisar')}</div><div class="pub-body"><p class="pub-meta">${esc(p.tribunal||'')} · ${esc(p.orgao||p.tipo||'Comunicação')} · Disponibilização ${fmt(p.data_disponibilizacao)}<br>Primeira captura ${stamp(p.first_seen_at)}${capture?' · OAB '+esc(capture):''}</p>${sug?`<p class="suggestion">${esc(sug)}</p>`:''}${p.revisao_detectada?'<p class="hint">Fonte alterada — original preservado no histórico.</p>':''}<div class="pub-preview">${esc(content.slice(0,520))}${content.length>520?'…':''}</div>${p.classificacao?`<p>${esc(p.classificacao)} · ${esc(p.providencia)}</p>`:''}<div class="actions">${button('openTriage',p.id,content.length>520?'Ler integralmente e classificar':'Ler e classificar','btn btn-navy btn-sm')}${p.processo_id?button('openDetProc',p.processo_id,'Abrir pasta'):''}${sourceLink(p)}${button('taskFromPub',p.id,'+ Acompanhamento')}${button('audFromPub',p.id,'+ Audiência')}</div></div></article>`;
 }
 function renderPubs(){
+ text('pubPendingCount',pending().length);text('pubHistoryCount',rows('publicacoes').length);text('pubOldCount',pending().filter(p=>p.first_seen_at.slice(0,10)<today()).length);
  const q=val('sPub').toLowerCase(),trib=val('fPubTrib'),date=val('fPubData'),status=val('fPubStatus'),oab=val('fPubOab');
- html('pubList',rows('publicacoes').filter(p=>(!q||(p.texto_integral+' '+procNum(p.processo_id)+' '+p.numero_recebido).toLowerCase().includes(q)||digits(q).length>4&&digits(procNum(p.processo_id)).includes(digits(q)))&&(!trib||p.tribunal===trib)&&(!date||p.data_disponibilizacao===date)&&(!status||(status==='sem_vinculo'?!p.processo_id:p.triagem_status===status))&&(!oab||rows('publicacao_oabs').some(o=>o.publicacao_id===p.id&&o.oab_id===oab))).sort((a,b)=>a.first_seen_at.localeCompare(b.first_seen_at)).map(pubCard).join('')||empty('Nenhuma publicação neste filtro'));
+ html('pubList',rows('publicacoes').filter(p=>(!q||(publicationText(p.texto_integral)+' '+procNum(p.processo_id)+' '+p.numero_recebido+' '+(p.classificacao||'')+' '+(p.providencia||'')).toLowerCase().includes(q)||digits(q).length>4&&digits(procNum(p.processo_id)).includes(digits(q)))&&(!trib||p.tribunal===trib)&&(!date||p.data_disponibilizacao>=date)&&(!val('fPubFim')||p.data_disponibilizacao<=val('fPubFim'))&&(!val('fPubCategory')||p.classificacao===val('fPubCategory'))&&(!status||(status==='sem_vinculo'?!p.processo_id:p.triagem_status===status))&&(!oab||rows('publicacao_oabs').some(o=>o.publicacao_id===p.id&&o.oab_id===oab))).sort((a,b)=>a.first_seen_at.localeCompare(b.first_seen_at)).map(pubCard).join('')||empty('Nenhuma publicação neste filtro'));
 }
-function openDetProc(id){
+function openDetProcBase(id){
  const p=process(id);if(!p)return;const pubs=rows('publicacoes').filter(x=>x.processo_id===id),tasks=rows('compromissos').filter(x=>x.processo_id===id),auds=rows('audiencias').filter(x=>x.processo_id===id);
- html('dProcHero',`<div class="dh-num">${esc(maskCNJ(p.numero_cnj))}</div><div class="dh-name">${esc(label(p))}</div><p>${pubs.filter(x=>x.triagem_status!=='classificada').length} publicações pendentes · ${tasks.filter(x=>x.status!=='concluido').length} tarefas abertas · ${auds.filter(x=>x.status==='agendada'&&x.data>=today()).length} audiências futuras</p>`);
+ html('dProcHero',`<div class="dh-num">${esc(maskCNJ(p.numero_cnj))}</div><div class="dh-name">${esc(label(p))}</div><p>${pubs.filter(x=>x.triagem_status!=='classificada').length} publicações pendentes · ${tasks.filter(taskOpen).length} tarefas abertas · ${auds.filter(x=>x.status==='agendada'&&x.data>=today()).length} audiências futuras</p>`);
  html('dProcGrid',Object.entries({Área:p.payload.area,Juízo:p.payload.juizo,Distribuição:fmt(p.payload.data),Status:p.payload.status||'ativo'}).map(([k,v])=>`<div class="detail-field"><label>${k}</label><p>${esc(v||'Não informado')}</p></div>`).join(''));
  html('dProcAuds',auds.map(a=>`<div class="detail-list-item">${fmt(a.data)} ${esc(a.hora.slice(0,5))} ${chip(a.status)} ${button('openDetAud',a.id,a.payload.tipo||'Audiência')}</div>`).join('')||empty('Nenhuma audiência'));
  html('dProcPrazs',tasks.map(t=>`<div class="detail-list-item">${button('openDetPraz',t.id,t.descricao)} ${fmt(taskDate(t))} ${chip(taskStatus(t))}</div>`).join('')||empty('Nenhuma tarefa'));
@@ -97,32 +103,38 @@ function openDetProc(id){
  showView('det-proc');
 }
 function openDetAud(id){const a=rows('audiencias').find(x=>x.id===id);if(!a)return;html('dAudHero',`<div class="dh-num">${esc(procNum(a.processo_id))}</div><div class="dh-name">${esc(a.payload.tipo)}</div>`);html('dAudGrid',`<p>${fmt(a.data)} ${esc(a.hora.slice(0,5))} · ${esc(a.payload.modalidade||'')} · ${esc(a.payload.vara||'')} · ${esc(a.status)}</p>`);text('dAudObs',a.payload.obs||'');html('dAudActions',button('openAudModal',id,'Editar')+button('openDetProc',a.processo_id,'Abrir pasta')+(a.publicacao_id?button('openTriage',a.publicacao_id,'Publicação de origem'):'')+(safeURL(a.payload.link)?`<a class="btn btn-ghost" target="_blank" rel="noopener noreferrer" href="${esc(safeURL(a.payload.link))}">Link da audiência ↗</a>`:''));showView('det-aud');}
-function openDetPraz(id){const t=rows('compromissos').find(x=>x.id===id);if(!t)return;html('dPrazHero',`<div class="dh-num">${esc(procNum(t.processo_id))}</div><div class="dh-name">${esc(t.descricao)}</div>`);html('dPrazGrid',`<p>Fatal confirmada: ${fmt(t.data_fatal_confirmada)} · Interna: ${fmt(t.data_interna)} · Sugerida: ${fmt(t.data_sugerida)} · ${esc(taskStatus(t))}</p>`);text('dPrazObs',t.payload.obs||'');html('dPrazActions',button('openEditPrazModal',id,'Editar')+button(t.status==='concluido'?'reabrirPraz':'concluirPraz',id,t.status==='concluido'?'Reabrir':'Concluir')+(t.processo_id?button('openDetProc',t.processo_id,'Abrir pasta'):'')+(t.publicacao_id?button('openTriage',t.publicacao_id,'Publicação de origem'):'')+button('delPraz',id,'Remover'));showView('det-praz');}
+function openDetPrazBase(id){const t=rows('compromissos').find(x=>x.id===id);if(!t)return;html('dPrazHero',`<div class="dh-num">${esc(procNum(t.processo_id))}</div><div class="dh-name">${esc(t.descricao)}</div>`);html('dPrazGrid',`<p>Fatal confirmada: ${fmt(t.data_fatal_confirmada)} · Interna: ${fmt(t.data_interna)} · Sugerida: ${fmt(t.data_sugerida)} · ${esc(taskStatus(t))}</p>`);text('dPrazObs',t.payload.obs||'');html('dPrazActions',button('openEditPrazModal',id,'Editar')+button((t.status==='concluido'||t.status==='cancelado')?'reabrirPraz':'concluirPraz',id,(t.status==='concluido'||t.status==='cancelado')?'Reabrir':'Concluir')+(t.processo_id?button('openDetProc',t.processo_id,'Abrir pasta'):'')+(t.publicacao_id?button('openTriage',t.publicacao_id,'Publicação de origem'):'')+button('delPraz',id,'Cancelar'));showView('det-praz');}
 async function ensureProc(number){if(!validCNJ(number))throw new Error('Informe um CNJ válido com 20 dígitos e dígito verificador.');return rpc(db,'ensure_processo',{p_numero:digits(number)});}
-function openProcModal(id){editing.proc=id||uuid();editing.procExisting=!!id;const p=process(id);for(const key of ['num','parte','area','status','juizo','data','obs'])set('p_'+key,key==='num'?maskCNJ(p?.numero_cnj):p?.payload?.[key]||(key==='status'?'ativo':key==='area'?'civel':''));text('procModalTitle',id?'Editar pasta':'Nova pasta');modal('ovProc');}
+function openProcModalBase(id){editing.proc=id||uuid();editing.procExisting=!!id;const p=process(id);for(const key of ['num','parte','area','status','juizo','data','obs'])set('p_'+key,key==='num'?maskCNJ(p?.numero_cnj):p?.payload?.[key]||(key==='status'?'ativo':key==='area'?'civel':''));text('procModalTitle',id?'Editar pasta':'Nova pasta');modal('ovProc');}
 async function saveProc(){
  const n=digits(val('p_num'));if(!validCNJ(n))throw new Error('CNJ inválido; confira os 20 dígitos e o verificador.');
- const payload=Object.fromEntries(['parte','area','status','juizo','data','obs'].map(k=>[k,val('p_'+k)]));
+ const payload={...process(editing.proc)?.payload,...Object.fromEntries(['parte','area','status','juizo','data','obs'].map(k=>[k,val('p_'+k)])),...clientFields()};
  let id;if(editing.procExisting){id=editing.proc;await save(db,'processos',{id,user_id:user.id,numero_cnj:n,payload});}else{id=await rpc(db,'ensure_processo',{p_numero:n,p_payload:payload});}
  await reload();closeModal('ovProc');openDetProc(id);toast('Pasta confirmada no banco.');
 }
 function openAudModal(id){const a=rows('audiencias').find(x=>x.id===id);editing.aud=id||uuid();origin=a?.publicacao_id||null;for(const key of ['data','hora','proc','parte','vara','area','tipo','obs','modalidade','link','status'])set('a_'+key,key==='proc'?procNum(a?.processo_id):a?.[key]??a?.payload?.[key]??({data:today(),area:'civel',tipo:'Instrução e Julgamento',status:'agendada',modalidade:'Presencial'}[key]||''));if(!a)set('a_proc','');text('audModalTitle',a?'Editar audiência':'Nova audiência');modal('ovAud');}
 async function saveAud(){
  if(!val('a_data')||!val('a_hora'))throw new Error('Informe data e hora.');const pid=await ensureProc(val('a_proc'));
- const payload=Object.fromEntries(['parte','vara','area','tipo','obs','modalidade','link'].map(k=>[k,val('a_'+k)]));
+ const payload={...rows('audiencias').find(a=>a.id===editing.aud)?.payload,...Object.fromEntries(['parte','vara','area','tipo','obs','modalidade','link'].map(k=>[k,val('a_'+k)]))};
  await save(db,'audiencias',{id:editing.aud,user_id:user.id,processo_id:pid,publicacao_id:origin,data:val('a_data'),hora:val('a_hora'),status:val('a_status'),payload});await reload();closeModal('ovAud');toast('Audiência salva no banco.');
 }
-function openPrazModal(id){const t=rows('compromissos').find(x=>x.id===id);editing.task=id||uuid();origin=t?.publicacao_id||null;set('z_proc',t?.processo_id?procNum(t.processo_id):'');set('z_desc',t?.descricao);set('z_tipo',t?.tipo||'Administrativo');set('z_data',t?.data_fatal_confirmada);set('z_interna',t?.data_interna);set('z_sugerida',t?.data_sugerida);set('z_obs',t?.payload.obs);text('taskModalTitle',t?'Editar compromisso':'Novo compromisso');modal('ovPraz');}
+function openPrazModalBase(id){const t=rows('compromissos').find(x=>x.id===id);editing.task=id||uuid();origin=t?.publicacao_id||null;set('z_proc',t?.processo_id?procNum(t.processo_id):'');set('z_desc',t?.descricao);set('z_tipo',t?.tipo||'Administrativo');set('z_data',t?.data_fatal_confirmada);set('z_interna',t?.data_interna);set('z_sugerida',t?.data_sugerida);set('z_obs',t?.payload.obs);text('taskModalTitle',t?'Editar compromisso':'Novo compromisso');modal('ovPraz');}
 const openEditPrazModal=openPrazModal;
 async function savePraz(){
  if(!val('z_desc'))throw new Error('Descreva o compromisso.');const pid=val('z_proc')?await ensureProc(val('z_proc')):null;
  const t=rows('compromissos').find(x=>x.id===editing.task);
- await save(db,'compromissos',{id:editing.task,user_id:user.id,processo_id:pid,publicacao_id:origin,descricao:val('z_desc'),tipo:val('z_tipo'),status:t?.status||'pendente',data_fatal_confirmada:val('z_data')||null,data_interna:val('z_interna')||null,data_sugerida:val('z_sugerida')||null,confirmado_em:val('z_data')?new Date().toISOString():null,payload:{...t?.payload,obs:val('z_obs')}});await reload();closeModal('ovPraz');toast('Compromisso salvo no banco.');
+ await save(db,'compromissos',{id:editing.task,user_id:user.id,processo_id:pid,publicacao_id:origin,descricao:val('z_desc'),tipo:val('z_tipo'),status:t?.status||'pendente',data_fatal_confirmada:val('z_data')||null,data_interna:val('z_interna')||null,data_sugerida:val('z_sugerida')||null,data_revisao:val('z_revisao')||null,prioridade:val('z_prioridade')||'normal',confirmado_em:val('z_data')?new Date().toISOString():null,payload:{...t?.payload,obs:val('z_obs')}});await reload();closeModal('ovPraz');toast('Compromisso salvo no banco.');
 }
-async function taskState(id,status){checked(await db.from('compromissos').update({status,updated_at:new Date().toISOString()}).eq('id',id).select().single());await reload();if($('v-det-praz').classList.contains('active'))openDetPraz(id);}
+async function taskState(id,status){
+ const before=rows('compromissos').find(t=>t.id===id);
+ await rpc(db,'registrar_atividade_v3',{p_id:uuid(),p_compromisso:id,p_texto:status==='concluido'?'Compromisso concluído':status==='cancelado'?'Compromisso cancelado':'Compromisso reaberto',p_estado:status});
+ await reload();if($('v-det-praz').classList.contains('active'))openDetPraz(id);
+ if(status==='concluido'&&before?.status!=='concluido')bot?.notify('Congratulate','Compromisso concluído. O histórico foi preservado.');
+}
 const concluirPraz=id=>taskState(id,'concluido'),reabrirPraz=id=>taskState(id,'pendente');
 async function remove(table,id){if(!confirm('Remover este registro? Registros vinculados impedem a exclusão da pasta.'))return;checked(await db.from(table).delete().eq('id',id).select().single());await reload();navTo(({processos:'processos',audiencias:'audiencias',compromissos:'prazos'})[table]);}
-const delProc=id=>remove('processos',id),delAud=id=>remove('audiencias',id),delPraz=id=>remove('compromissos',id);
+const delProc=id=>remove('processos',id),delAud=id=>remove('audiencias',id);
+async function delPraz(id){if(confirm('Cancelar o compromisso preservando seu histórico?'))await taskState(id,'cancelado');}
 function taskFromPub(id){const p=rows('publicacoes').find(x=>x.id===id);closeModal('ovTriage');openPrazModal();origin=id;set('z_proc',p.processo_id?procNum(p.processo_id):'');set('z_desc',p.providencia||'');}
 function audFromPub(id){const p=rows('publicacoes').find(x=>x.id===id);closeModal('ovTriage');openAudModal();origin=id;set('a_proc',p.processo_id?procNum(p.processo_id):'');}
 function taskFromProc(id){openPrazModal();set('z_proc',procNum(id));}
@@ -132,7 +144,7 @@ async function savePub(){
  if(!val('pub_corpo')||!val('pub_data'))throw new Error('Informe o conteúdo e a data.');
  await rpc(db,'ingest_publicacao',{p_item:{fonte:'MANUAL',id_externo:editing.pub,numero:val('pub_proc'),texto_integral:val('pub_corpo'),data_disponibilizacao:val('pub_data'),tribunal:val('pub_trib'),tipo:val('pub_titulo'),link_origem:val('pub_link'),raw:{advogado:val('pub_adv'),urgente:val('pub_urg')==='1'}}});await reload();closeModal('ovPub');toast('Publicação salva para análise.');
 }
-function openTriage(id){
+function openTriageBase(id){
  selectedPub=id;const p=rows('publicacoes').find(x=>x.id===id);if(!p)return;
  text('triageText',p.texto_integral);text('triageInfo',`${procNum(p.processo_id)} · ${p.tribunal||''} · ${fmt(p.data_disponibilizacao)} · primeira captura ${stamp(p.first_seen_at)}`);
  set('triageCategory',p.classificacao||'Ciência, sem providência');set('triageAction',p.providencia);set('triageObs',p.observacoes);set('triageCNJ',p.processo_id?procNum(p.processo_id):p.numero_recebido);html('triageLink',sourceLink(p));
@@ -141,7 +153,25 @@ function openTriage(id){
  html('triageEvents',rows('historico_alteracoes').filter(h=>h.registro_id===id).sort((a,b)=>a.created_at.localeCompare(b.created_at)).map(h=>`<details><summary>${stamp(h.created_at)} · ${esc(h.acao)}</summary><pre class="source-text">${esc(JSON.stringify(h.detalhes,null,2))}</pre></details>`).join(''));
  modal('ovTriage');
 }
-async function classify(reopen=false){if(!selectedPub)return;await rpc(db,'classificar_publicacao',{p_id:selectedPub,p_categoria:val('triageCategory'),p_providencia:val('triageAction'),p_obs:val('triageObs'),p_reabrir:reopen});await reload();closeModal('ovTriage');toast(reopen?'Publicação reaberta com o mesmo ID.':'Classificação salva; os acompanhamentos seguem independentes.');}
+async function classify(reopen=false){
+ if(!selectedPub)return;const id=selectedPub,p=rows('publicacoes').find(p=>p.id===id);
+ const requires=val('triageRequires'),tasks=[];
+ if(!reopen&&!requires)throw new Error('Escolha explicitamente se exige providência ou se é somente ciência.');
+ if(!reopen&&requires==='yes'){
+  const existing=rows('compromissos').filter(t=>t.publicacao_id===id&&t.processo_id&&t.status!=='cancelado');
+  if($('triageCreate').checked||!existing.length){
+   const description=val('triageTaskTitle')||val('triageAction');if(!description)throw new Error('Descreva o compromisso antes de classificar.');
+   const pid=await ensureProc(val('triageCNJ'));
+   tasks.push({id:editing.triageTask,processo_id:pid,descricao:description,tipo:val('triageCategory')==='Prazo processual'?'Outro':'Administrativo',data_interna:val('triageInternal')||null});
+  }
+ }
+ const result=await rpc(db,'classificar_publicacao_v3',{p_id:id,p_categoria:val('triageCategory'),p_exige:requires==='yes',p_providencia:val('triageAction'),p_obs:val('triageObs'),p_compromissos:tasks,p_reabrir:reopen,p_motivo:val('triageReason')||null});
+ await reload();closeModal('ovTriage');
+ const current=rows('publicacoes').find(p=>p.id===id),commit=result.compromisso_id||rows('compromissos').find(t=>t.publicacao_id===id)?.id;
+ html('decisionFeedback',`<p>${reopen?'Análise reaberta no mesmo registro.':'Classificação confirmada no banco.'}</p><div class="actions">${commit?button('openDetPraz',commit,'Abrir compromisso'):''}${current.processo_id?button('openDetProc',current.processo_id,'Abrir pasta'):''}${button('openTriage',id,'Ver histórico')}${!reopen?button('undoTriage',id,'Desfazer / Reabrir'):''}${button('nextPending',id,'Próxima pendente')}</div>`);
+ $('decisionFeedback').hidden=false;toast(reopen?'Publicação reaberta; acompanhamentos preservados.':'Classificação e compromisso confirmados.');
+ if(!reopen&&$('triageNext').checked)nextPending(id);
+}
 async function linkPub(){await rpc(db,'vincular_publicacao',{p_id:selectedPub,p_numero:val('triageCNJ')});await reload();openTriage(selectedPub);toast('Vínculo e acompanhamentos derivados atualizados.');}
 function renderAdv(){const p=rows('profiles')[0];html('advCard',`<div class="card pub-body"><h2>${esc(p?.nome||user.email)}</h2><p>${esc(user.email)}</p><p>Acervo pessoal · ${rows('processos').length} pastas · ${rows('publicacoes').length} publicações</p><h3>OABs monitoradas</h3>${rows('oabs_monitoradas').map(o=>`<p>${esc(o.numero_oab+'/'+o.uf)} · ${o.ativa?'Ativa':'Inativa'} ${button('toggleOAB',o.id,o.ativa?'Desativar':'Ativar')}</p>`).join('')||'<p>Nenhuma OAB cadastrada</p>'}</div>`);html('migrationReview',rows('migracao_revisao').filter(r=>!r.resolvido).map(r=>`<details><summary>${esc(r.motivo)}</summary><pre class="source-text">${esc(JSON.stringify(r.dados,null,2))}</pre><p>Use os cadastros normais para regularizar o registro, confira os vínculos e depois marque a revisão como resolvida.</p>${button('resolveReview',r.id,'Marcar revisão resolvida')}</details>`).join('')||empty('Nenhuma pendência de migração'));
 }
@@ -190,7 +220,87 @@ async function importBackup(){
  await reload();download('LEX-relatorio-migracao-'+today()+'.json',report);text('importStatus',`Persistência confirmada: ${report.importado} importados, ${report.existente} existentes, ${report.revisao} para revisão. Legado original preservado.`);
 }
 async function resolveReview(id){checked(await db.from('migracao_revisao').update({resolvido:true}).eq('id',id));await reload();}
-const actions={doLogin,doLogout,recover,changePassword,togglePassVis,navTo,backTo,openSidebar,closeSidebar,closeModal,renderAuds,renderProcs,renderPrazs,renderPubs,openProcModal,saveProc,openAudModal,saveAud,openPrazModal,openEditPrazModal,savePraz,concluirPraz,reabrirPraz,delProc,delAud,delPraz,openDetProc,openDetAud,openDetPraz,taskFromPub,audFromPub,taskFromProc,audFromProc,openPubModal,savePub,openTriage,linkPub,openAdvModal,saveAdv,addOAB,toggleOAB,sincronizarDJEN,startSync,resumeSync,stopSyncRun,incremental,exportOld,exportOnline,previewImport,importBackup,resolveReview,reload,
+function prefKey(){return 'lex_v3_preferences_'+user.id;}
+function preferences(){try{return JSON.parse(localStorage.getItem(prefKey())||'{}');}catch{return {};}}
+function writePreferences(p){try{localStorage.setItem(prefKey(),JSON.stringify(p));}catch{}}
+function renderPreferences(){const p=preferences();$('botEnabled').checked=p.botEnabled!==false;$('botMessages').checked=p.botMessages!==false;$('botReduced').checked=!!p.botReduced;$('completeContact').checked=p.completeContact!==false;}
+function saveBotPrefs(){writePreferences({...preferences(),botEnabled:$('botEnabled').checked,botMessages:$('botMessages').checked,botReduced:$('botReduced').checked,completeContact:$('completeContact').checked});setupAssistant(false);}
+function setupAssistant(greeting=true){
+ bot?.destroy();bot=null;renderPreferences();const pref=preferences();if(pref.botEnabled===false)return;
+ try{bot=new LexBot({userId:user.id,reduced:pref.botReduced,messages:pref.botMessages!==false});
+ if(greeting){const c=dashboardCounts(rows('compromissos'),rows('publicacoes'),rows('audiencias'),today());bot.daily(c.late||c.today?'Alert':'Greet',`${c.pending} publicações aguardam análise. ${c.late} prazos confirmados vencidos e ${c.today} vencendo hoje.`);}
+ }catch{bot?.destroy();bot=null;}
+}
+function showUrgencies(automatic=false){
+ const p=preferences(),c=dashboardCounts(rows('compromissos'),rows('publicacoes'),rows('audiencias'),today());
+ if(automatic&&(p.hideDailyUrgencies||p.urgencyDay===today()))return;
+ if(automatic)writePreferences({...p,urgencyDay:today()});
+ if(automatic&&!c.late&&!c.today&&!c.next)return;
+ $('hideDailyUrgencies').checked=!!p.hideDailyUrgencies;
+ html('urgentContents',`<p>Somente vencimentos confirmados. Aguardar terceiro não suspende prazo.</p><div class="actions">${button('dashFilter','late',c.late+' vencidos')}${button('dashFilter','today',c.today+' vencem hoje')}${button('dashFilter','next',c.next+' nos próximos 2 dias')}</div>`);modal('ovUrgencies');
+}
+function dismissUrgencies(){writePreferences({...preferences(),urgencyDay:today(),hideDailyUrgencies:$('hideDailyUrgencies').checked});closeModal('ovUrgencies');}
+function renderDash(){
+ renderDashBase();const c=dashboardCounts(rows('compromissos'),rows('publicacoes'),rows('audiencias'),today());
+ const labels={pending:'Publicações pendentes',late:'Prazos vencidos',today:'Vencem hoje',next:'Próximos 2 dias',working:'Tarefas em andamento',waiting:'Aguardando terceiro',undated:'Sem vencimento',audiences:'Audiências'};
+ html('statsRow',Object.entries(labels).map(([k,label])=>`<button class="stat-card ${k==='late'&&c[k]?'stat-danger':''}" data-action="dashFilter" data-id="${k}"><div class="stat-num">${c[k]}</div><div class="stat-label">${label}</div></button>`).join(''));
+}
+function dashFilter(scope){closeModal('ovUrgencies');taskScope=scope;if(scope==='pending'){pubTab('pending');navTo('publicacoes');return;}if(scope==='audiences'){navTo('audiencias');return;}
+ set('fPrazStatus','abertos');set('fPrazUrg',({late:'vencidos',today:'hoje',next:'dois_dias',undated:'sem_data'})[scope]||'');
+ if(scope==='working')set('fPrazStatus','em_andamento');if(scope==='waiting')set('fPrazStatus','aguardando_terceiro');navTo('prazos');
+}
+function pubTab(which){set('fPubStatus',which==='pending'?'pendente_de_analise':'');renderPubs();$('tabPending').classList.toggle('btn-navy',which==='pending');$('tabHistory').classList.toggle('btn-navy',which!=='pending');}
+function nextPending(id){const current=pending().filter(p=>p.id!==id).sort((a,b)=>a.first_seen_at.localeCompare(b.first_seen_at))[0];if(current)openTriage(current.id);else toast('Nenhuma outra publicação pendente.');}
+async function undoTriage(id){openTriage(id);await classify(true);}
+function updateDecision(){
+ const requires=val('triageRequires')==='yes';$('triageWork').hidden=!requires;
+ const create=requires&&$('triageCreate').checked;for(const id of ['triageTaskTitle','triageInternal'])$(id).closest('.fg').hidden=!create;
+}
+function openTriage(id){
+ openTriageBase(id);const p=rows('publicacoes').find(p=>p.id===id);if(!p)return;
+ text('triageText',publicationText(p.texto_integral));text('triageOriginal',p.texto_integral);set('triageRequires',p.exige_providencia===true?'yes':p.exige_providencia===false?'no':'');set('triageTaskTitle',p.providencia||'');set('triageInternal','');set('triageReason','');editing.triageTask=uuid();
+ const linked=rows('compromissos').filter(t=>t.publicacao_id===id&&t.processo_id&&t.status!=='cancelado');
+ $('triageCreate').checked=!linked.length;$('triageCreate').disabled=!linked.length;text('triageExisting',linked.length?linked.length+' compromisso(s) já persistido(s). Confira antes de criar outro.':'Nenhum compromisso válido persistido; a análise com providência exige salvar um.');updateDecision();
+}
+function latestActivity(id){return rows('compromisso_atividades').filter(a=>a.compromisso_id===id).sort((a,b)=>b.created_at.localeCompare(a.created_at))[0];}
+function timeline(list){return list.sort((a,b)=>a.created_at.localeCompare(b.created_at)).map(a=>`<article class="timeline-entry"><time>${stamp(a.created_at)}</time><span> · ${esc(rows('profiles')[0]?.nome||user.email)}</span><p>${esc(a.texto)}</p>${a.estado_novo?chip(states[a.estado_novo]||a.estado_novo):''}${a.proximo_passo?`<p>Próximo: ${esc(a.proximo_passo)}</p>`:''}</article>`).join('')||'<p class="muted">Sem atividade registrada</p>';}
+function renderPrazs(){
+ const q=val('sPraz').toLowerCase(),tipo=val('fPrazTipo'),status=val('fPrazStatus'),urg=val('fPrazUrg');
+ const list=rows('compromissos').filter(t=>{
+  const date=t.data_fatal_confirmada,d=days(date);const overdue=taskOpen(t)&&date&&date<today();
+  return (!q||(t.descricao+' '+procNum(t.processo_id)).toLowerCase().includes(q)||digits(q).length>4&&digits(procNum(t.processo_id)).includes(digits(q)))&&(!tipo||t.tipo===tipo)&&(!status||(status==='abertos'?taskOpen(t):status==='atrasado'?overdue:t.status===status))&&(!urg||({sem_data:!date&&!t.data_interna,vencidos:overdue,hoje:date===today(),dois_dias:date&&d>0&&d<=2,urgente:date&&d<=3,proximo:date&&d<=7,futuro:date&&d>7})[urg]);
+ });
+ html('tbPraz',list.sort((a,b)=>(taskDate(a)||'9999').localeCompare(taskDate(b)||'9999')).map(t=>{const a=latestActivity(t.id);return `<tr><td>${fmt(t.data_fatal_confirmada)}${t.data_interna?'<br>Interna: '+fmt(t.data_interna):''}${t.data_revisao?'<br>Revisão: '+fmt(t.data_revisao):''}</td><td>${t.data_fatal_confirmada?days(t.data_fatal_confirmada)+'d':'—'}</td><td>${t.processo_id?button('openDetProc',t.processo_id,procNum(t.processo_id)):esc(procNum(null))}</td><td>${button('openDetPraz',t.id,t.descricao)}<p class="last-activity">${a?esc(a.texto.slice(0,120)):'Sem atividade registrada'}</p>${t.payload?.proximo_passo?'<p class="last-activity">Próximo: '+esc(t.payload.proximo_passo)+'</p>':''}<small>${esc(rows('profiles')[0]?.nome||user.email)}</small></td><td>${esc(t.tipo)}<br>${chip('Prioridade: '+(t.prioridade||t.payload?.prioridade||'normal'))}</td><td>${chip(states[t.status]||t.status)}${taskOpen(t)&&t.data_fatal_confirmada&&days(t.data_fatal_confirmada)<0?'<span class="due-danger">Fatal vencida</span>':''}</td><td><div class="actions">${button('activityModal',t.id,'+ Andamento')}${button(t.status==='concluido'||t.status==='cancelado'?'reabrirPraz':'concluirPraz',t.id,t.status==='concluido'||t.status==='cancelado'?'Reabrir':'Concluir')}</div></td></tr>`;}).join('')||'<tr><td colspan="7">Nenhum compromisso neste filtro</td></tr>');
+}
+function openDetPraz(id){
+ openDetPrazBase(id);const t=rows('compromissos').find(t=>t.id===id);if(!t)return;
+ html('dPrazGrid',`<div><label>Situação</label><p>${chip(states[t.status]||t.status)}</p></div><div><label>Fatal confirmada</label><p>${fmt(t.data_fatal_confirmada)}</p></div><div><label>Data interna</label><p>${fmt(t.data_interna)}</p></div><div><label>Revisão</label><p>${fmt(t.data_revisao)}</p></div><div><label>Prioridade jurídica</label><p>${esc(t.prioridade||'normal')}</p></div><div><label>Responsável</label><p>${esc(rows('profiles')[0]?.nome||user.email)}</p></div>`);
+ html('dPrazObs',`<p>${esc(t.payload?.obs||'')}</p>${t.concluido_em?'<p>Conclusão: '+stamp(t.concluido_em)+' · '+esc(rows('profiles')[0]?.nome||user.email)+'</p>':''}<div class="detail-sec">Histórico de atividades</div>${button('activityModal',id,'+ Registrar andamento','btn btn-navy')}<div id="activityTimeline">${timeline(rows('compromisso_atividades').filter(a=>a.compromisso_id===id))}</div><details><summary>Alterações do título, datas e vínculo</summary>${rows('historico_alteracoes').filter(a=>a.registro_id===id).map(a=>`<p>${stamp(a.created_at)} · ${esc(a.acao)}</p><pre class="source-text">${esc(JSON.stringify(a.detalhes,null,2))}</pre>`).join('')}</details>`);
+}
+function activityModal(id){closeModal('ovTriage');activityTarget=id;activityRequest=uuid();const t=rows('compromissos').find(t=>t.id===id);if(!t)return;text('activityTitle',t.descricao);set('activityText','');set('activityState',t.status);set('activityNext',t.payload?.proximo_passo);set('activityReview',t.data_revisao);modal('ovActivity');}
+async function saveActivity(){if(!val('activityText'))throw new Error('Descreva a atividade realizada.');const id=activityTarget;
+ const state=val('activityState'),previous=rows('compromissos').find(t=>t.id===id)?.status;
+ await rpc(db,'registrar_atividade_v3',{p_id:activityRequest,p_compromisso:id,p_texto:val('activityText'),p_estado:state,p_proximo:val('activityNext'),p_revisao:val('activityReview')||null});
+ await reload();closeModal('ovActivity');if($('v-det-praz').classList.contains('active'))openDetPraz(id);if($('v-det-proc').classList.contains('active')){const pid=rows('compromissos').find(t=>t.id===id)?.processo_id;if(pid)openDetProc(pid);}toast('Andamento confirmado. Título e prazo fatal preservados.');if(state==='concluido'&&previous!=='concluido')bot?.notify('Congratulate','Compromisso concluído.');
+}
+function openPrazModal(id){openPrazModalBase(id);const t=rows('compromissos').find(t=>t.id===id);set('z_revisao',t?.data_revisao);set('z_prioridade',t?.prioridade||t?.payload?.prioridade||'normal');set('shortcutBase','');set('shortcutCustom','');$('confirmLegalDate').checked=false;text('shortcutResult','');}
+function applyDateShortcut(n){const date=suggestDate(val('shortcutBase'),n||val('shortcutCustom'),val('shortcutRegime')==='uteis');set(val('shortcutTarget')==='interna'?'z_interna':'z_sugerida',date);text('shortcutResult','Sugestão: '+fmt(date)+'. Não altera a data fatal.');$('confirmLegalDate').checked=false;}
+function confirmSuggestedDate(){if(!$('confirmLegalDate').checked||!val('z_sugerida')||!val('shortcutBase'))throw new Error('Confira a sugestão e confirme explicitamente os critérios jurídicos.');set('z_data',val('z_sugerida'));}
+function openProcModal(id){openProcModalBase(id);const p=process(id)?.payload||{};for(const key of ['apelido','cliente_nome','cpf_cnpj','telefone','cliente_email','documentos_url'])set('p_'+key,p[key]||'');}
+function clientFields(){const p=Object.fromEntries(['apelido','cliente_nome','cpf_cnpj','telefone','cliente_email','documentos_url'].map(k=>[k,val('p_'+k)]));
+ if(p.cpf_cnpj&&!validDocument(p.cpf_cnpj))throw new Error('CPF/CNPJ inválido. Deixe vazio quando não informado.');
+ if(p.telefone&&!phoneBR(p.telefone))throw new Error('Telefone inválido. Informe DDD e número, ou DDI explícito.');
+ if(p.cliente_email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(p.cliente_email))throw new Error('E-mail do cliente inválido.');
+ if(p.documentos_url&&!httpsURL(p.documentos_url))throw new Error('Use uma URL HTTPS válida para documentos.');
+ return {...p,cpf_cnpj:digits(p.cpf_cnpj),telefone:phoneBR(p.telefone),documentos_url:p.documentos_url?httpsURL(p.documentos_url):''};
+}
+function openDetProc(id){openDetProcBase(id);const p=process(id);if(!p)return;const d=p.payload||{},complete=folderComplete(d,preferences().completeContact===false?['cliente_nome']:undefined),wa=phoneBR(d.telefone),docs=httpsURL(d.documentos_url);
+ $('dProcHero').insertAdjacentHTML('beforeend',`<p class="completion-hint">${complete?'Cadastro complementar preenchido':'Cadastro incompleto — completar quando possível'}</p>`);
+ $('dProcGrid').insertAdjacentHTML('beforeend',Object.entries({'Nome do cliente':d.cliente_nome,'Descrição amigável':d.apelido,'CPF/CNPJ':d.cpf_cnpj,'Telefone':d.telefone,'E-mail':d.cliente_email}).map(([k,v])=>`<div class="detail-field"><label>${k}</label><p>${esc(v||'Não informado')}</p></div>`).join('')+`<div class="actions">${docs?`<a class="btn btn-ghost" href="${esc(docs)}" target="_blank" rel="noopener noreferrer">Abrir documentos ↗</a>`:''}${wa?`<a class="btn btn-ghost" href="https://wa.me/${wa}" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>`:''}</div>`);
+ const taskIds=rows('compromissos').filter(t=>t.processo_id===id).map(t=>t.id);html('folderActivities',timeline(rows('compromisso_atividades').filter(a=>taskIds.includes(a.compromisso_id))));
+}
+
+const actions={activityModal,saveActivity,applyDateShortcut,confirmSuggestedDate,updateDecision,pubTab,nextPending,undoTriage,showUrgencies,dismissUrgencies,dashFilter,saveBotPrefs,doLogin,doLogout,recover,changePassword,togglePassVis,navTo,backTo,openSidebar,closeSidebar,closeModal,renderAuds,renderProcs,renderPrazs,renderPubs,openProcModal,saveProc,openAudModal,saveAud,openPrazModal,openEditPrazModal,savePraz,concluirPraz,reabrirPraz,delProc,delAud,delPraz,openDetProc,openDetAud,openDetPraz,taskFromPub,audFromPub,taskFromProc,audFromProc,openPubModal,savePub,openTriage,linkPub,openAdvModal,saveAdv,addOAB,toggleOAB,sincronizarDJEN,startSync,resumeSync,stopSyncRun,incremental,exportOld,exportOnline,previewImport,importBackup,resolveReview,reload,
  classify:()=>classify(false),reopenPub:()=>classify(true),triageTask:()=>taskFromPub(selectedPub),triageAud:()=>audFromPub(selectedPub)};
 // Toda gravação tem tratamento comum e bloqueio contra clique duplo na mesma ação.
 const busy=new Set();

@@ -1,3 +1,5 @@
+> Referência histórica da base anterior. Para atualizar, use README-IMPLANTACAO-V3.md e somente a migration 004; não reinicialize o banco.
+
 # LEX — implementação e validação
 
 Entrega de 15/10/2026, baseada no ZIP fornecido e na especificação obrigatória. Código efetivamente alterado; nenhum push, deploy, criação de conta externa ou migração de dados reais foi realizado.

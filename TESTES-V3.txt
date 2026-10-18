@@ -1,0 +1,335 @@
+LEX V3 — 16/10/2026
+53 testes aprovados, zero falhas.
+Node 24.19.0, PGlite PostgreSQL local, Edge headless.
+Auth/PostgREST/DJEN simulados nos testes; nenhum acesso à base de produção.
+Homologação Supabase hospedada: NÃO EXECUTADO, faltam variáveis SUPABASE_URL, SUPABASE_ANON_KEY, LEX_TEST_EMAIL_A, LEX_TEST_PASSWORD_A, LEX_TEST_EMAIL_B, LEX_TEST_PASSWORD_B.
+Atlas original RGBA 1120x1056: transparência testada no canvas; 24 animações e coordenadas válidas; assets idênticos aos anexados.
+
+TAP version 13
+# Subtest: API autenticada + SQL: 205 itens, falha HTTP intermediária e retomada completa
+ok 1 - API autenticada + SQL: 205 itens, falha HTTP intermediária e retomada completa
+  ---
+  duration_ms: 4249.4877
+  type: 'test'
+  ...
+# Subtest: navegador: login remoto carrega acervo sem erros de inicialização
+ok 2 - navegador: login remoto carrega acervo sem erros de inicialização
+  ---
+  duration_ms: 4149.9565
+  type: 'test'
+  ...
+# Subtest: navegador: conteúdo malicioso não executa e texto integral fica disponível
+ok 3 - navegador: conteúdo malicioso não executa e texto integral fica disponível
+  ---
+  duration_ms: 425.4765
+  type: 'test'
+  ...
+# Subtest: navegador: triagem cria tarefa administrativa sem data; classifica sem concluir a tarefa
+ok 4 - navegador: triagem cria tarefa administrativa sem data; classifica sem concluir a tarefa
+  ---
+  duration_ms: 1292.1441
+  type: 'test'
+  ...
+# Subtest: navegador: nova pasta exige só CNJ e reabrir mesmo CNJ não duplica
+ok 5 - navegador: nova pasta exige só CNJ e reabrir mesmo CNJ não duplica
+  ---
+  duration_ms: 1619.4924
+  type: 'test'
+  ...
+# Subtest: navegador: publicação manual, audiência sem cliente e tarefa com data confirmada
+ok 6 - navegador: publicação manual, audiência sem cliente e tarefa com data confirmada
+  ---
+  duration_ms: 2346.1146
+  type: 'test'
+  ...
+# Subtest: navegador: novo build e recarregamento mantêm dados confirmados
+ok 7 - navegador: novo build e recarregamento mantêm dados confirmados
+  ---
+  duration_ms: 928.08
+  type: 'test'
+  ...
+# Subtest: navegador: sessão em contexto independente recupera o acervo A
+ok 8 - navegador: sessão em contexto independente recupera o acervo A
+  ---
+  duration_ms: 977.2802
+  type: 'test'
+  ...
+# Subtest: V3 navegador: leitura estruturada preserva parágrafos/listas/tabela e original
+ok 9 - V3 navegador: leitura estruturada preserva parágrafos/listas/tabela e original
+  ---
+  duration_ms: 923.0212
+  type: 'test'
+  ...
+# Subtest: V3 navegador: falha de gravação mantém triagem; retry e dois cliques não duplicam tarefa
+ok 10 - V3 navegador: falha de gravação mantém triagem; retry e dois cliques não duplicam tarefa
+  ---
+  duration_ms: 663.0102
+  type: 'test'
+  ...
+# Subtest: V3 navegador: dois andamentos, título e prazo preservados, próxima etapa visível
+ok 11 - V3 navegador: dois andamentos, título e prazo preservados, próxima etapa visível
+  ---
+  duration_ms: 1704.751
+  type: 'test'
+  ...
+# Subtest: V3 navegador: dados opcionais persistem, links seguros e atalhos não alteram fatal
+ok 12 - V3 navegador: dados opcionais persistem, links seguros e atalhos não alteram fatal
+  ---
+  duration_ms: 1568.1017
+  type: 'test'
+  ...
+# Subtest: V3 navegador: LexBot único, transparente, minimização, preferência e logout
+ok 13 - V3 navegador: LexBot único, transparente, minimização, preferência e logout
+  ---
+  duration_ms: 1607.3558
+  type: 'test'
+  ...
+# Subtest: V3 navegador: falha do sprite não impede login ou navegação
+ok 14 - V3 navegador: falha do sprite não impede login ou navegação
+  ---
+  duration_ms: 970.8456
+  type: 'test'
+  ...
+# Subtest: V3 navegador: urgência diária é única e cards levam ao filtro confirmado
+ok 15 - V3 navegador: urgência diária é única e cards levam ao filtro confirmado
+  ---
+  duration_ms: 1396.3521
+  type: 'test'
+  ...
+# Subtest: navegador: logout A, login B não mostra acervo de A
+ok 16 - navegador: logout A, login B não mostra acervo de A
+  ---
+  duration_ms: 1092.1587
+  type: 'test'
+  ...
+# Subtest: navegador: tela móvel não extrapola largura
+ok 17 - navegador: tela móvel não extrapola largura
+  ---
+  duration_ms: 1006.3217
+  type: 'test'
+  ...
+# Subtest: navegador: configuração ausente bloqueia gravações e não semeia dados demo
+ok 18 - navegador: configuração ausente bloqueia gravações e não semeia dados demo
+  ---
+  duration_ms: 635.2258
+  type: 'test'
+  ...
+# Subtest: 3 publicações, 1 pasta; repetição não duplica nem cria tarefas
+ok 19 - 3 publicações, 1 pasta; repetição não duplica nem cria tarefas
+  ---
+  duration_ms: 2244.3745
+  type: 'test'
+  ...
+# Subtest: triagem é permanente; captura e classificação preservadas na revisão
+ok 20 - triagem é permanente; captura e classificação preservadas na revisão
+  ---
+  duration_ms: 24.7312
+  type: 'test'
+  ...
+# Subtest: duas tarefas independentes, conclusão e reabertura; sync não recria
+ok 21 - duas tarefas independentes, conclusão e reabertura; sync não recria
+  ---
+  duration_ms: 37.5069
+  type: 'test'
+  ...
+# Subtest: CNJ normalizado, máscara e inválidos sem descarte da publicação
+ok 22 - CNJ normalizado, máscara e inválidos sem descarte da publicação
+  ---
+  duration_ms: 15.9835
+  type: 'test'
+  ...
+# Subtest: fingerprint estável sem ID; IDs diferentes com texto igual são preservados
+ok 23 - fingerprint estável sem ID; IDs diferentes com texto igual são preservados
+  ---
+  duration_ms: 14.655
+  type: 'test'
+  ...
+# Subtest: fallback distingue retificações, datas e identificadores da fonte
+ok 24 - fallback distingue retificações, datas e identificadores da fonte
+  ---
+  duration_ms: 15.1554
+  type: 'test'
+  ...
+# Subtest: duas OABs da mesma conta capturam uma publicação lógica
+ok 25 - duas OABs da mesma conta capturam uma publicação lógica
+  ---
+  duration_ms: 12.6309
+  type: 'test'
+  ...
+# Subtest: RLS: mesmo CNJ em A/B, leitura/alteração/exclusão alheias e FK cruzada negadas
+ok 26 - RLS: mesmo CNJ em A/B, leitura/alteração/exclusão alheias e FK cruzada negadas
+  ---
+  duration_ms: 28.6158
+  type: 'test'
+  ...
+# Subtest: paginação transacional, falha intermediária, replay e retomada 205 itens
+ok 27 - paginação transacional, falha intermediária, replay e retomada 205 itens
+  ---
+  duration_ms: 278.9558
+  type: 'test'
+  ...
+# Subtest: falha em um item reverte página inteira e mantém checkpoint
+ok 28 - falha em um item reverte página inteira e mantém checkpoint
+  ---
+  duration_ms: 11.3677
+  type: 'test'
+  ...
+# Subtest: legado reimportável, inválidos em revisão e nenhuma sugestão gera tarefa
+ok 29 - legado reimportável, inválidos em revisão e nenhuma sugestão gera tarefa
+  ---
+  duration_ms: 34.6156
+  type: 'test'
+  ...
+# Subtest: revisão humana obrigatória e menções não calculam fatal
+ok 30 - revisão humana obrigatória e menções não calculam fatal
+  ---
+  duration_ms: 6.3679
+  type: 'test'
+  ...
+# Subtest: audiência manual sem cliente vincula pasta; restrição impede exclusão da pasta
+ok 31 - audiência manual sem cliente vincula pasta; restrição impede exclusão da pasta
+  ---
+  duration_ms: 8.9722
+  type: 'test'
+  ...
+# Subtest: vínculo corrigido move acompanhamentos derivados e registra auditoria
+ok 32 - vínculo corrigido move acompanhamentos derivados e registra auditoria
+  ---
+  duration_ms: 8.8148
+  type: 'test'
+  ...
+# Subtest: restauração é idempotente, pertence à conta e não sobrescreve dados atuais
+ok 33 - restauração é idempotente, pertence à conta e não sobrescreve dados atuais
+  ---
+  duration_ms: 16.8331
+  type: 'test'
+  ...
+# Subtest: backup completo restaura publicações, tarefas, audiências, vínculos e auditoria em outra instância local
+ok 34 - backup completo restaura publicações, tarefas, audiências, vínculos e auditoria em outra instância local
+  ---
+  duration_ms: 2165.8813
+  type: 'test'
+  ...
+# Subtest: sem acesso anônimo ou adulteração da auditoria; cota persistente
+ok 35 - sem acesso anônimo ou adulteração da auditoria; cota persistente
+  ---
+  duration_ms: 23.4927
+  type: 'test'
+  ...
+# Subtest: CNJ valida DV e máscara
+ok 36 - CNJ valida DV e máscara
+  ---
+  duration_ms: 1.7323
+  type: 'test'
+  ...
+# Subtest: texto integral e identidade da fonte mantidos
+ok 37 - texto integral e identidade da fonte mantidos
+  ---
+  duration_ms: 2.0743
+  type: 'test'
+  ...
+# Subtest: HTML e URLs perigosas escapados
+ok 38 - HTML e URLs perigosas escapados
+  ---
+  duration_ms: 0.3935
+  type: 'test'
+  ...
+# Subtest: sugestão não produz data fatal, tarefa nem contagem automática
+ok 39 - sugestão não produz data fatal, tarefa nem contagem automática
+  ---
+  duration_ms: 0.4635
+  type: 'test'
+  ...
+# Subtest: paginação 205 itens em 3 páginas; total ausente consulta página extra
+ok 40 - paginação 205 itens em 3 páginas; total ausente consulta página extra
+  ---
+  duration_ms: 0.9014
+  type: 'test'
+  ...
+# Subtest: count limitado não encerra página cheia e resposta truncada é sinalizada
+ok 41 - count limitado não encerra página cheia e resposta truncada é sinalizada
+  ---
+  duration_ms: 0.3458
+  type: 'test'
+  ...
+# Subtest: proxy usa página real, consulta nacional, retry 429 e falha definitiva
+ok 42 - proxy usa página real, consulta nacional, retry 429 e falha definitiva
+  ---
+  duration_ms: 510.8609
+  type: 'test'
+  ...
+# Subtest: datas civis e janela incremental recuperam lacunas
+ok 43 - datas civis e janela incremental recuperam lacunas
+  ---
+  duration_ms: 0.2944
+  type: 'test'
+  ...
+# Subtest: backup exclui senhas/tokens e exige titular explícito
+ok 44 - backup exclui senhas/tokens e exige titular explícito
+  ---
+  duration_ms: 1.4489
+  type: 'test'
+  ...
+# Subtest: endpoint privado rejeita chamada anônima; config pendente é explícita
+ok 45 - endpoint privado rejeita chamada anônima; config pendente é explícita
+  ---
+  duration_ms: 0.7915
+  type: 'test'
+  ...
+# Subtest: V3 aditiva preserva registros, IDs, Auth, classificações e RLS anteriores
+ok 46 - V3 aditiva preserva registros, IDs, Auth, classificações e RLS anteriores
+  ---
+  duration_ms: 2308.2927
+  type: 'test'
+  ...
+# Subtest: classificação exige tarefa transacional, rollback integral e retry idempotente
+ok 47 - classificação exige tarefa transacional, rollback integral e retry idempotente
+  ---
+  duration_ms: 1137.4592
+  type: 'test'
+  ...
+# Subtest: proteção contra baixa direta sem compromisso e contra RPC de outra conta
+ok 48 - proteção contra baixa direta sem compromisso e contra RPC de outra conta
+  ---
+  duration_ms: 1158.5753
+  type: 'test'
+  ...
+# Subtest: andamentos preservam título, datas, vínculos; estados, conclusão/reabertura e RLS
+ok 49 - andamentos preservam título, datas, vínculos; estados, conclusão/reabertura e RLS
+  ---
+  duration_ms: 778.2361
+  type: 'test'
+  ...
+# Subtest: backup V3 restaura classificação com providência e timeline sem recriar tarefas
+ok 50 - backup V3 restaura classificação com providência e timeline sem recriar tarefas
+  ---
+  duration_ms: 1472.7625
+  type: 'test'
+  ...
+# Subtest: CPF/CNPJ opcionais e válidos; telefones e documentos somente HTTPS
+ok 51 - CPF/CNPJ opcionais e válidos; telefones e documentos somente HTTPS
+  ---
+  duration_ms: 1.6488
+  type: 'test'
+  ...
+# Subtest: atalhos são sugestões civis: corridos, úteis simples e data-base obrigatória
+ok 52 - atalhos são sugestões civis: corridos, úteis simples e data-base obrigatória
+  ---
+  duration_ms: 4.7373
+  type: 'test'
+  ...
+# Subtest: contagens separam estados e fatais; sem data não fica vencido
+ok 53 - contagens separam estados e fatais; sem data não fica vencido
+  ---
+  duration_ms: 1.5845
+  type: 'test'
+  ...
+1..53
+# tests 53
+# suites 0
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24358.7491

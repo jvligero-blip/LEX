@@ -15,5 +15,5 @@ http.createServer(async(req,res)=>{try{
  const file=path.resolve(root,'.'+decodeURIComponent(u.pathname==='/'?'/index.html':u.pathname));
  if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}
  if(!(await stat(file)).isFile())throw new Error('Arquivo não encontrado');
- res.setHeader('Content-Type',file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.js')?'application/javascript; charset=utf-8':'application/octet-stream');res.end(await readFile(file));
+ res.setHeader('Content-Type',file.endsWith('.html')?'text/html; charset=utf-8':file.endsWith('.js')?'application/javascript; charset=utf-8':file.endsWith('.css')?'text/css':file.endsWith('.json')?'application/json':file.endsWith('.png')?'image/png':'application/octet-stream');res.end(await readFile(file));
 }catch{res.writeHead(404).end('Não encontrado');}}).listen(3000,'127.0.0.1',()=>console.log('LEX em http://127.0.0.1:3000'));

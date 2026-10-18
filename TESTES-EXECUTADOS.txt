@@ -1,3 +1,5 @@
+> Referência histórica da base anterior. Para atualizar, use README-IMPLANTACAO-V3.md e somente a migration 004; não reinicialize o banco.
+
 LEX — execução de 15/10/2026
 Node 24.19.0 · PostgreSQL embarcado PGlite · Edge headless
 Auth/PostgREST simulados no navegador; SQL/RLS executados no banco local.

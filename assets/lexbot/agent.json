@@ -1,0 +1,1263 @@
+{
+  "overlayCount": 1,
+  "sounds": [],
+  "framesize": [
+    160,
+    176
+  ],
+  "tts": {
+    "rate": 1,
+    "pitch": 1,
+    "voice": ""
+  },
+  "animations": {
+    "Idle1_1": {
+      "frames": [
+        {
+          "duration": 1000,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 240,
+          "images": [
+            [
+              160,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 600,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 90,
+          "images": [
+            [
+              320,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 100,
+          "images": [
+            [
+              480,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 90,
+          "images": [
+            [
+              320,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 1100,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Idle1_2": {
+      "frames": [
+        {
+          "duration": 400,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 300,
+          "images": [
+            [
+              960,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 350,
+          "images": [
+            [
+              640,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 210,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 310,
+          "images": [
+            [
+              0,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 320,
+          "images": [
+            [
+              800,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 430,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Blink": {
+      "frames": [
+        {
+          "duration": 100,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 80,
+          "images": [
+            [
+              320,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 110,
+          "images": [
+            [
+              480,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 80,
+          "images": [
+            [
+              320,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 160,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Show": {
+      "frames": [
+        {
+          "duration": 110,
+          "images": [
+            [
+              0,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 110,
+          "images": [
+            [
+              160,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 100,
+          "images": [
+            [
+              320,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 100,
+          "images": [
+            [
+              480,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 130,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Hide": {
+      "frames": [
+        {
+          "duration": 90,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 90,
+          "images": [
+            [
+              480,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 90,
+          "images": [
+            [
+              320,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 90,
+          "images": [
+            [
+              160,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 140,
+          "images": [
+            [
+              0,
+              880
+            ]
+          ]
+        }
+      ]
+    },
+    "Greet": {
+      "frames": [
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 110,
+          "images": [
+            [
+              480,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 230,
+          "images": [
+            [
+              640,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 230,
+          "images": [
+            [
+              800,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              480,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 220,
+          "images": [
+            [
+              640,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "GetAttention": {
+      "frames": [
+        {
+          "duration": 130,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 220,
+          "images": [
+            [
+              960,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              160,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 210,
+          "images": [
+            [
+              960,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Alert": {
+      "frames": [
+        {
+          "duration": 160,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 240,
+          "images": [
+            [
+              960,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              160,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 230,
+          "images": [
+            [
+              960,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 220,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Panic": {
+      "frames": [
+        {
+          "duration": 100,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 190,
+          "images": [
+            [
+              320,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 130,
+          "images": [
+            [
+              480,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              320,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 120,
+          "images": [
+            [
+              480,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              320,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Think": {
+      "frames": [
+        {
+          "duration": 140,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 450,
+          "images": [
+            [
+              640,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 450,
+          "images": [
+            [
+              800,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 330,
+          "images": [
+            [
+              640,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 190,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Congratulate": {
+      "frames": [
+        {
+          "duration": 130,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 220,
+          "images": [
+            [
+              960,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 230,
+          "images": [
+            [
+              960,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 200,
+          "images": [
+            [
+              960,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Celebrate": {
+      "frames": [
+        {
+          "duration": 130,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 220,
+          "images": [
+            [
+              960,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 230,
+          "images": [
+            [
+              960,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 200,
+          "images": [
+            [
+              960,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Acknowledge": {
+      "frames": [
+        {
+          "duration": 140,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 130,
+          "images": [
+            [
+              160,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 150,
+          "images": [
+            [
+              320,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 140,
+          "images": [
+            [
+              160,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 210,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "GestureRight": {
+      "frames": [
+        {
+          "duration": 140,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 250,
+          "images": [
+            [
+              800,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 330,
+          "images": [
+            [
+              800,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "GestureLeft": {
+      "frames": [
+        {
+          "duration": 140,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 250,
+          "images": [
+            [
+              960,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 330,
+          "images": [
+            [
+              960,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "GestureUp": {
+      "frames": [
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 340,
+          "images": [
+            [
+              0,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 200,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "GestureDown": {
+      "frames": [
+        {
+          "duration": 160,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 300,
+          "images": [
+            [
+              320,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 160,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "ClickedOn": {
+      "frames": [
+        {
+          "duration": 120,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              640,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 260,
+          "images": [
+            [
+              640,
+              176
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Working": {
+      "frames": [
+        {
+          "duration": 150,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 300,
+          "images": [
+            [
+              160,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 310,
+          "images": [
+            [
+              320,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 300,
+          "images": [
+            [
+              160,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 160,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Sad": {
+      "frames": [
+        {
+          "duration": 120,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 330,
+          "images": [
+            [
+              160,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 310,
+          "images": [
+            [
+              320,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 270,
+          "images": [
+            [
+              160,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Sleep": {
+      "frames": [
+        {
+          "duration": 140,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 450,
+          "images": [
+            [
+              480,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 440,
+          "images": [
+            [
+              640,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 520,
+          "images": [
+            [
+              480,
+              528
+            ]
+          ]
+        },
+        {
+          "duration": 190,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Surprised": {
+      "frames": [
+        {
+          "duration": 150,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 430,
+          "images": [
+            [
+              800,
+              880
+            ]
+          ]
+        },
+        {
+          "duration": 180,
+          "images": [
+            [
+              0,
+              352
+            ]
+          ]
+        },
+        {
+          "duration": 170,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Walk": {
+      "frames": [
+        {
+          "duration": 110,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 210,
+          "images": [
+            [
+              480,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 210,
+          "images": [
+            [
+              640,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 210,
+          "images": [
+            [
+              480,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 210,
+          "images": [
+            [
+              640,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 120,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    },
+    "Run": {
+      "frames": [
+        {
+          "duration": 90,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        },
+        {
+          "duration": 130,
+          "images": [
+            [
+              800,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 130,
+          "images": [
+            [
+              960,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 130,
+          "images": [
+            [
+              800,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 130,
+          "images": [
+            [
+              960,
+              704
+            ]
+          ]
+        },
+        {
+          "duration": 130,
+          "images": [
+            [
+              0,
+              0
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

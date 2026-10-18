@@ -1,0 +1,20 @@
+{
+  "base_oficial": "LEX-main.zip",
+  "sha256_base": "55ccc1de986c5b86d5515435d00989bf1e821a5bba94519a0024ce4c82041c16",
+  "arte": "LEXBOT_v2_REFINADO_TRANSPARENTE.zip",
+  "sha256_atlas": "0bb3ddf5f420328ed3fac02cef1c8116ae17f39d7b90acf6600aab93a95da06a",
+  "arquivos_funcionais_preservados": [
+    "api/publicacoes.js",
+    "api/andamentos.js",
+    "api/config.js",
+    "lib/domain.js",
+    "lib/server.js",
+    "supabase/migrations/001_lex.sql",
+    "supabase/migrations/002_migracao.sql",
+    "supabase/migrations/003_vinculos.sql",
+    "vercel.json"
+  ],
+  "testes": 53,
+  "falhas": 0,
+  "producao": "Não acessada; nenhuma migration, push ou deploy executado"
+}

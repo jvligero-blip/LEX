@@ -402,7 +402,7 @@ textarea.finput{min-height:80px;resize:vertical;}
 .connection-state{font-size:.78rem;padding:.65rem 1.4rem;color:var(--text2);background:var(--blue-light);overflow-wrap:anywhere}
 .pub-body{padding:1.2rem}.publication{margin-bottom:1rem}.publication p{font-size:.82rem;margin:.65rem 0}.source-text{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;font-family:inherit;font-size:.86rem;line-height:1.65;max-height:48vh;overflow:auto;background:var(--bg);padding:1rem;border-radius:8px;margin:.8rem 0}.actions{display:flex;gap:.5rem;flex-wrap:wrap;margin:.8rem 0}.hint{font-size:.8rem;color:var(--red);line-height:1.6}details{margin:.7rem 0}summary{cursor:pointer}button.stat-card{text-align:left;font-family:inherit;cursor:pointer;min-height:110px}#dProcHero p{color:white;padding:.6rem 0}#triageTasks .btn{margin:.3rem}.modal-body .form-row{margin-top:.6rem}#importPreview{overflow-wrap:anywhere}
 #appScreen>div:last-child{flex:1;width:100%}button.stat-card{border:0}.stat-label{font-size:.8rem;color:var(--text2)}.empty-state{padding:1rem;color:var(--muted);font-size:.86rem}.card.pub-body{margin-bottom:1rem;white-space:normal}.publication .pub-body{white-space:normal}.card-head{flex-wrap:wrap}.chip{white-space:normal;overflow-wrap:anywhere}.topbar-title{min-width:0}.topbar .btn{flex-shrink:0}
-</style></head>
+</style><link rel="stylesheet" href="/v3.css"></head>
 <body>
 
 <!-- ═══════════════════════════════════════
@@ -508,7 +508,7 @@ textarea.finput{min-height:80px;resize:vertical;}
       <button class="btn btn-navy" onclick="navTo('audiencias');setTimeout(()=>openAudModal(),80)">+ Nova Audiência</button>
     </div>
     <div class="alert-bar" id="alertBar">⚠️&nbsp;<span id="alertMsg"></span></div>
-    <div class="stats-row" id="statsRow"></div>
+    <button class="btn btn-ghost btn-sm" onclick="showUrgencies()">Resumo de urgências</button><div class="stats-row" id="statsRow"></div>
     <div class="two-col">
       <div class="card">
         <div class="card-head">
@@ -591,13 +591,13 @@ textarea.finput{min-height:80px;resize:vertical;}
       </select>
       <select class="f-select" id="fPrazStatus" onchange="renderPrazs()">
         <option value="">Todos os status</option>
-        <option value="pendente">🟡 Pendente</option>
+        <option value="abertos">Todos abertos</option><option value="pendente">A fazer</option><option value="em_andamento">Em andamento</option><option value="aguardando_terceiro">Aguardando terceiro</option><option value="cancelado">Cancelado</option>
         <option value="concluido">✅ Concluído</option>
         <option value="atrasado">🔴 Atrasado</option>
       </select>
       <select class="f-select" id="fPrazUrg" onchange="renderPrazs()">
         <option value="">Todos os prazos</option>
-        <option value="urgente">🔴 Urgente (≤3 dias)</option>
+        <option value="sem_data">Sem data definida / Programar</option><option value="hoje">Vencem hoje</option><option value="dois_dias">Próximos 2 dias</option><option value="vencidos">Vencidos</option><option value="urgente">🔴 Urgente (≤3 dias)</option>
         <option value="proximo">🟡 Próximo (≤7 dias)</option>
         <option value="futuro">🟢 Futuro</option>
       </select>
@@ -618,6 +618,7 @@ textarea.finput{min-height:80px;resize:vertical;}
       </div>
     </div>
 
+<div class="publication-tabs"><button class="btn btn-navy" id="tabPending" onclick="pubTab('pending')">A analisar <span id="pubPendingCount">0</span></button><button class="btn btn-ghost" id="tabHistory" onclick="pubTab('history')">Histórico <span id="pubHistoryCount">0</span></button><span><b id="pubOldCount">0</b> pendentes de dias anteriores</span></div>
     <!-- SYNC STATUS BAR -->
     <div id="syncBar" style="display:none;background:var(--blue-light);border:1.5px solid var(--blue);border-radius:10px;padding:.75rem 1.1rem;margin-bottom:1.25rem;font-size:.84rem;color:var(--blue);display:none;align-items:center;gap:.75rem;">
       <span id="syncSpinner" style="animation:spin 1s linear infinite;display:inline-block">⏳</span>
@@ -636,9 +637,9 @@ textarea.finput{min-height:80px;resize:vertical;}
         <option value="STF">STF</option><option value="TRF">TRF</option>
         <option value="Outro">Outro</option>
       </select>
-      <input class="f-search" id="fPubData" type="date" style="flex:none;width:auto" onchange="renderPubs()">
+      <label class="filter-date">De <input class="f-select" id="fPubData" type="date" onchange="renderPubs()"></label><label class="filter-date">Até <input class="f-select" id="fPubFim" type="date" onchange="renderPubs()"></label><div class="fg"><label class="flabel" for="fPubCategory">Classificação</label><select class="finput" id="fPubCategory" onchange="renderPubs()"><option value="">Todas</option><option value="Prazo processual">Prazo processual</option><option value="Providência administrativa">Providência administrativa</option><option value="Audiência/evento">Audiência/evento</option><option value="Ciência, sem providência">Ciência sem providência</option><option value="Outro">Outro</option></select></div>
     </div>
-    <div id="pubList"></div>
+    <div id="decisionFeedback" class="decision-feedback" hidden role="status"></div><div id="pubList"></div>
   </div>
 
   <!-- ══ ADVOGADO ══ -->
@@ -647,7 +648,7 @@ textarea.finput{min-height:80px;resize:vertical;}
       <div><h1>Perfil do Advogado</h1><p>Conta pessoal, OABs, backups e migração</p></div>
       <button class="btn btn-navy" onclick="openAdvModal()">✏️ Editar Perfil</button>
     </div>
-    <div id="advCard"></div>
+    <div id="advCard"></div><div class="card pub-body"><h3>LexBot · assistente visual</h3><p>Alertas usam somente as contagens da sua conta. Sem interpretação jurídica ou áudio automático.</p><label><input type="checkbox" id="botEnabled" checked onchange="saveBotPrefs()"> Ativar assistente</label> <label><input type="checkbox" id="botMessages" checked onchange="saveBotPrefs()"> Mensagens</label> <label><input type="checkbox" id="botReduced" onchange="saveBotPrefs()"> Reduzir animações</label><p>Cadastro completo da pasta: </p><label><input type="checkbox" id="completeContact" checked onchange="saveBotPrefs()"> Exigir também meio de contato no indicador (não bloqueia cadastros)</label></div>
     <div class="card pub-body"><h3>Adicionar OAB monitorada</h3><div class="form-row"><div class="fg"><label class="flabel" for="newOAB">Número OAB</label><input class="finput" type="text" id="newOAB" value=""></div><div class="fg"><label class="flabel" for="newUF">UF</label><input class="finput" type="text" id="newUF" value="SP"></div></div><button class="btn btn-navy" onclick="addOAB()">Adicionar OAB</button></div>
     <div class="card pub-body"><h3>Backup e migração por titular</h3><p>Exporte o legado no mesmo domínio e navegador antigos. Os arquivos contêm dados confidenciais; guarde-os em local protegido.</p>
     <div class="actions"><button class="btn btn-ghost" onclick="exportOld()">Exportar backup legado (JSON)</button><button class="btn btn-ghost" onclick="exportOnline()">Exportar backup online (JSON)</button></div>
@@ -668,7 +669,7 @@ textarea.finput{min-height:80px;resize:vertical;}
     <div class="detail-sec">Prazos e tarefas neste processo</div>
     <div class="detail-list" id="dProcPrazs"></div>
     <div class="detail-sec">Publicações desta pasta</div><div id="dProcPubs"></div>
-    <div id="dProcObs"></div>
+    <div class="detail-sec">Histórico de atividades da pasta</div><div id="folderActivities"></div><div id="dProcObs"></div>
     <div class="detail-actions" id="dProcActions"></div>
   </div>
 
@@ -731,7 +732,7 @@ textarea.finput{min-height:80px;resize:vertical;}
     <div class="modal-hd"><div class="modal-hd-ico" style="background:var(--green-light)">📂</div><h2 id="procModalTitle">Novo Processo</h2><button class="modal-x" onclick="closeModal('ovProc')">×</button></div>
     <div class="modal-body">
       <div class="fg"><label class="flabel">Nº do Processo *</label><input class="finput" type="text" id="p_num" placeholder="0000000-00.0000.0.00.0000"></div>
-      <div class="fg"><label class="flabel">Parte / Requerente (opcional)</label><input class="finput" type="text" id="p_parte" placeholder="Nome completo"></div>
+      <details class="client-details"><summary>Dados opcionais do cliente e documentos</summary><div class="fg"><label class="flabel" for="p_apelido">Descrição amigável da pasta</label><input class="finput" type="text" id="p_apelido"></div><div class="fg"><label class="flabel" for="p_cliente_nome">Nome do cliente (não presumido pelas partes)</label><input class="finput" type="text" id="p_cliente_nome"></div><div class="fg"><label class="flabel" for="p_cpf_cnpj">CPF/CNPJ</label><input class="finput" type="text" id="p_cpf_cnpj"></div><div class="fg"><label class="flabel" for="p_telefone">Telefone / WhatsApp</label><input class="finput" type="text" id="p_telefone"></div><div class="fg"><label class="flabel" for="p_cliente_email">E-mail do cliente</label><input class="finput" type="email" id="p_cliente_email"></div><div class="fg"><label class="flabel" for="p_documentos_url">URL HTTPS da pasta de documentos</label><input class="finput" type="url" id="p_documentos_url"></div></details><div class="fg"><label class="flabel">Parte / Requerente (opcional)</label><input class="finput" type="text" id="p_parte" placeholder="Nome completo"></div>
       <div class="form-row">
         <div class="fg"><label class="flabel">Área</label>
           <select class="finput" id="p_area"><option value="civel">Cível</option><option value="criminal">Criminal</option><option value="trabalhista">Trabalhista</option><option value="familia">Família</option><option value="administrativo">Administrativo</option></select>
@@ -765,7 +766,7 @@ textarea.finput{min-height:80px;resize:vertical;}
         </div>
       </div>
       <div class="form-row"><div class="fg"><label class="flabel" for="z_interna">Data interna / meta</label><input class="finput" type="date" id="z_interna" value=""></div><div class="fg"><label class="flabel" for="z_sugerida">Data sugerida (sem efeito fatal)</label><input class="finput" type="date" id="z_sugerida" value=""></div></div><p class="hint">Datas são civis. Feriados, suspensão, termo inicial e prazo fatal exigem conferência humana.</p><div class="fg"><label class="flabel">Responsável</label><select class="finput" id="z_owner"></select></div>
-      <div class="fg"><label class="flabel">Observações</label><textarea class="finput" id="z_obs"></textarea></div>
+      <div class="fg"><label class="flabel" for="z_revisao">Data de revisão / acompanhamento</label><input class="finput" type="date" id="z_revisao"></div><div class="fg"><label class="flabel" for="z_prioridade">Prioridade jurídica (independente da situação do prazo)</label><select class="finput" id="z_prioridade" ><option value="normal">Normal</option><option value="alta">Alta</option><option value="fatal">Fatal</option><option value="fatalissima">Fatalíssima</option></select></div><details><summary>Atalhos de datas</summary><p class="hint">Sugestão simples. Dias úteis excluem apenas sábados e domingos; confira feriados, suspensões e termo inicial.</p><div class="fg"><label class="flabel" for="shortcutBase">Data-base explícita</label><input class="finput" type="date" id="shortcutBase"></div><div class="fg"><label class="flabel" for="shortcutRegime">Regime</label><select class="finput" id="shortcutRegime" ><option value="corridos">Dias corridos</option><option value="uteis">Dias úteis (sem calendário judicial)</option></select></div><div class="fg"><label class="flabel" for="shortcutTarget">Aplicar como</label><select class="finput" id="shortcutTarget" ><option value="sugerida">Data sugerida para conferência</option><option value="interna">Data interna administrativa</option></select></div><div class="actions"><button class="btn btn-ghost btn-sm" onclick="applyDateShortcut(5)">5 dias</button><button class="btn btn-ghost btn-sm" onclick="applyDateShortcut(10)">10 dias</button><button class="btn btn-ghost btn-sm" onclick="applyDateShortcut(15)">15 dias</button><button class="btn btn-ghost btn-sm" onclick="applyDateShortcut(30)">30 dias</button></div><div class="fg"><label class="flabel" for="shortcutCustom">Quantidade customizada</label><input class="finput" type="number" id="shortcutCustom"></div><button class="btn btn-ghost btn-sm" onclick="applyDateShortcut()">Calcular sugestão</button><p id="shortcutResult"></p><label><input type="checkbox" id="confirmLegalDate"> Conferi data-base, regime, feriados/suspensões e termo inicial.</label><button class="btn btn-ghost btn-sm" onclick="confirmSuggestedDate()">Confirmar sugestão como fatal</button></details><div class="fg"><label class="flabel">Observações</label><textarea class="finput" id="z_obs"></textarea></div>
     </div>
     <div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovPraz')">Cancelar</button><button class="btn btn-navy" onclick="savePraz()">Salvar</button></div>
   </div>
@@ -833,18 +834,20 @@ textarea.finput{min-height:80px;resize:vertical;}
 
 
 <div class="overlay" id="ovTriage"><div class="modal modal-lg"><div class="modal-hd"><h2>Análise humana da publicação</h2><button class="modal-x" onclick="closeModal('ovTriage')">×</button></div><div class="modal-body">
-<p id="triageInfo"></p><div id="triageLink"></div><pre class="source-text" id="triageText"></pre>
+<p id="triageInfo"></p><div id="triageLink"></div><div class="reading-layout"><div class="reading-pane"><div class="formatted-publication" id="triageText"></div><details><summary>Ver original</summary><pre class="source-text" id="triageOriginal"></pre></details></div><div class="decision-pane">
 <div class="fg"><label class="flabel" for="triageCNJ">Vincular ou corrigir pasta por CNJ</label><input class="finput" type="text" id="triageCNJ" value=""></div><button class="btn btn-ghost" onclick="linkPub()">Salvar vínculo</button>
 <div class="fg"><label class="flabel" for="triageCategory">Classificação</label><select class="finput" id="triageCategory"><option>Prazo processual</option><option>Providência administrativa</option><option>Audiência/evento</option><option>Ciência, sem providência</option><option>Outro</option></select></div>
 <div class="fg"><label class="flabel" for="triageAction">Providência / descrição livre (obrigatória em Outro)</label><textarea class="finput" id="triageAction"></textarea></div><div class="fg"><label class="flabel" for="triageObs">Observações</label><textarea class="finput" id="triageObs"></textarea></div>
-<p class="hint">Classificar encerra apenas a triagem. Crie quantos acompanhamentos forem necessários; cada um é concluído separadamente.</p>
+<div class="fg"><label class="flabel" for="triageRequires">Exige providência?</label><select class="finput" id="triageRequires" onchange="updateDecision()"><option value="">Escolha uma decisão</option><option value="yes">Sim — exige compromisso persistido</option><option value="no">Não — confirmo somente ciência</option></select></div><div id="triageWork"><p id="triageExisting"></p><label><input type="checkbox" id="triageCreate" onchange="updateDecision()"> Criar novo compromisso nesta classificação</label><div class="fg"><label class="flabel" for="triageTaskTitle">Título / finalidade do compromisso</label><input class="finput" type="text" id="triageTaskTitle"></div><div class="fg"><label class="flabel" for="triageInternal">Data interna (facultativa)</label><input class="finput" type="date" id="triageInternal"></div></div><div class="fg"><label class="flabel" for="triageReason">Motivo da reabertura (opcional)</label><input class="finput" type="text" id="triageReason"></div><label><input type="checkbox" id="triageNext"> Após salvar, abrir a próxima pendente</label><p class="hint">Nenhum prazo fatal é calculado pelo texto. Providência só encerra a análise com compromisso confirmado no banco.</p>
 <div class="actions"><button class="btn btn-ghost" onclick="triageTask()">+ Acompanhamento</button><button class="btn btn-ghost" onclick="triageAud()">+ Audiência</button></div><div id="triageTasks"></div><details><summary>Histórico de alterações</summary><div id="triageEvents"></div></details>
-</div><div class="modal-ft"><button class="btn btn-ghost" onclick="reopenPub()">Reabrir análise</button><button class="btn btn-navy" onclick="classify()">Salvar classificação</button></div></div></div>
+</div></div></div><div class="modal-ft"><button class="btn btn-ghost" onclick="closeModal('ovTriage')">Manter pendente / verificar autos</button><button class="btn btn-ghost" onclick="reopenPub()">Reabrir análise</button><button class="btn btn-navy" onclick="classify()">Salvar classificação</button></div></div></div>
 <div class="overlay" id="ovSync"><div class="modal modal-lg"><div class="modal-hd"><h2>Sincronização DJEN</h2><button class="modal-x" onclick="closeModal('ovSync')">×</button></div><div class="modal-body"><label class="flabel" for="syncOab">OAB monitorada</label><select class="finput" id="syncOab"></select>
 <div class="form-row"><div class="fg"><label class="flabel" for="syncInicio">De (inclusive)</label><input class="finput" type="date" id="syncInicio" value="2026-10-01"></div><div class="fg"><label class="flabel" for="syncFim">Até (inclusive)</label><input class="finput" type="date" id="syncFim" value=""></div></div>
 <div class="actions"><button class="btn btn-ghost" onclick="incremental()">Janela incremental com recuperação</button><button class="btn btn-navy" onclick="startSync()">Iniciar carga</button><button class="btn btn-ghost" onclick="stopSyncRun()">Pausar após o lote</button></div><p id="syncProgress" role="status"></p><p class="hint">Consulta nacional, sem filtro de tribunal. Mantenha a página aberta; cargas interrompidas podem ser retomadas. Agendamento diário não está ativado.</p><div id="syncHistory"></div></div></div></div>
 <div class="overlay" id="ovPassword"><div class="modal"><div class="modal-hd"><h2>Definir nova senha</h2></div><div class="modal-body"><div class="fg"><label class="flabel" for="newPassword">Nova senha (mínimo 8 caracteres)</label><input class="finput" type="password" id="newPassword" value=""></div></div><div class="modal-ft"><button class="btn btn-navy" onclick="changePassword()">Salvar senha</button></div></div></div>
 
+<div class="overlay" id="ovActivity"><div class="modal"><div class="modal-hd"><h2>Registrar andamento</h2><button class="modal-x" onclick="closeModal('ovActivity')">×</button></div><div class="modal-body"><p id="activityTitle"></p><label class="flabel" for="activityText">Atividade realizada</label><textarea class="finput" id="activityText"></textarea><div class="fg"><label class="flabel" for="activityState">Situação</label><select class="finput" id="activityState" ><option value="pendente">A fazer</option><option value="em_andamento">Em andamento</option><option value="aguardando_terceiro">Aguardando terceiro</option><option value="concluido">Concluído</option><option value="cancelado">Cancelado</option></select></div><div class="fg"><label class="flabel" for="activityNext">Próximo passo (opcional)</label><input class="finput" type="text" id="activityNext"></div><div class="fg"><label class="flabel" for="activityReview">Revisar em (sem alterar fatal)</label><input class="finput" type="date" id="activityReview"></div></div><div class="modal-ft"><button class="btn btn-navy" onclick="saveActivity()">Salvar andamento</button></div></div></div>
+<div class="overlay" id="ovUrgencies"><div class="modal"><div class="modal-hd"><h2>Resumo de urgências</h2><button class="modal-x" onclick="dismissUrgencies()">×</button></div><div class="modal-body"><div id="urgentContents"></div><label><input type="checkbox" id="hideDailyUrgencies"> Não abrir automaticamente nos próximos dias</label></div><div class="modal-ft"><button class="btn btn-navy" onclick="dismissUrgencies()">Conferido</button></div></div></div>
 <div class="toast" id="toast">✅ <span id="toastMsg"></span></div>
 
 <script type="module" src="/app.js"></script>

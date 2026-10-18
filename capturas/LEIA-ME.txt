@@ -1,0 +1,2 @@
+Capturas da aplicação V3 executada localmente com dados fictícios de teste.
+Não são telas da base de produção nem comprovação de Supabase hospedado.
