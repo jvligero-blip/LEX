@@ -1,5 +1,5 @@
 import {createClient} from '@supabase/supabase-js';
-export const tables=['profiles','processos','publicacoes','compromissos','audiencias','oabs_monitoradas','publicacao_oabs','sincronizacoes','historico_alteracoes','migracao_revisao','migracao_refs','compromisso_atividades'];
+export const tables=['profiles','processos','publicacoes','compromissos','audiencias','oabs_monitoradas','publicacao_oabs','sincronizacoes','historico_alteracoes','migracao_revisao','migracao_refs','compromisso_atividades','v4_colaboracoes','v4_pastas','v4_membros','v4_exclusoes','v4_decisoes','v4_revisoes','v4_delegacoes'];
 export function connect(config){return createClient(config.supabaseUrl,config.supabaseKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});}
 export function checked(result){if(result.error)throw result.error;return result.data;}
 export async function all(db,table){

@@ -1,0 +1,51 @@
+{
+  "version": "4.1.0",
+  "base_commit": "7aa26533dcd101c694da1c452406ea817dfd1709",
+  "base_zip_comment": "7aa26533dcd101c694da1c452406ea817dfd1709",
+  "base_zip_sha256": "1d94c135248b5a5382895af182fd3a238cb4059f9da1a6420efb576955fb2ad1",
+  "unchanged_verified_sha256": {
+    "supabase/migrations/001_lex.sql": "320dd0fbd964e6ff2bca5f0764a2a7c3b4342f47229db1dd6c8cc3fc82f6eb2a",
+    "supabase/migrations/002_migracao.sql": "c913e156b5db4e24214c8a36d4586cbff9b4042f29de7cf7213220b043c6eb87",
+    "supabase/migrations/003_vinculos.sql": "3785222eab69e6fa009481e602060dc495a5708d0ef01766109dddbd742d951b",
+    "supabase/migrations/004_v3_fluxos.sql": "4ebcd4d1fac32e5a78068eebcb6b5eaec4c42fd56c6f47e7c7546c8e6ff6d0f8",
+    "src/lexbot.js": "d79a08d2a189ba0f4cb17ae311df101d9acf3431e70a27d8e6d3f65c581b0cee",
+    "src/publication-view.js": "4dcc7f71169dffea2e27ae941d41746d062c65c7a27c187703a0982d73cb275b",
+    "vercel.json": "54e1134e8d403474581e9f7b7fd26802c951a565b83d53d855ab8c4ec1d7f25e",
+    "api/config.js": "777d3320b4865d69866b66fae95a7fe6a893afec7574f42ca29f79a829673f56",
+    "api/publicacoes.js": "0ebd90ad4e005a0c228d469cc21563294f568853a7f4b24b4c8faf7828de1395",
+    "api/andamentos.js": "8321ef4634d641aad487d861d20db6b307d4285d1346992fabb3acf74f156d09",
+    "assets/lexbot/agent.json": "6c340c3aade487338d3072a5b918e56473ed2941648d585e7c255b4c83d12611",
+    "assets/lexbot/icon.png": "7dd3b1c276030df50ba54dc1f6ccf158de08c6deb41c79a83cdc3e8dede30ef0",
+    "assets/lexbot/LICENCA-CLIPPYJS-REFERENCIA.txt": "9011e2cbb2481a2a591ed38997719b471a0a48ace3b8f809b3d6c0fd0aac2ac2",
+    "assets/lexbot/map.png": "0bb3ddf5f420328ed3fac02cef1c8116ae17f39d7b90acf6600aab93a95da06a"
+  },
+  "changed_base_files": [
+    ".env.example",
+    "index.html",
+    "package-lock.json",
+    "package.json",
+    "src/app.js",
+    "src/store.js",
+    "tests/api.test.mjs",
+    "tests/browser.test.mjs",
+    "v3.css"
+  ],
+  "production_database_accessed": false,
+  "deployed": false,
+  "hosted_supabase_tested": false,
+  "added_files": [
+    "ALTERACOES-V4.md",
+    "BASE-E-VALIDACAO-V4.json",
+    "ESPECIFICACAO-V4.1.md",
+    "README-IMPLANTACAO-V4.md",
+    "TESTES-V4.txt",
+    "lib/v4-domain.js",
+    "scripts/test-online-v4.mjs",
+    "supabase/migrations/005_v4_colaboracao.sql",
+    "supabase/migrations/006_v4_integridade_backup.sql",
+    "supabase/verificar-v4.sql",
+    "tests/v4-helper.mjs",
+    "tests/v4.database.test.mjs",
+    "tests/v4.domain.test.mjs"
+  ]
+}

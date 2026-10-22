@@ -1,6 +1,6 @@
 {
   "name": "lex-mvp-online",
-  "version": "3.0.0",
+  "version": "4.1.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -10,7 +10,7 @@
     "build": "node scripts/build.mjs",
     "dev": "node --env-file-if-exists=.env scripts/dev.mjs",
     "test": "node --test tests/*.test.mjs",
-    "test:online": "node --env-file-if-exists=.env scripts/test-online.mjs"
+    "test:online": "node --env-file-if-exists=.env scripts/test-online-v4.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.90.1"
