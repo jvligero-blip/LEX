@@ -1,0 +1,49 @@
+{
+  "versao": "4.2.0",
+  "base": "LEX-V4.1.1-NOTIFICACOES.zip",
+  "base_sha256": "33ee150c1e32fc0248777ccd0888db5f0ef8abb3f9bb3e57f302968eb52c5dcf",
+  "migrations_preservadas": {
+    "supabase/migrations/001_lex.sql": "53d37525c16905f9dfa9d376506f76565175c7810d15e90d8b38e6182be96139",
+    "supabase/migrations/002_migracao.sql": "619c08005803265442a20129f7fb6e8661390ee498f48d6283718b66473c2b6b",
+    "supabase/migrations/003_vinculos.sql": "e40d7f0ac72c0a127d11065867394eb69b800bd55635a07f3b33753e3d888052",
+    "supabase/migrations/004_v3_fluxos.sql": "4ebcd4d1fac32e5a78068eebcb6b5eaec4c42fd56c6f47e7c7546c8e6ff6d0f8",
+    "supabase/migrations/005_v4_colaboracao.sql": "8508ef752d92cff75b130661b0e7e7e719fc75563c2c018be0f359bfbe7e80d1",
+    "supabase/migrations/006_v4_integridade_backup.sql": "addb61c58a7fabf407ca2c943ff3dd7bfb979355a1c000eca085bf5079246bb7",
+    "supabase/migrations/007_delegacao_notificacoes.sql": "d0ae20e699ecc5ed33592bbeef172b6d57c8cea1d71dd0d05b45b07a3a205ea9"
+  },
+  "alterados": [
+    ".gitignore",
+    "index.html",
+    "lib/v4-domain.js",
+    "package-lock.json",
+    "package.json",
+    "README.md",
+    "scripts/test-online-v4.mjs",
+    "src/app.js",
+    "src/notifications.js",
+    "tests/api.test.mjs",
+    "tests/browser.test.mjs",
+    "tests/notifications.database.test.mjs",
+    "tests/v4.database.test.mjs",
+    "v3.css"
+  ],
+  "adicionados": [
+    ".env.homologacao.example",
+    "ALTERACOES-V4.2.md",
+    "README-IMPLANTACAO-V4.2.md",
+    "TESTES-V4.2-execucao.log",
+    "TESTES-V4.2.txt",
+    "capturas-v42/notificacoes-mobile.png",
+    "capturas-v42/V42-conferencia.png",
+    "capturas-v42/V42-lado-a-lado.png",
+    "supabase/verificar-v4.2.sql",
+    "tests/v42-helper.mjs",
+    "tests/v42.database.test.mjs",
+    "supabase/migrations/008_v42_permissoes_conferencia.sql"
+  ],
+  "testes_completos": 108,
+  "falhas": 0,
+  "producao_alterada": false,
+  "homologacao_supabase_hospedado": false,
+  "concorrencia_postgresql_independente": false
+}

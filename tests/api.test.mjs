@@ -1,4 +1,4 @@
-import {databaseV4 as database} from './v4-helper.mjs';
+import {databaseV42 as database} from './v42-helper.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import handler from '../api/publicacoes.js';

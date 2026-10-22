@@ -1,0 +1,32 @@
+{
+  "version": "4.1.1",
+  "base_repository": "https://github.com/jvligero-blip/LEX",
+  "base_commit": "5043473b5f730afc1d7eeaf959a53f92be81351f",
+  "migration_to_apply": "007_delegacao_notificacoes.sql",
+  "unchanged_verified": [
+    "supabase/migrations/001_lex.sql",
+    "supabase/migrations/002_migracao.sql",
+    "supabase/migrations/003_vinculos.sql",
+    "supabase/migrations/004_v3_fluxos.sql",
+    "supabase/migrations/005_v4_colaboracao.sql",
+    "supabase/migrations/006_v4_integridade_backup.sql",
+    "src/lexbot.js",
+    "src/publication-view.js",
+    "vercel.json",
+    "api/config.js",
+    "api/publicacoes.js",
+    "api/andamentos.js",
+    "assets/lexbot/agent.json",
+    "assets/lexbot/icon.png",
+    "assets/lexbot/LICENCA-CLIPPYJS-REFERENCIA.txt",
+    "assets/lexbot/map.png"
+  ],
+  "tests": {
+    "passed": 93,
+    "failed": 0,
+    "skipped": 0
+  },
+  "production_modified": false,
+  "deployed": false,
+  "hosted_supabase_tested": false
+}

@@ -1,0 +1,18 @@
+import {esc} from '../lib/domain.js';
+import {states} from '../lib/v3-domain.js';
+import {decisions} from '../lib/v4-domain.js';
+export const notificationLabels={convite:'Convite para colaborar',convite_aceito:'Colaboração aceita',convite_recusado:'Convite recusado',colaboracao_revogada:'Colaboração revogada',delegacao:'Pedido de compromisso aguardando aceite',delegacao_aceita:'Compromisso aceito',delegacao_recusada:'Transferência recusada',delegacao_revogada:'Transferência cancelada',compromisso_criado:'Novo compromisso compartilhado',atividade:'Novo andamento',compromisso_concluido:'Compromisso concluído',publicacao_analisada:'Publicação analisada',publicacao_reaberta:'Análise reaberta',pasta_compartilhada:'Pasta compartilhada com você',acesso_revogado:'Permissão de acesso alterada',leitura:'Solicitação marcada como lida'};
+const status={...states,ativa:'Ativa',aceita:'Aceita',recusada:'Recusada',revogada:'Revogada',compromisso_encerrado:'Compromisso encerrado',pendente_de_analise:'Pendente de análise',classificada:'Análise registrada'};
+const b=(action,id,label,main=false)=>`<button class="btn ${main?'btn-navy':'btn-ghost'} btn-sm" data-action="${action}" data-id="${esc(id)}">${esc(label)}</button>`;
+export function notificationCard(n){
+ const when=new Date(n.created_at).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'});
+ const read=n.lida_em?'Lida':'Não lida';
+ const state=n.estado==='pendente'&&['convite','delegacao','leitura'].includes(n.tipo)?'Aguardando aceite':status[n.estado]||n.estado;
+ return `<article class="notification-card ${n.lida_em?'':'unread'}" data-notice="${esc(n.id)}"><div class="notification-head"><h3>${esc(notificationLabels[n.tipo]||'Atualização no LEX')}</h3><span class="chip">${read}</span></div><p class="notification-source">${esc(n.ator)} · ${esc(when)}</p><p>${esc(n.titulo||'')}</p>${n.detalhe?`<p>${esc(decisions[n.detalhe]||n.detalhe)}</p>`:''}${n.estado?`<p>Situação: ${esc(state)}</p>`:''}${n.datas&&Object.keys(n.datas).length?`<p>Datas: ${Object.entries(n.datas).map(([k,v])=>esc(k)+': '+esc(String(v).slice(0,10))).join(' · ')}</p>`:''}${n.pedido_restrito?'<p class="hint">Pedido restrito. O acesso à tarefa e ao histórico só será liberado após aceitar.</p>':''}${!n.acessivel&&!n.pedido_restrito?'<p class="hint">O conteúdo não está disponível para sua conta. O histórico do aviso foi preservado.</p>':''}<div class="actions">${n.responder?(n.tipo==='convite'?b('acceptNotification',n.id,'Aceitar colaboração',true):b('acceptNotification',n.id,'Aceitar compromisso',true))+b('rejectNotification',n.id,'Recusar'):''}${n.acessivel?b('openNotification',n.id,n.destino==='advogado'?'Ver colaboração':n.destino==='publicacao'?'Ver análise':n.destino==='pasta'?'Abrir pasta':'Abrir compromisso'):''}${!n.lida_em?b('readNotification',n.id,'Marcar como lida'):''}</div></article>`;
+}
+export function delegateExplanation(candidate){
+ if(!candidate)return {message:'Selecione um colaborador ativo.',needsConsent:false,blocked:true};
+ if(candidate.tem_acesso)return {message:'Esta pessoa já pode ver o compromisso. A troca de responsável só acontece após o aceite.',needsConsent:false,blocked:false};
+ if(candidate.pode_autorizar)return {message:'A colaboração está ativa, mas este compromisso ainda é privado. Você pode autorizar somente esta tarefa e seu histórico após o aceite; a pasta, as publicações e as outras tarefas continuam privadas.',needsConsent:true,blocked:false};
+ return {message:'A colaboração está ativa, mas esta pessoa não tem acesso a este compromisso. Peça ao titular para compartilhar a tarefa ou a pasta antes de transferir.',needsConsent:false,blocked:true};
+}

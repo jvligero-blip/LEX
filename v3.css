@@ -17,3 +17,12 @@
 #syncIndeterminate{width:100%;height:8px;accent-color:#174e68}#syncProgress{padding:14px;background:#f3f6f8;border-radius:10px;line-height:1.7}
 #collaborationPanel small,.last-activity small{color:#647180}.actions{flex-wrap:wrap}#ovTriage .modal{padding-bottom:10px}
 @media(max-width:600px){.publication .actions button{min-height:38px}.collab-row button{margin:4px}#fTaskScope{width:100%}}
+
+/* Central de notificações e autorização explícita por compromisso. */
+.notification-bell{display:inline-flex;align-items:center;gap:7px}.notification-badge{background:#a82a3a;color:#fff;font-weight:700;min-width:21px;padding:2px 5px;border-radius:12px;font-size:11px;line-height:16px;text-align:center}
+.notification-badge[hidden],[hidden]{display:none!important}.notification-card{border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0;background:var(--white)}.notification-card.unread{border-left:4px solid var(--blue);background:#f8fbff}
+.notification-card p{margin:8px 0;line-height:1.6;overflow-wrap:anywhere}.notification-head{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}.notification-head h3{margin:0;font-size:1rem}.notification-source{font-size:.8rem;color:var(--muted)}.notification-help{background:#edf3f8;border-radius:8px;padding:10px}.notification-filter{width:auto;max-width:180px}.notification-modal .modal-body{max-height:72vh;overflow-y:auto}
+.toast.toast-error{background:#922d3b}#delegateExplanation{padding:12px;background:#edf3f8;border-radius:8px;line-height:1.6}#delegateConsentRow{padding:10px 0;line-height:1.6}#delegateAccessActions{margin-top:12px}
+@media(max-width:600px){.bell-label{display:none}.notification-modal{width:100%}.notification-head{flex-wrap:wrap}.topbar{gap:.4rem}.topbar .btn{padding:.35rem .5rem}.notification-modal .actions{gap:7px}}
+
+.act-comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}.act-comparison article{min-width:0;padding:12px;border:1px solid #ddd;border-radius:10px}.act-comparison .source-text{max-height:48vh;overflow:auto;white-space:pre-wrap}.modal-wide{max-width:1100px;width:94vw}@media(max-width:700px){.act-comparison{grid-template-columns:1fr}}

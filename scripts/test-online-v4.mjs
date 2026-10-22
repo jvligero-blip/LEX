@@ -15,7 +15,20 @@ try{
  folder=rid();ok(await a.rpc('v4_salvar_pasta',{p_id:folder,p_titulo:'HOMOLOGAÇÃO V4 '+new Date().toISOString()}));
  relation=ok(await a.rpc('v4_convidar',{p_email:process.env.LEX_TEST_EMAIL_B,p_automatico:false}));
  assert.equal(ok(await b.from('v4_pastas').select('id').eq('id',folder)).length,0);ok(await b.rpc('v4_responder_convite',{p_id:relation,p_acao:'aceitar'}));
- assert.equal(ok(await b.from('v4_pastas').select('id').eq('id',folder)).length,0);ok(await a.rpc('v4_compartilhar',{p_pasta:folder,p_membro:B}));
+ assert.equal(ok(await b.from('v4_pastas').select('id').eq('id',folder)).length,0);
+ // V4.2 real: pedido privado não é SELECT, aceite e recusa têm efeitos distintos.
+ const privateTask=rid(),rejected=rid(),accepted=rid();
+ ok(await a.rpc('v4_salvar_compromisso',{p_id:privateTask,p_pasta:null,p_dados:{descricao:'Pedido privado de homologação V4.2',responsavel:A,payload:{obs:'Não aparece no pedido'}}}));
+ ok(await a.rpc('v4_delegar_com_acesso',{p_id:rejected,p_compromisso:privateTask,p_destinatario:B,p_autorizar_compromisso:true}));
+ assert.equal(ok(await b.from('compromissos').select('id').eq('id',privateTask)).length,0);
+ const notice=ok(await b.rpc('v4_listar_notificacoes')).itens.find(n=>n.solicitacao_id===rejected);assert.ok(notice.responder&&notice.pedido_restrito&&!notice.acessivel);assert.ok(!JSON.stringify(notice).includes('Não aparece'));
+ assert.ok((await b.rpc('v4_atividade',{p_id:rid(),p_compromisso:privateTask,p_texto:'Negado antes do aceite'})).error);
+ ok(await b.rpc('v4_responder_delegacao',{p_id:rejected,p_aceitar:false}));assert.ok((await b.rpc('v4_responder_delegacao',{p_id:rejected,p_aceitar:true})).error);
+ ok(await a.rpc('v4_delegar_com_acesso',{p_id:accepted,p_compromisso:privateTask,p_destinatario:B,p_autorizar_compromisso:true}));ok(await b.rpc('v4_responder_delegacao',{p_id:accepted,p_aceitar:true}));
+ const privateRow=ok(await b.from('compromissos').select().eq('id',privateTask).single());assert.equal(privateRow.responsavel,B);assert.equal(ok(await b.from('v4_pastas').select('id').eq('id',folder)).length,0);
+ ok(await a.rpc('v4_revogar_acesso_compromisso',{p_compromisso:privateTask,p_membro:B}));assert.equal(ok(await b.from('compromissos').select('id').eq('id',privateTask)).length,0);assert.ok((await b.rpc('v42_atividade',{p_id:rid(),p_compromisso:privateTask,p_texto:'Formulário revogado',p_versao:privateRow.versao})).error);
+ console.log('PASSOU V4.2: pendente restrito, recusa terminal, aceite individual, revogação e formulário antigo bloqueado. Fixture:',privateTask);
+ ok(await a.rpc('v4_compartilhar',{p_pasta:folder,p_membro:B}));
  task=rid();ok(await b.rpc('v4_salvar_compromisso',{p_id:task,p_pasta:folder,p_dados:{descricao:'Providência de homologação',responsavel:B}}));
  const owned=ok(await a.from('compromissos').select().eq('id',task).single());assert.equal(owned.user_id,A);assert.equal(owned.criado_por,B);assert.equal(owned.responsavel,B);
  assert.equal(ok(await c.from('compromissos').select('id').eq('id',task)).length,0);assert.ok((await c.rpc('v4_atividade',{p_id:rid(),p_compromisso:task,p_texto:'Ataque de homologação'})).error);

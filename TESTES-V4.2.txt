@@ -1,0 +1,27 @@
+LEX V4.2 — testes e limites (22/10/2026)
+
+EXECUTADOS
+- Suíte completa: 108 testes, 108 aprovados, 0 falhas, 0 ignorados.
+- Node 24.19.0; PGlite 0.3.14; Playwright 1.56.1; Microsoft Edge headless.
+- Build de produção e verificação sintática do JavaScript concluídos.
+- Fixtures simuladas A/B/C, migrações 001–008 no banco local: RLS/UUID conhecido, pedido sem SELECT/agenda/escrita antes do aceite, recusa terminal, aceite apenas da tarefa, preservação de acesso explícito, revogação de tarefa/pasta/relação e cancelamento de encaminhamento do remetente revogado, versões de formulários, idempotência e limite de uma pendência.
+- Migração de grants da 007: pendentes, recusados, aceitos e grant reativado após aceite antigo; auditoria e suspensão do implícito antes de substituir predicado, sem promover membros. Migrations 001–007 conferidas por SHA-256 contra o ZIP base e preservadas byte a byte.
+- CNJ/cliente/lado iguais não concedem acesso; sugestão restrita e lote de IDs selecionados, assuntos sem CNJ e posterior vinculação preservando ID.
+- Cópias com IDs externos distintos, duas classificações e tarefas, confirmação humana auditada/revogável, manter distintos/reavaliar, fontes originais sem alterações e sem baixa por hash. Leitura da comparação revalida acesso no servidor.
+- Navegador: autenticação simulada e sessões separadas, triagem/erros/retry, agenda, timeline/autor, audiências, backup/restauração, links Drive/WhatsApp, sino/filtros/leitura versus aceite, responsividade e LexBot.
+- Polling medido com relógio de navegador: 10 s sem consultas amplas; 25 s consulta avisos; retorno à aba consulta avisos; sem recarregar acervo na ausência de novo evento. Atualização do acervo após ação/novo evento.
+- API + SQL: 205 itens DJEN simulados, paginação, falha intermediária, retomada, repetição e preservação de análise.
+- Verificador SQL executado em transação READ ONLY no PGlite; auxiliares/anon sem permissão indevida.
+- Capturas inspecionadas localmente. Log detalhado em TESTES-V4.2-execucao.log.
+
+NÃO EXECUTADOS / PENDÊNCIAS EXTERNAS
+- Supabase hospedado, Auth/PostgREST reais e DJEN real: faltam projeto/credenciais de homologação e duas OABs reais. O navegador intercepta esses transportes e usa PostgreSQL/PGlite local; isso NÃO é homologação hospedada.
+- Script online oferecido, mas não executou testes por falta de SUPABASE_URL, SUPABASE_ANON_KEY, LEX_TEST_EMAIL_A/B/C, LEX_TEST_PASSWORD_A/B/C, LEX_TEST_PROJECT_HOST e confirmação LEX_TEST_CONFIRM=homologacao. Nenhuma requisição remota foi feita por ele.
+- Concorrência em conexões PostgreSQL independentes: não executada; psql/postgres/docker não estavam disponíveis no PATH. PGlite serializa o executor. Testes de duas sessões de navegador e retries não provam todos os interleavings de PostgreSQL hospedado.
+- Backup/restauração de produção e publicação GitHub/Vercel não executados. Só homologação local com fixtures, sem mudança na produção.
+
+REPRODUZIR
+npm ci
+npm test
+npm run build
+Homologação real opcional: ver README-IMPLANTACAO-V4.2.md e .env.homologacao.example.

@@ -1,0 +1,148 @@
+LEX V4.1.1 — CORREÇÃO DE DELEGAÇÃO E NOTIFICAÇÕES (22/10/2026)
+Base: https://github.com/jvligero-blip/LEX, commit 5043473b5f730afc1d7eeaf959a53f92be81351f.
+Código atual clonado do GitHub; mudanças publicadas pelo Claude preservadas.
+
+CAUSA REPRODUZIDA
+A relação entre as contas estava ativa no teste. A tarefa era privada e não tinha pasta.
+O seletor antigo listava a conta, mas v4_delegar recusava: Destinatário não autorizado.
+Após a 007, a prévia explica a permissão e o titular confirma acesso somente ao compromisso.
+O teste prova que pasta, publicações e outras tarefas não são reveladas por isso.
+O registro específico da captura de produção não foi consultado; o diagnóstico é do código e da reprodução local.
+
+RESULTADOS EFETIVOS
+- npm ci: aprovado, 18 pacotes instalados pelo lockfile.
+- npm run build: aprovado, arquitetura HTML/JS e dependências preservadas.
+- npm test: 93 testes; 93 aprovados; 0 falhas; 0 ignorados.
+- Migrações 001–006, /api, LexBot, assets e configuração Vercel conferidos contra o commit-base, sem alterações de conteúdo.
+- Revisão visual: notificações em desktop/celular e convite/aceite no próprio sininho.
+Ambiente: Windows, Node 24.19.0, PGlite 0.3.14, Edge headless / Playwright 1.56.1. Projeto exige Node 22+.
+
+NOVOS TESTES
+Reprodução do erro da V4.1; consentimento obrigatório do titular; tarefa sem pasta; mesmo ID;
+sem exposição da pasta/publicação/outras tarefas; terceiro sem acesso mesmo com relação ativa;
+leitura de notificação diferente de aceite; recibo de leitura idempotente; aceite/recusa;
+autoria de andamento/conclusão; paginação estável; leitura apenas da própria caixa;
+helpers de emissão bloqueados ao cliente/anônimo; revogação individual/pasta/relação;
+ocultação de conteúdo de avisos após revogação; sem reativação silenciosa por novo convite;
+migration 007 preservando registros V4 e recuperando só solicitações pendentes, sem duplicar;
+encaminhamento de publicação atômico: erro reverte tarefa/classificação/permissão/notificações;
+erro com alerta em vez de check verde; conteúdo HTML escapado; ausência da 007 não bloqueia login.
+Regressões: DJEN com 205 itens, paginação/falha/retry/dedup; publicações antigas/HTML original;
+backup/restore V3/V4; CNJ/assuntos; datas/títulos/timeline; Auth/RLS; audiências; LexBot e responsividade.
+
+LIMITES
+Auth/PostgREST/Supabase hospedados e o banco real de produção NÃO foram acessados/alterados.
+Não houve deploy, push, migration remota ou envio real de mensagens/e-mails.
+Faltam credenciais de homologação. Repetir testes em cópia representativa e conexões PostgreSQL independentes.
+PGlite executa as transações localmente de forma serializada; não comprova concorrência multi-conexão hospedada.
+O e-mail só identifica contas; as notificações são internas ao LEX, sem SMTP/e-mail/push externo.
+Caixa e acessos individuais entram no backup pessoal como referência; restauração não reativa permissões nem avisos.
+Recuperação integral desses novos registros exige backup PostgreSQL/Auth validado.
+Antes de produção: revisar/aplicar SOMENTE 007 sobre a base atual, em homologação, com backup.
+
+SAÍDA DA SUÍTE FINAL
+
+> lex-mvp-online@4.1.1 test
+> node --test tests/*.test.mjs
+
+✔ API autenticada + SQL: 205 itens, falha HTTP intermediária e retomada completa (5614.2526ms)
+✔ navegador: login remoto carrega acervo sem erros de inicialização (5218.7418ms)
+✔ navegador: conteúdo malicioso não executa e texto integral fica disponível (435.8879ms)
+✔ navegador: triagem cria tarefa administrativa sem data; classifica sem concluir a tarefa (1365.8235ms)
+✔ navegador: nova pasta exige só CNJ e reabrir mesmo CNJ não duplica (1688.8315ms)
+✔ navegador: publicação manual, audiência sem cliente e tarefa com data confirmada (2587.6539ms)
+✔ navegador: novo build e recarregamento mantêm dados confirmados (914.4776ms)
+✔ navegador: sessão em contexto independente recupera o acervo A (1334.3997ms)
+✔ V3 navegador: leitura estruturada preserva parágrafos/listas/tabela e original (923.7293ms)
+✔ V3 navegador: falha de gravação mantém triagem; retry e dois cliques não duplicam tarefa (790.6674ms)
+✔ V3 navegador: dois andamentos, título e prazo preservados, próxima etapa visível (1814.2847ms)
+✔ V3 navegador: dados opcionais persistem, links seguros e atalhos não alteram fatal (1616.6951ms)
+✔ V3 navegador: LexBot único, transparente, minimização, preferência e logout (1696.9357ms)
+✔ V3 navegador: falha do sprite não impede login ou navegação (1046.9793ms)
+✔ V3 navegador: urgência diária é única e cards levam ao filtro confirmado (1258.0702ms)
+✔ navegador: logout A, login B não mostra acervo de A (1133.806ms)
+✔ navegador: tela móvel não extrapola largura (986.9049ms)
+✔ navegador: configuração ausente bloqueia gravações e não semeia dados demo (672.8786ms)
+✔ V4 navegador: convite/aceite, assunto compartilhado e tarefa manual automática na segunda sessão (7232.8699ms)
+✔ V4 navegador: andamento por B, conclusão por A e anexar CNJ mantêm a mesma tarefa (10706.8623ms)
+✔ V4 navegador: Nada a fazer uma vez trata duas origens sem tarefa, autoria/histórico preservados (4383.7816ms)
+✔ V4 navegador: revogação remove acesso na segunda sessão sem excluir tarefa (4972.1677ms)
+✔ V4 navegador: DJEN consultando, parcial, retomada e conclusão com checkpoint real e sem percentual fictício (4555.7816ms)
+✔ notificações: convite chega no sininho, leitura não aceita e aceite funciona sem procurar no perfil (4103.6855ms)
+✔ notificações: transferência privada explica autorização, recebe aceite e avisa conclusão com autoria real (5511.9289ms)
+✔ notificações: SQL 007 ausente não impede entrar e informa a configuração necessária (1080.5573ms)
+✔ 3 publicações, 1 pasta; repetição não duplica nem cria tarefas (3105.5961ms)
+✔ triagem é permanente; captura e classificação preservadas na revisão (28.5835ms)
+✔ duas tarefas independentes, conclusão e reabertura; sync não recria (48.9402ms)
+✔ CNJ normalizado, máscara e inválidos sem descarte da publicação (25.7943ms)
+✔ fingerprint estável sem ID; IDs diferentes com texto igual são preservados (22.2224ms)
+✔ fallback distingue retificações, datas e identificadores da fonte (18.4304ms)
+✔ duas OABs da mesma conta capturam uma publicação lógica (15.3858ms)
+✔ RLS: mesmo CNJ em A/B, leitura/alteração/exclusão alheias e FK cruzada negadas (28.2925ms)
+✔ paginação transacional, falha intermediária, replay e retomada 205 itens (394.0449ms)
+✔ falha em um item reverte página inteira e mantém checkpoint (12.1269ms)
+✔ legado reimportável, inválidos em revisão e nenhuma sugestão gera tarefa (29.1789ms)
+✔ revisão humana obrigatória e menções não calculam fatal (5.1882ms)
+✔ audiência manual sem cliente vincula pasta; restrição impede exclusão da pasta (10.1096ms)
+✔ vínculo corrigido move acompanhamentos derivados e registra auditoria (16.1442ms)
+✔ restauração é idempotente, pertence à conta e não sobrescreve dados atuais (33.0835ms)
+✔ backup completo restaura publicações, tarefas, audiências, vínculos e auditoria em outra instância local (2436.6565ms)
+✔ sem acesso anônimo ou adulteração da auditoria; cota persistente (46.883ms)
+✔ CNJ valida DV e máscara (1.8223ms)
+✔ texto integral e identidade da fonte mantidos (12.8934ms)
+✔ HTML e URLs perigosas escapados (0.4301ms)
+✔ sugestão não produz data fatal, tarefa nem contagem automática (0.6053ms)
+✔ paginação 205 itens em 3 páginas; total ausente consulta página extra (1.164ms)
+✔ count limitado não encerra página cheia e resposta truncada é sinalizada (0.3486ms)
+✔ proxy usa página real, consulta nacional, retry 429 e falha definitiva (513.6071ms)
+✔ datas civis e janela incremental recuperam lacunas (0.547ms)
+✔ backup exclui senhas/tokens e exige titular explícito (2.5395ms)
+✔ endpoint privado rejeita chamada anônima; config pendente é explícita (1.9313ms)
+✔ reproduz a recusa V4.1 com relação ativa; correção compartilha só a tarefa, inclusive sem pasta (3499.9931ms)
+✔ autorização individual não revela pasta, publicação nem outras tarefas; C é bloqueado (1496.3031ms)
+✔ convite aparece no sininho; lida não significa aceita; recibo de leitura idempotente (1269.215ms)
+✔ notificações de atividade/análise só para membros; dados são ocultados após revogação (986.4778ms)
+✔ migration 007 preserva registros V4, recupera pendências e não duplica na reaplicação (818.0729ms)
+✔ notificações paginadas, leitura somente própria e helper de emissão bloqueado (988.788ms)
+✔ terceiro com colaboração ativa continua fora do compromisso privado; revogação individual e da pasta (801.4918ms)
+✔ encaminhar publicação é atômico com a permissão: falha mantém pendente; retry não duplica (796.646ms)
+✔ notificações distinguem leitura, aceite e tarefa a fazer; conteúdo dinâmico escapado (45.2634ms)
+✔ seletor explica colaboração ativa sem permissão e exige autorização mínima do titular (0.4221ms)
+✔ V3 aditiva preserva registros, IDs, Auth, classificações e RLS anteriores (3177.0718ms)
+✔ classificação exige tarefa transacional, rollback integral e retry idempotente (1181.6994ms)
+✔ proteção contra baixa direta sem compromisso e contra RPC de outra conta (1417.8287ms)
+✔ andamentos preservam título, datas, vínculos; estados, conclusão/reabertura e RLS (866.9275ms)
+✔ backup V3 restaura classificação com providência e timeline sem recriar tarefas (1501.2298ms)
+✔ CPF/CNPJ opcionais e válidos; telefones e documentos somente HTTPS (2.344ms)
+✔ atalhos são sugestões civis: corridos, úteis simples e data-base obrigatória (7.3333ms)
+✔ contagens separam estados e fatais; sem data não fica vencido (1.6739ms)
+✔ V4 migration aditiva/reexecutável preserva cada campo, ID e status V3 (3376.1803ms)
+✔ isolamento A/B/C, convite pendente, aceite sem escopo, busca exata e sem listagem (1451.7069ms)
+✔ compromisso manual é uma linha; Ana cria/atualiza na pasta de A com autoria real (1431.2109ms)
+✔ terceiro não lista/conta/lê/escreve por ID conhecido, nem RPC ou anônimo (924.6617ms)
+✔ revogar pasta/relação encerra leitura/escrita, retém tarefa e atividades e não reativa grants antigos (888.1526ms)
+✔ CNJ igual privado permanece privado; auto exige cliente compatível e respeita restrição (787.3529ms)
+✔ assunto título somente, sem data/responsável; assumir e anexar CNJ preservam IDs/histórico/membros (808.0939ms)
+✔ delegação aguarda aceite; responsável/criador independentes; conflito de edição bloqueia perda de atualização (791.3034ms)
+✔ Nada a fazer um clique / Já fiz não criam tarefa; decisão colaborativa não reescreve fonte B (813.579ms)
+✔ Vou fazer atômico; dois usuários/retries mesmo ato geram uma obrigação; distinto/incerto segue pendente (802.0688ms)
+✔ não é minha responsabilidade é individual; reabrir conserva fonte e histórico; revisão independente (778.2242ms)
+✔ classificações antigas contraditórias identificadas, intactas, sem nova obrigação automática (809.3161ms)
+✔ gravação direta não forja criador/responsável/ator e não vincula pasta de terceiro (726.6678ms)
+✔ origem OAB única compartilhada, audiências compartilhadas e exclusão de OAB privada (684.209ms)
+✔ reabertura compartilhada preserva decisão anterior e permite nova resolução comum sem recriar fontes (769.0574ms)
+✔ RPC legada V3 também passa pela trava comum e preserva classificação flexível (737.5976ms)
+✔ backup V4 restaura assunto/tarefa/decisão/histórico próprios, sem reativar compartilhamento (1413.1243ms)
+✔ backup V3 sem colunas novas continua restaurável; backup misto rejeitado com rollback (755.1885ms)
+✔ duas solicitações simultâneas A/B usam uma resolução/obrigação (executor local serializado) (750.1773ms)
+✔ backup pessoal inclui extensões próprias e nunca copia linhas do colega (3.1233ms)
+✔ resolução operacional mantém classificação V3 e revisão individual explícita (0.318ms)
+✔ filtros responsabilidade, sem data e acompanhamento não duplicam tarefas (1.5647ms)
+ℹ tests 93
+ℹ suites 0
+ℹ pass 93
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 69610.1442

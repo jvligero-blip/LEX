@@ -1,7 +1,8 @@
+import {databaseV42 as databaseV4} from './v42-helper.mjs';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {database,as,rpc,count,pub,cnj,A,B} from './db-helper.mjs';
-import {databaseV4,upgrade,sqlV4,sqlV4Extra,C} from './v4-helper.mjs';
+import {upgrade,sqlV4,sqlV4Extra,C} from './v4-helper.mjs';
 import {personalBackup} from '../lib/v4-domain.js';
 const id=()=>crypto.randomUUID();
 const task=(descricao='Protocolar ação',extra={})=>({descricao,responsavel:A,...extra});
@@ -56,11 +57,11 @@ test('revogar pasta/relação encerra leitura/escrita, retém tarefa e atividade
  await collaborate(db);await as(db,B);assert.equal(await count(db,'v4_pastas'),0);
  }finally{await db.close();}
 });
-test('CNJ igual privado permanece privado; auto exige cliente compatível e respeita restrição',async()=>{
+test('CNJ igual privado permanece privado mesmo após igualar cliente/lado; restrição preservada',async()=>{
  const db=await databaseV4();try{
  const pa=await rpc(db,'ensure_processo',[cnj(9),{cliente_nome:'Maria',lado:'autora'}]);await as(db,B);await rpc(db,'ensure_processo',[cnj(9),{cliente_nome:'Carlos',lado:'réu'}]);await as(db,A);await collaborate(db,true);
  assert.equal(await count(db,'processos'),1);await as(db,B);assert.equal(await count(db,'processos'),1);
- await db.query("update processos set payload=$1 where user_id=$2",[{cliente_nome:'Maria',lado:'autora'},B]);assert.equal(await count(db,'processos'),2);
+ await db.query("update processos set payload=$1 where user_id=$2",[{cliente_nome:'Maria',lado:'autora'},B]);assert.equal(await count(db,'processos'),1);
  await as(db,A);const f=await folder(db,pa);await rpc(db,'v4_salvar_pasta',[f,'Restrita',cnj(9),{cliente_nome:'Maria',lado:'autora'},true]);await as(db,B);assert.equal(await count(db,'processos'),1);
  }finally{await db.close();}
 });
@@ -79,17 +80,17 @@ test('delegação aguarda aceite; responsável/criador independentes; conflito d
  await assert.rejects(()=>rpc(db,'v4_salvar_compromisso',[t,f,task('Edição obsoleta',{responsavel:B}),1]));assert.equal((await db.query('select descricao from compromissos')).rows[0].descricao,'Protocolar ação');
  }finally{await db.close();}
 });
-test('Nada a fazer um clique / Já fiz não criam tarefa; decisão colaborativa não reescreve fonte B',async()=>{
+test('Nada a fazer / Já fiz não criam tarefa; cópia só sai da fila após conferência humana',async()=>{
  const db=await databaseV4();try{
  const {a,b}=await pair(db);const req=id();await rpc(db,'v4_analisar',[a.id,'nada_a_fazer',req]);await rpc(db,'v4_analisar',[a.id,'nada_a_fazer',req]);assert.equal(await count(db,'compromissos'),0);assert.equal(await count(db,'v4_decisoes'),1);
- await as(db,B);const context=await rpc(db,'v4_contexto');assert.equal(context.publicacoes.find(p=>p.id===b.id).decisao_id,req);assert.equal((await db.query('select triagem_status from publicacoes where id=$1',[b.id])).rows[0].triagem_status,'pendente_de_analise');
+ await as(db,B);const context=await rpc(db,'v4_contexto');assert.equal(context.publicacoes.find(p=>p.id===b.id).decisao_id,null);await rpc(db,'v42_conferir',[b.id,a.id,'confirmado',null,true]);assert.equal((await rpc(db,'v4_contexto')).publicacoes.find(p=>p.id===b.id).legado_id,a.id);assert.equal((await db.query('select triagem_status from publicacoes where id=$1',[b.id])).rows[0].triagem_status,'pendente_de_analise');
  const p=await rpc(db,'ingest_publicacao',[strong('outro-ato')]);await rpc(db,'v4_analisar',[p.id,'ja_fiz',id(),'Documento já enviado']);assert.equal(await count(db,'compromissos'),0);
  }finally{await db.close();}
 });
-test('Vou fazer atômico; dois usuários/retries mesmo ato geram uma obrigação; distinto/incerto segue pendente',async()=>{
+test('Vou fazer atômico; duas fontes independentes preservam suas obrigações sem baixa por hash',async()=>{
  const db=await databaseV4();try{
  const {a,b}=await pair(db);await assert.rejects(()=>rpc(db,'v4_analisar',[a.id,'vou_fazer',id(),'',{id:id(),descricao:''}]));assert.equal(await count(db,'compromissos'),0);assert.equal((await db.query('select triagem_status from publicacoes where id=$1',[a.id])).rows[0].triagem_status,'pendente_de_analise');
- const first=await rpc(db,'v4_analisar',[a.id,'vou_fazer',id(),'Peticionar',{id:id(),descricao:'Peticionar'}]);await as(db,B);const second=await rpc(db,'v4_analisar',[b.id,'vou_fazer',id(),'Peticionar',{id:id(),descricao:'Peticionar'}]);assert.equal(first.compromisso_id,second.compromisso_id);assert.equal(await count(db,'compromissos'),1);
+ const first=await rpc(db,'v4_analisar',[a.id,'vou_fazer',id(),'Peticionar',{id:id(),descricao:'Peticionar'}]);await as(db,B);const second=await rpc(db,'v4_analisar',[b.id,'vou_fazer',id(),'Peticionar',{id:id(),descricao:'Peticionar'}]);assert.notEqual(first.compromisso_id,second.compromisso_id);assert.equal(await count(db,'compromissos'),2);
  const distinct=await rpc(db,'ingest_publicacao',[strong('ato-diferente')]);const uncertain=await rpc(db,'ingest_publicacao',[strong('ato-incerto',1,{orgao:null})]);const ctx=await rpc(db,'v4_contexto');for(const p of [distinct,uncertain])assert.equal(ctx.publicacoes.find(x=>x.id===p.id).decisao_id,null);
  }finally{await db.close();}
 });
@@ -104,7 +105,7 @@ test('classificações antigas contraditórias identificadas, intactas, sem nova
  const {a,b}=await pair(db);await db.query("update publicacoes set triagem_status='classificada',exige_providencia=false,classificacao='Ciência, sem providência',providencia='A',analisado_por=$2,analisado_em=now() where id=$1",[a.id,A]);await as(db,B);await db.query("update publicacoes set triagem_status='classificada',exige_providencia=false,classificacao='Outro',providencia='B',analisado_por=$2,analisado_em=now() where id=$1",[b.id,B]);
  const ctx=await rpc(db,'v4_contexto');assert.ok(ctx.publicacoes.every(p=>p.conflito));await assert.rejects(()=>rpc(db,'v4_analisar',[b.id,'nada_a_fazer',id()]));assert.equal(await count(db,'compromissos'),0);
  const before=(await db.query('select * from publicacoes order by id')).rows;
- await assert.rejects(()=>rpc(db,'v4_unificar_ato',[b.id,a.id,null,false]));const chosen=await rpc(db,'v4_unificar_ato',[b.id,a.id,null,true]);assert.deepEqual((await db.query('select * from publicacoes order by id')).rows,before);assert.ok((await rpc(db,'v4_contexto')).publicacoes.every(p=>p.decisao_id===chosen));
+ await assert.rejects(()=>rpc(db,'v4_unificar_ato',[b.id,a.id,null,false]));const chosen=await rpc(db,'v4_unificar_ato',[b.id,a.id,null,true]);assert.deepEqual((await db.query('select * from publicacoes order by id')).rows,before);assert.equal((await rpc(db,'v4_contexto')).publicacoes.find(p=>p.id===b.id).vinculo_id,chosen);
  }finally{await db.close();}
 });
 test('gravação direta não forja criador/responsável/ator e não vincula pasta de terceiro',async()=>{
@@ -124,17 +125,14 @@ test('origem OAB única compartilhada, audiências compartilhadas e exclusão de
  await as(db,C);await assert.rejects(()=>rpc(db,'v4_salvar_audiencia',[aud,f,{data:'2027-01-01',hora:'09:00',status:'cancelada'}]));assert.equal(await count(db,'audiencias'),0);
  }finally{await db.close();}
 });
-test('reabertura compartilhada preserva decisão anterior e permite nova resolução comum sem recriar fontes',async()=>{
- const db=await databaseV4();try{
- const {a,b}=await pair(db);await rpc(db,'v4_analisar',[a.id,'nada_a_fazer',id()]);await as(db,B);await rpc(db,'v4_reabrir',[b.id,false]);
- let ctx=await rpc(db,'v4_contexto');assert.equal(ctx.publicacoes.find(p=>p.id===a.id).reaberto,true);
- await as(db,A);const r=await rpc(db,'v4_analisar',[a.id,'ja_fiz',id(),'Executado após revisão']);await as(db,B);ctx=await rpc(db,'v4_contexto');assert.equal(ctx.publicacoes.find(p=>p.id===b.id).decisao_id,r.decisao_id);assert.equal(await count(db,'publicacoes'),2);assert.equal(await count(db,'v4_decisoes'),3);
- }finally{await db.close();}
+test('reabertura de cópia não altera decisão da outra fonte; registros anteriores preservados',async()=>{
+ const db=await databaseV4();try{const {a,b}=await pair(db);const original=await rpc(db,'v4_analisar',[a.id,'nada_a_fazer',id()]);await as(db,B);await rpc(db,'v4_reabrir',[b.id,false]);let ctx=await rpc(db,'v4_contexto');assert.equal(ctx.publicacoes.find(p=>p.id===a.id).reaberto,false);const r=await rpc(db,'v4_analisar',[b.id,'ja_fiz',id(),'Executado após revisão']);ctx=await rpc(db,'v4_contexto');assert.equal(ctx.publicacoes.find(p=>p.id===b.id).decisao_id,r.decisao_id);assert.equal(ctx.publicacoes.find(p=>p.id===a.id).decisao_id,original.decisao_id);assert.equal(await count(db,'publicacoes'),2);assert.equal(await count(db,'v4_decisoes'),3);}finally{await db.close();}
 });
+
 test('RPC legada V3 também passa pela trava comum e preserva classificação flexível',async()=>{
  const db=await databaseV4();try{
  const {a,b}=await pair(db);const r=await rpc(db,'classificar_publicacao_v3',[a.id,'Outro',true,'Conferência','observação',[{id:id(),processo_id:a.processo_id,descricao:'Conferir ato'}],false,null]);
- await as(db,B);const rr=await rpc(db,'classificar_publicacao_v3',[b.id,'Outro',true,'Conferência','',[{id:id(),processo_id:b.processo_id,descricao:'Conferir ato'}],false,null]);assert.equal(r.compromisso_id,rr.compromisso_id);assert.equal(await count(db,'compromissos'),1);
+ await as(db,B);const rr=await rpc(db,'classificar_publicacao_v3',[b.id,'Outro',true,'Conferência','',[{id:id(),processo_id:b.processo_id,descricao:'Conferir ato'}],false,null]);assert.notEqual(r.compromisso_id,rr.compromisso_id);assert.equal(await count(db,'compromissos'),2);
  }finally{await db.close();}
 });
 test('backup V4 restaura assunto/tarefa/decisão/histórico próprios, sem reativar compartilhamento',async()=>{
@@ -153,9 +151,9 @@ test('backup V3 sem colunas novas continua restaurável; backup misto rejeitado 
  const bad=structuredClone(backup);bad.data.compromissos[0].user_id=B;await assert.rejects(()=>rpc(db,'restaurar_backup',[bad]));assert.equal(await count(db,'compromissos'),1);
  }finally{await db.close();}
 });
-test('duas solicitações simultâneas A/B usam uma resolução/obrigação (executor local serializado)',async()=>{
+test('duas solicitações A/B não unificam fontes sem confirmação (executor local serializado)',async()=>{
  const db=await databaseV4();try{
  const {a,b}=await pair(db);const requests=[[A,a.id],[B,b.id]].map(([uid,pid])=>db.transaction(async tx=>{await tx.exec(`set local role authenticated;set local request.jwt.claim.sub='${uid}';`);return rpc(tx,'v4_analisar',[pid,'vou_fazer',id(),'Conferir',{id:id(),descricao:'Conferir'}]);}));
- const result=await Promise.all(requests);assert.equal(result[0].compromisso_id,result[1].compromisso_id);assert.equal(await count(db,'compromissos'),1);
+ const result=await Promise.all(requests);assert.notEqual(result[0].compromisso_id,result[1].compromisso_id);assert.equal(await count(db,'compromissos'),2);
  }finally{await db.close();}
 });
